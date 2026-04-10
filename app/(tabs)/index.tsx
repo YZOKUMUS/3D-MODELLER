@@ -1,5 +1,4 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -19,77 +18,50 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridModelCard } from '@/components/GridModelCard';
-import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import { BAMBU } from '@/constants/bambuTheme';
 import { CATALOG, CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
-import { HIT_SLOP } from '@/lib/layout';
 import { Icon } from '@/lib/web-icon';
 
-type FeedTab = 'foryou' | 'featured' | 'trending' | 'print';
-
-const FEED_TABS: { id: FeedTab; label: string }[] = [
-  { id: 'foryou', label: 'Senin için' },
-  { id: 'featured', label: 'Öne çıkan' },
-  { id: 'trending', label: 'Trend' },
-  { id: 'print', label: '3D Baskı' },
-];
-
-const QUICK_NAV: {
-  label: string;
-  icon: 'th' | 'car' | 'star' | 'cube' | 'user';
-  category: ModelCategory | 'Tümü';
-  color: string;
-  bg: string;
-}[] = [
-  { label: 'Tüm modeller', icon: 'th', category: 'Tümü', color: BAMBU.iconColor[0], bg: BAMBU.iconBg[0] },
-  { label: 'Araç', icon: 'car', category: 'Araç', color: BAMBU.iconColor[1], bg: BAMBU.iconBg[1] },
-  { label: 'Motorsiklet', icon: 'star', category: 'Motorsiklet', color: BAMBU.iconColor[2], bg: BAMBU.iconBg[2] },
-  { label: 'Silah', icon: 'cube', category: 'Silah', color: BAMBU.iconColor[3], bg: BAMBU.iconBg[3] },
+const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' }[] = [
+  { id: 'all', label: 'Senin İçin', category: 'Tümü' },
+  { id: 'trending', label: 'Trend', category: 'Tümü' },
+  ...CATEGORIES.map((c) => ({ id: c, label: c, category: c as ModelCategory })),
 ];
 
 export default function StoreScreen() {
   const router = useRouter();
-  const scheme = useColorScheme() ?? 'light';
-  const isDark = scheme === 'dark';
+  const scheme = useColorScheme() ?? 'dark';
+  const isDark = true;
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { width: windowWidth } = useWindowDimensions();
 
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<ModelCategory | 'Tümü'>('Tümü');
-  const [feedTab, setFeedTab] = useState<FeedTab>('foryou');
+  const [activeTab, setActiveTab] = useState('all');
   const [visibleCount, setVisibleCount] = useState(20);
 
   const scrollRef = useRef<ScrollView>(null);
-  const fabUpOpacity = useRef(new Animated.Value(0)).current;
-  const fabDownOpacity = useRef(new Animated.Value(1)).current;
-  const showUp = useRef(false);
+  const fabOpacity = useRef(new Animated.Value(0)).current;
+  const showFab = useRef(false);
   const contentHeight = useRef(0);
   const layoutHeight = useRef(0);
 
   const onScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const y = e.nativeEvent.contentOffset.y;
-      const shouldShowUp = y > 600;
-      if (shouldShowUp !== showUp.current) {
-        showUp.current = shouldShowUp;
-        Animated.parallel([
-          Animated.timing(fabUpOpacity, {
-            toValue: shouldShowUp ? 1 : 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(fabDownOpacity, {
-            toValue: shouldShowUp ? 0 : 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
+      const shouldShow = y > 300;
+      if (shouldShow !== showFab.current) {
+        showFab.current = shouldShow;
+        Animated.timing(fabOpacity, {
+          toValue: shouldShow ? 1 : 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
       }
     },
-    [fabUpOpacity, fabDownOpacity],
+    [fabOpacity],
   );
 
   const scrollToTop = useCallback(() => {
@@ -100,63 +72,87 @@ export default function StoreScreen() {
   const scrollToBottom = useCallback(() => {
     lightImpact();
     const maxY = contentHeight.current - layoutHeight.current;
-    if (maxY > 0) {
-      scrollRef.current?.scrollTo({ y: maxY, animated: true });
-    }
+    if (maxY > 0) scrollRef.current?.scrollTo({ y: maxY, animated: true });
   }, []);
+
+  const currentTab = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
 
   const filtered = useMemo(() => {
     let list = [...CATALOG].reverse();
-    if (category !== 'Tümü') {
-      list = list.filter((m) => m.category === category);
+    if (currentTab.category !== 'Tümü') {
+      list = list.filter((m) => m.category === currentTab.category);
+    }
+    if (activeTab === 'trending') {
+      list = [...list].sort((a, b) => b.rating - a.rating);
     }
     const q = query.trim().toLowerCase();
     if (q) {
       list = list.filter(
         (m) =>
           m.title.toLowerCase().includes(q) ||
-          m.tagline.toLowerCase().includes(q) ||
-          m.formats.some((f) => f.toLowerCase().includes(q))
+          m.tagline.toLowerCase().includes(q)
       );
     }
-    switch (feedTab) {
-      case 'featured':
-        return [...list].sort((a, b) => b.rating - a.rating);
-      case 'trending':
-        return [...list].sort((a, b) => Number(b.id) - Number(a.id));
-      case 'print':
-        return list.filter((m) => m.formats.some((f) => f.toUpperCase().includes('GLB')));
-      default:
-        return list;
-    }
-  }, [query, category, feedTab]);
+    return list;
+  }, [query, activeTab, currentTab.category]);
 
   const visibleModels = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
   const hasMore = filtered.length > visibleCount;
 
-  const featuredCarousel = useMemo(() => [...CATALOG].reverse().slice(0, 3), []);
-  const collectionsCarousel = useMemo(() => [...CATALOG].reverse().slice(3, 6), []);
+  const gap = 6;
+  const sidePad = 6;
+  const colWidth = Math.floor((windowWidth - sidePad * 2 - gap) / 2);
 
-  const sheetHMargin = 12 * 2;
-  const sheetPadding = 16 * 2;
-  const innerWidth = Math.max(0, windowWidth - sheetHMargin - sheetPadding);
-  const gap = 10;
-  const useTwoCols = innerWidth >= 304;
-  const colWidth = useTwoCols ? Math.floor((innerWidth - gap) / 2) : Math.floor(innerWidth);
-
-  const carouselCardWidth = Math.min(160, Math.max(124, Math.round(windowWidth * 0.42)));
-  const carouselImgHeight = Math.round(carouselCardWidth * 0.66);
+  const leftCol: typeof visibleModels = [];
+  const rightCol: typeof visibleModels = [];
+  visibleModels.forEach((m, i) => (i % 2 === 0 ? leftCol : rightCol).push(m));
 
   const scrollBottomPad = 20 + tabBarHeight;
 
-  const cardSurface = isDark ? BAMBU.cardBgDark : BAMBU.cardBg;
-  const searchBg = isDark ? BAMBU.searchBgDark : BAMBU.searchBg;
-  const textPrimary = isDark ? '#fafafa' : '#18181b';
-  const textMuted = isDark ? '#a1a1aa' : '#71717a';
-
   return (
-    <View style={[styles.root, { backgroundColor: isDark ? '#0a0a0c' : BAMBU.gradient[0] }]}>
+    <View style={[styles.root, { backgroundColor: '#111' }]}>
       <StatusBar style="light" />
+
+      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.searchRow}>
+          <Icon name="search" size={16} color="#71717a" />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Ara..."
+            placeholderTextColor="#71717a"
+            style={styles.searchInput}
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="search"
+          />
+        </View>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabsRow}
+        style={styles.tabsContainer}>
+        {ALL_TABS.map((t) => {
+          const active = activeTab === t.id;
+          return (
+            <Pressable
+              key={t.id}
+              onPress={() => {
+                lightImpact();
+                setActiveTab(t.id);
+                setVisibleCount(20);
+              }}
+              style={[styles.tab, active && styles.tabActive]}>
+              <Text style={[styles.tabText, active && styles.tabTextActive]}>
+                {t.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
       <ScrollView
         ref={scrollRef}
         onScroll={onScroll}
@@ -167,250 +163,41 @@ export default function StoreScreen() {
         nestedScrollEnabled={Platform.OS === 'android'}
         onContentSizeChange={(_w, h) => { contentHeight.current = h; }}
         onLayout={(e) => { layoutHeight.current = e.nativeEvent.layout.height; }}
-        contentContainerStyle={{ paddingBottom: scrollBottomPad + insets.bottom }}>
-        <LinearGradient
-          colors={[BAMBU.gradient[0], BAMBU.gradient[1], BAMBU.gradient[2]]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.heroGrad, { paddingTop: insets.top + 20, paddingBottom: 72 }]}>
-          <Text style={styles.heroTitle} maxFontSizeMultiplier={1.35}>
-            Zengin 3D model koleksiyonu
-          </Text>
-          <Text style={styles.heroSub} maxFontSizeMultiplier={1.3}>
-            Çok formatlı dijital üretim — çeşitli kategorilerde modeller
-          </Text>
-        </LinearGradient>
+        contentContainerStyle={{ paddingBottom: scrollBottomPad + insets.bottom, paddingHorizontal: sidePad }}>
 
-        <View style={[styles.sheet, { backgroundColor: cardSurface, marginTop: -52 }]}>
-          <View style={[styles.searchRow, { backgroundColor: searchBg }]}>
-            <Icon name="search" size={16} color={textMuted} />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Ara: model, format…"
-              placeholderTextColor={textMuted}
-              style={[styles.input, { color: textPrimary }]}
-              autoCorrect={false}
-              autoCapitalize="none"
-              returnKeyType="search"
-              textAlignVertical="center"
-              underlineColorAndroid="transparent"
-            />
-          </View>
-
-          <View style={styles.quickRow}>
-            {QUICK_NAV.map((item) => {
-              const active = category === item.category;
-              return (
-                <Pressable
-                  key={item.label}
-                  hitSlop={HIT_SLOP}
-                  android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true }}
-                  onPress={() => {
-                    lightImpact();
-                    setCategory(item.category);
-                    setVisibleCount(20);
-                  }}
-                  style={styles.quickItem}>
-                  <View
-                    style={[
-                      styles.quickIcon,
-                      { backgroundColor: active ? item.bg : isDark ? '#27272a' : '#f4f4f5' },
-                    ]}>
-                    <Icon name={item.icon} size={22} color={active ? item.color : textMuted} />
-                  </View>
-                  <Text style={[styles.quickLabel, { color: textMuted }]} numberOfLines={2}>
-                    {item.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <View style={styles.carouselBlock}>
-            <View style={styles.carouselHead}>
-              <Text style={[styles.carouselTitle, { color: textPrimary }]}>Öne çıkanlar</Text>
-              <Text style={[styles.carouselHint, { color: textMuted }]}>Editör seçimi</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              nestedScrollEnabled={Platform.OS === 'android'}
-              contentContainerStyle={styles.carouselScroll}>
-              {featuredCarousel.map((m) => (
-                <Pressable
-                  key={m.id}
-                  hitSlop={HIT_SLOP}
-                  android_ripple={{ color: 'rgba(0,0,0,0.08)' }}
-                  onPress={() => {
-                    lightImpact();
-                    router.push(`/model/${m.id}`);
-                  }}
-                  style={[
-                    styles.carouselCard,
-                    {
-                      width: carouselCardWidth,
-                      backgroundColor: isDark ? '#252530' : '#f4f4f5',
-                    },
-                  ]}>
-                  <ModelCoverImage
-                    source={m.coverImage}
-                    accent={m.accent}
-                    fallbackLetter={m.title.slice(0, 1)}
-                    style={{
-                      width: carouselCardWidth,
-                      height: carouselImgHeight,
-                      borderTopLeftRadius: 14,
-                      borderTopRightRadius: 14,
-                    }}
-                  />
-                  <Text style={[styles.carouselCardTitle, { color: textPrimary }]} numberOfLines={1}>
-                    {m.title}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
-
-          <View style={styles.carouselBlock}>
-            <View style={styles.carouselHead}>
-              <Text style={[styles.carouselTitle, { color: textPrimary }]}>Koleksiyonlar</Text>
-              <Text style={[styles.carouselHint, { color: textMuted }]}>Yeni eklenenler</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              nestedScrollEnabled={Platform.OS === 'android'}
-              contentContainerStyle={styles.carouselScroll}>
-              {collectionsCarousel.map((m) => (
-                <Pressable
-                  key={m.id}
-                  hitSlop={HIT_SLOP}
-                  android_ripple={{ color: 'rgba(0,0,0,0.08)' }}
-                  onPress={() => {
-                    lightImpact();
-                    router.push(`/model/${m.id}`);
-                  }}
-                  style={[
-                    styles.carouselCard,
-                    {
-                      width: carouselCardWidth,
-                      backgroundColor: isDark ? '#252530' : '#f4f4f5',
-                    },
-                  ]}>
-                  <ModelCoverImage
-                    source={m.coverImage}
-                    accent={m.accent}
-                    fallbackLetter={m.title.slice(0, 1)}
-                    style={{
-                      width: carouselCardWidth,
-                      height: carouselImgHeight,
-                      borderTopLeftRadius: 14,
-                      borderTopRightRadius: 14,
-                    }}
-                  />
-                  <Text style={[styles.carouselCardTitle, { color: textPrimary }]} numberOfLines={1}>
-                    {m.title}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.feedTabs}>
-            {FEED_TABS.map((t) => {
-              const active = feedTab === t.id;
-              return (
-                <Pressable
-                  key={t.id}
-                  onPress={() => {
-                    lightImpact();
-                    setFeedTab(t.id);
-                    setVisibleCount(20);
-                  }}
-                  style={[styles.feedTabBtn, active && styles.feedTabBtnActive]}>
-                  <Text
-                    style={[
-                      styles.feedTabText,
-                      { color: active ? BAMBU.tabActive : textMuted },
-                      active && styles.feedTabTextActive,
-                    ]}>
-                    {t.label}
-                  </Text>
-                  {active ? <View style={styles.feedUnderline} /> : null}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View style={styles.grid}>
-            {filtered.length === 0 ? (
-              <Text style={[styles.empty, { color: textMuted }]}>
-                Sonuç yok. Aramayı veya sekmeyi değiştirin.
-              </Text>
-            ) : (
-              visibleModels.map((model) => (
+        {filtered.length === 0 ? (
+          <Text style={styles.empty}>Sonuç bulunamadı.</Text>
+        ) : (
+          <View style={[styles.masonry, { gap }]}>
+            <View style={[styles.masonryCol, { gap }]}>
+              {leftCol.map((model) => (
                 <GridModelCard key={model.id} model={model} width={colWidth} isDark={isDark} />
-              ))
-            )}
+              ))}
+            </View>
+            <View style={[styles.masonryCol, { gap }]}>
+              {rightCol.map((model) => (
+                <GridModelCard key={model.id} model={model} width={colWidth} isDark={isDark} />
+              ))}
+            </View>
           </View>
-          {hasMore && (
-            <Pressable
-              onPress={() => { lightImpact(); setVisibleCount((c) => c + 20); }}
-              style={[styles.loadMore, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
-              <Text style={[styles.loadMoreText, { color: BAMBU.tabActive }]}>
-                Daha fazla göster ({filtered.length - visibleCount} kaldı)
-              </Text>
-            </Pressable>
-          )}
+        )}
 
-          <View style={styles.moreCats}>
-            <Text style={[styles.moreCatsTitle, { color: textPrimary }]}>Tüm kategoriler</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {(['Tümü', ...CATEGORIES] as const).map((cat) => {
-                const active = category === cat;
-                return (
-                  <Pressable
-                    key={cat}
-                    onPress={() => {
-                      lightImpact();
-                      setCategory(cat);
-                    }}
-                    style={[
-                      styles.chip,
-                      active
-                        ? { backgroundColor: BAMBU.tabActive }
-                        : { backgroundColor: isDark ? '#27272a' : '#f4f4f5' },
-                    ]}>
-                    <Text style={[styles.chipText, { color: active ? '#fff' : textMuted }]}>{cat}</Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
+        {hasMore && (
+          <Pressable
+            onPress={() => { lightImpact(); setVisibleCount((c) => c + 20); }}
+            style={styles.loadMore}>
+            <Text style={styles.loadMoreText}>
+              Daha fazla göster ({filtered.length - visibleCount} kaldı)
+            </Text>
+          </Pressable>
+        )}
       </ScrollView>
 
-      <View pointerEvents="box-none" style={[styles.fabWrap, { bottom: tabBarHeight + 16 }]}>
-        <Animated.View style={{ opacity: fabUpOpacity }}>
-          <Pressable
-            onPress={scrollToTop}
-            style={styles.fab}
-            accessibilityLabel="Başa dön"
-            accessibilityRole="button">
-            <Icon name="chevron-up" size={20} color="#fff" />
-          </Pressable>
-        </Animated.View>
-        <Animated.View style={{ opacity: fabDownOpacity }}>
-          <Pressable
-            onPress={scrollToBottom}
-            style={styles.fab}
-            accessibilityLabel="Sona git"
-            accessibilityRole="button">
-            <Icon name="chevron-down" size={20} color="#fff" />
-          </Pressable>
-        </Animated.View>
-      </View>
+      <Animated.View style={[styles.fabWrap, { bottom: tabBarHeight + 16, opacity: fabOpacity }]}>
+        <Pressable onPress={scrollToTop} style={styles.fab}>
+          <Icon name="chevron-up" size={20} color="#fff" />
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }
@@ -419,193 +206,95 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  heroGrad: {
-    paddingHorizontal: 22,
-  },
-  heroTitle: {
-    color: BAMBU.heroText,
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    lineHeight: 30,
-  },
-  heroSub: {
-    color: 'rgba(255,255,255,0.92)',
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 8,
-    maxWidth: 320,
-  },
-  sheet: {
-    marginHorizontal: 12,
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    borderRadius: 22,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
+  topBar: {
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+    backgroundColor: '#111',
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 14,
+    backgroundColor: '#1e1e24',
+    borderRadius: 22,
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 10,
   },
-  input: {
+  searchInput: {
     flex: 1,
-    fontSize: 16,
-    paddingVertical: 4,
+    fontSize: 15,
+    color: '#fafafa',
+    paddingVertical: 2,
   },
-  quickRow: {
+  tabsContainer: {
+    backgroundColor: '#111',
+    flexGrow: 0,
+  },
+  tabsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 18,
-    paddingHorizontal: 2,
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
-  quickItem: {
-    width: '23%',
-    alignItems: 'center',
+  tab: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#1e1e24',
   },
-  quickIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
+  tabActive: {
+    backgroundColor: '#00c853',
   },
-  quickLabel: {
-    fontSize: 10,
-    textAlign: 'center',
-    marginTop: 6,
-    lineHeight: 13,
-    fontWeight: '600',
-  },
-  carouselBlock: {
-    marginTop: 20,
-  },
-  carouselHead: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: 10,
-  },
-  carouselTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-  },
-  carouselHint: {
-    fontSize: 12,
-  },
-  carouselScroll: {
-    gap: 12,
-    paddingRight: 8,
-  },
-  carouselCard: {
-    width: 148,
-    borderRadius: 14,
-    overflow: 'hidden',
-    paddingBottom: 8,
-  },
-  carouselImg: {
-    width: 148,
-    height: 100,
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-  },
-  carouselCardTitle: {
+  tabText: {
+    color: '#a1a1aa',
     fontSize: 13,
-    fontWeight: '700',
-    paddingHorizontal: 8,
-    marginTop: 6,
-  },
-  feedTabs: {
-    flexDirection: 'row',
-    gap: 20,
-    marginTop: 22,
-    paddingBottom: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(120,120,128,0.25)',
-  },
-  feedTabBtn: {
-    paddingVertical: 6,
-    minWidth: 72,
-  },
-  feedTabBtnActive: {},
-  feedTabText: {
-    fontSize: 14,
     fontWeight: '600',
   },
-  feedTabTextActive: {
+  tabTextActive: {
+    color: '#fff',
     fontWeight: '800',
   },
-  feedUnderline: {
-    marginTop: 6,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: BAMBU.tabActive,
-  },
-  grid: {
+  masonry: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 4,
+  },
+  masonryCol: {
+    flex: 1,
   },
   empty: {
-    width: '100%',
+    color: '#71717a',
     textAlign: 'center',
-    paddingVertical: 28,
+    paddingVertical: 40,
     fontSize: 15,
   },
   loadMore: {
-    marginTop: 4,
+    marginTop: 8,
     marginBottom: 12,
     paddingVertical: 14,
     borderRadius: 14,
+    backgroundColor: '#1e1e24',
     alignItems: 'center',
   },
   loadMoreText: {
+    color: '#00c853',
     fontSize: 15,
     fontWeight: '700',
-  },
-  moreCats: {
-    marginTop: 8,
-  },
-  moreCatsTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 10,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
   fabWrap: {
     position: 'absolute',
-    right: 20,
+    right: 16,
     alignItems: 'center',
-    gap: 10,
   },
   fab: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: BAMBU.tabActive,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#00c853',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
