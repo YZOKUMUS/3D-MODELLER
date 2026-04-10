@@ -1,7 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BAMBU } from '@/constants/bambuTheme';
@@ -9,11 +9,32 @@ import { useCart } from '@/context/CartContext';
 import { useColorScheme } from '@/components/useColorScheme';
 import { tabBarBottomPadding } from '@/lib/layout';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={22} style={{ marginBottom: 2 }} {...props} />;
+type TabGlyph = 'models' | 'cart' | 'profile';
+
+/** Web/PWA: FontAwesome sik bozuluyor; +html.tsx'teki Material Icons ligature kullan. */
+function TabBarIcon({ kind, color }: { kind: TabGlyph; color: string }) {
+  if (Platform.OS === 'web') {
+    const ligature =
+      kind === 'models' ? 'apps' : kind === 'cart' ? 'shopping_cart' : 'person';
+    return (
+      <Text
+        allowFontScaling={false}
+        selectable={false}
+        style={{
+          fontFamily: 'Material Icons',
+          fontSize: 26,
+          color,
+          marginBottom: 2,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+        }}>
+        {ligature}
+      </Text>
+    );
+  }
+  const name: React.ComponentProps<typeof FontAwesome>['name'] =
+    kind === 'models' ? 'th-large' : kind === 'cart' ? 'shopping-cart' : 'user';
+  return <FontAwesome name={name} size={22} color={color} style={{ marginBottom: 2 }} />;
 }
 
 export default function TabLayout() {
@@ -52,14 +73,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Modeller',
-          tabBarIcon: ({ color }) => <TabBarIcon name="th-large" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon kind="models" color={color} />,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
           title: 'Sepet',
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon kind="cart" color={color} />,
           tabBarBadge:
             ready && totalQuantity > 0
               ? totalQuantity > 99
@@ -72,7 +93,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Ben',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon kind="profile" color={color} />,
         }}
       />
     </Tabs>
