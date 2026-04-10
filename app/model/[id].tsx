@@ -3,9 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
-import { useColorScheme } from '@/components/useColorScheme';
 import { useCart } from '@/context/CartContext';
-import Colors from '@/constants/Colors';
 import { getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
@@ -16,19 +14,16 @@ export default function ModelDetailScreen() {
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   const router = useRouter();
   const model = id ? getModelById(id) : undefined;
-  const scheme = useColorScheme() ?? 'light';
-  const colors = Colors[scheme];
-  const isDark = scheme === 'dark';
   const insets = useSafeAreaInsets();
   const { add } = useCart();
 
   if (!model) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Bulunamadı' }} />
-        <View style={[styles.missing, { backgroundColor: colors.background }]}>
-          <Text style={[styles.missingText, { color: colors.text }]}>Model bulunamadı.</Text>
-          <Pressable onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: colors.tint }]}>
+        <Stack.Screen options={{ title: 'Bulunamadı', headerStyle: { backgroundColor: '#111' }, headerTintColor: '#fff' }} />
+        <View style={styles.missing}>
+          <Text style={styles.missingText}>Model bulunamadı.</Text>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
             <Text style={styles.backBtnText}>Geri dön</Text>
           </Pressable>
         </View>
@@ -44,139 +39,185 @@ export default function ModelDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: model.title, headerBackTitle: 'Geri' }} />
-      <ScrollView
-        style={{ flex: 1, backgroundColor: colors.background }}
-        contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}>
-        <View style={styles.hero}>
-          <ModelCoverImage
-            source={model.coverImage}
-            accent={model.accent}
-            fallbackLetter={model.title.slice(0, 1)}
-            fallbackFontSize={72}
-            style={styles.heroImage}
-            contain
-          />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerTransparent: true,
+          headerBackTitle: 'Geri',
+          headerTintColor: '#fff',
+        }}
+      />
+      <View style={styles.screen}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}>
 
-
-        </View>
-        <View style={styles.pad}>
-          <Text style={[styles.price, { color: colors.tint }]}>{formatTry(model.price)}</Text>
-          <Text style={[styles.tagline, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-            {model.tagline}
-          </Text>
-          <View style={styles.metaRow}>
-            <View style={[styles.pill, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
-              <Icon name="cube" size={14} color={colors.tint} />
-              <Text style={[styles.pillText, { color: colors.text }]}>{model.polyCount}</Text>
-            </View>
-            <View style={[styles.pill, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
-              <Icon name="star" size={14} color="#fbbf24" />
-              <Text style={[styles.pillText, { color: colors.text }]}>{model.rating}</Text>
+          <View style={styles.imageWrap}>
+            <ModelCoverImage
+              source={model.coverImage}
+              accent={model.accent}
+              fallbackLetter={model.title.slice(0, 1)}
+              fallbackFontSize={72}
+              style={styles.heroImage}
+              contain
+            />
+            <View style={styles.imageCounter}>
+              <Text style={styles.imageCounterText}>1/1</Text>
             </View>
           </View>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Açıklama</Text>
-          <Text style={[styles.body, { color: isDark ? '#d4d4d8' : '#475569' }]}>
-            {model.description}
-          </Text>
 
+          <View style={styles.content}>
+            <Text style={styles.title}>{model.title}</Text>
+
+            <View style={styles.badgeRow}>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{model.category}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statsRow}>
+              <View style={styles.stat}>
+                <Icon name="star" size={14} color="#fbbf24" />
+                <Text style={styles.statText}>{model.rating}</Text>
+              </View>
+              <View style={styles.stat}>
+                <Icon name="cube" size={14} color="#71717a" />
+                <Text style={styles.statText}>{model.polyCount}</Text>
+              </View>
+              <Text style={styles.priceTag}>{formatTry(model.price)}</Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionTitle}>Açıklama</Text>
+            <Text style={styles.description}>{model.description}</Text>
+          </View>
+        </ScrollView>
+
+        <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 12 }]}>
           <Pressable
             onPress={addToCart}
-            style={({ pressed }) => [
-              styles.cta,
-              { backgroundColor: colors.tint, opacity: pressed ? 0.92 : 1 },
-            ]}>
+            style={({ pressed }) => [styles.ctaBtn, { opacity: pressed ? 0.9 : 1 }]}>
             <Icon name="shopping-cart" size={18} color="#fff" />
-            <Text style={styles.ctaText}>Sepete ekle</Text>
+            <Text style={styles.ctaText}>Sepete Ekle</Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: {
+  screen: {
+    flex: 1,
+    backgroundColor: '#111',
+  },
+  scroll: {
+    flex: 1,
+  },
+  imageWrap: {
     width: '100%',
-    height: 350,
+    height: 380,
+    backgroundColor: '#0a0a0a',
     position: 'relative',
   },
   heroImage: {
     width: '100%',
-    height: 350,
+    height: 380,
   },
-  heroBadge: {
+  imageCounter: {
     position: 'absolute',
-    top: 16,
-    left: 16,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  heroBadgeText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  pad: {
-    padding: 20,
-  },
-  price: {
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  tagline: {
-    marginTop: 8,
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 16,
-  },
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    bottom: 12,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 12,
   },
-  pillText: {
-    fontSize: 14,
+  imageCounterText: {
+    color: '#fff',
+    fontSize: 12,
     fontWeight: '600',
   },
-  sectionTitle: {
-    marginTop: 22,
-    fontSize: 17,
+  content: {
+    padding: 16,
+  },
+  title: {
+    color: '#fafafa',
+    fontSize: 20,
     fontWeight: '800',
+    lineHeight: 26,
   },
-  body: {
-    marginTop: 8,
-    fontSize: 15,
-    lineHeight: 24,
-  },
-  formats: {
+  badgeRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
     marginTop: 10,
   },
-  formatChip: {
+  badge: {
+    backgroundColor: '#1e1e24',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
+    borderColor: '#2a2a32',
   },
-  formatText: {
-    fontWeight: '700',
+  badgeText: {
+    color: '#a1a1aa',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginTop: 14,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  statText: {
+    color: '#a1a1aa',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  priceTag: {
+    color: '#00c853',
+    fontSize: 18,
+    fontWeight: '800',
+    marginLeft: 'auto',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#2a2a32',
+    marginTop: 18,
+    marginBottom: 18,
+  },
+  sectionTitle: {
+    color: '#fafafa',
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  description: {
+    color: '#a1a1aa',
     fontSize: 14,
+    lineHeight: 22,
   },
-  cta: {
-    marginTop: 28,
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#111',
+    borderTopWidth: 1,
+    borderTopColor: '#1e1e24',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
+  ctaBtn: {
+    backgroundColor: '#00c853',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -191,15 +232,18 @@ const styles = StyleSheet.create({
   },
   missing: {
     flex: 1,
+    backgroundColor: '#111',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
   missingText: {
+    color: '#fafafa',
     fontSize: 17,
     marginBottom: 16,
   },
   backBtn: {
+    backgroundColor: '#00c853',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,

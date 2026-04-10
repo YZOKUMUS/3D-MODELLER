@@ -14,8 +14,7 @@ type Props = {
 
 export function GridModelCard({ model, width, isDark }: Props) {
   const router = useRouter();
-  const imgWidth = width;
-  const imgHeight = Math.round(imgWidth * (0.8 + (parseInt(model.id, 10) % 5) * 0.15));
+  const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
 
   return (
     <Pressable
@@ -26,24 +25,21 @@ export function GridModelCard({ model, width, isDark }: Props) {
       }}
       style={({ pressed }) => [
         styles.root,
-        {
-          width,
-          backgroundColor: '#1a1a1e',
-          opacity: pressed ? 0.85 : 1,
-        },
+        { width, opacity: pressed ? 0.85 : 1 },
       ]}>
       <ModelCoverImage
         source={model.coverImage}
         accent={model.accent}
         fallbackLetter={model.title.slice(0, 1)}
         fallbackFontSize={28}
-        style={{ width: imgWidth, height: imgHeight, borderRadius: 12 }}
+        style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
       />
-      <Text style={styles.title} numberOfLines={2}>
-        {model.title}
-      </Text>
-      <View style={styles.meta}>
-        <Text style={styles.price}>{formatTry(model.price)}</Text>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
+        <View style={styles.row}>
+          <Text style={styles.category}>{model.category}</Text>
+          <Text style={styles.price}>{formatTry(model.price)}</Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -52,27 +48,34 @@ export function GridModelCard({ model, width, isDark }: Props) {
 const styles = StyleSheet.create({
   root: {
     borderRadius: 12,
+    backgroundColor: '#1a1a1e',
     overflow: 'hidden',
+  },
+  info: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 10,
   },
   title: {
     color: '#e4e4e7',
-    marginTop: 8,
     fontSize: 13,
     fontWeight: '700',
     lineHeight: 17,
-    paddingHorizontal: 6,
   },
-  meta: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 6,
-    paddingBottom: 10,
-    marginTop: 4,
+    marginTop: 5,
+  },
+  category: {
+    color: '#71717a',
+    fontSize: 11,
+    fontWeight: '500',
   },
   price: {
     color: '#00c853',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
   },
 });
