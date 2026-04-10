@@ -1,35 +1,83 @@
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { useColorScheme } from '@/components/useColorScheme';
+import Colors from '@/constants/Colors';
+
+const BULLETS = [
+  'Ürünleri `data/catalog.ts` içinden düzenleyin; fiyat, format ve açıklamalar buradan gelir.',
+  'Sepet cihazda saklanır (AsyncStorage). Uygulamayı silince sıfırlanır.',
+  'Gerçek satış için ödeme (iyzico, Stripe) ve dosya teslimi (S3, e-posta linki) ekleyin.',
+  'Expo ile derlemek: npx expo prebuild ve EAS Build kullanın.',
+];
 
 export default function ModalScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
+  const scheme = useColorScheme() ?? 'light';
+  const colors = Colors[scheme];
+  const isDark = scheme === 'dark';
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
+  return (
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={styles.container}>
+      <View style={[styles.iconWrap, { backgroundColor: colors.tint }]}>
+        <FontAwesome name="info" size={28} color="#fff" />
+      </View>
+      <Text style={[styles.title, { color: colors.text }]}>Model Market</Text>
+      <Text style={[styles.lead, { color: isDark ? '#94a3b8' : '#64748b' }]}>
+        Bu sürüm, 3D model mağazanızın mobil deneyimini hızlıca denemeniz içindir. Tüm akışlar çevrimdışı
+        demo verisiyle çalışır.
+      </Text>
+      {BULLETS.map((line) => (
+        <View key={line} style={styles.row}>
+          <FontAwesome name="check-circle" size={18} color={colors.tint} style={styles.rowIcon} />
+          <Text style={[styles.bullet, { color: isDark ? '#e4e4e7' : '#334155' }]}>{line}</Text>
+        </View>
+      ))}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  iconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '800',
+    textAlign: 'center',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  lead: {
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+  },
+  rowIcon: {
+    marginTop: 2,
+    marginRight: 10,
+  },
+  bullet: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 22,
   },
 });

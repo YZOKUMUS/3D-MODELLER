@@ -1,0 +1,44 @@
+================================================================================
+  YENİ MODEL KAPAĞI (JPG) EKLEME
+================================================================================
+
+1) YENİ FOTOĞRAFLARI NEREYE KOYACAKSIN?
+   -------------------------------------------------
+   Bu klasöre at:
+
+      model-market\assets\incoming\
+
+   (İçinde .gitkeep dosyası var; yanına JPG’lerini kopyala.)
+   Birden fazla JPG ekleyebilirsin.
+
+
+2) SONRA NE YAPACAKSIN?
+   -------------------------------------------------
+   model-market klasöründe terminal:
+
+      npm run sync-covers
+
+   Bu komut:
+   - incoming içindeki JPG’leri sırayla assets\covers\cover-NNN.jpg yapar
+     (incoming klasörü boşalır)
+   - data\catalog.ts dosyasını tüm kapaklara göre yeniden yazar
+
+   Not: Sadece incoming’e yeni JPG attığında sync çalıştır; o zaman catalog.ts
+   tüm kapaklara göre yeniden üretilir (elle yazdığın metinler sıfırlanabilir).
+
+   incoming BOŞKEN sync çalıştırırsan catalog.ts DOKUNULMAZ.
+
+   Kapak dosyalarını elle sildin/ekledin ve katalogu baştan üretmek istiyorsan:
+
+      npm run sync-covers -- --rewrite-catalog
+
+
+3) SADECE KAYNAK DOSYALAR
+   -------------------------------------------------
+   Asıl kullanılan görseller:  model-market\assets\covers\
+   Üst klasörde (3D MODELLERİM) JPG tutmana gerek yok; mükerrerdi, silindi.
+
+
+================================================================================
+  Dosya: model-market\YENI-RESIM-NASIL-EKLENIR.txt
+================================================================================
