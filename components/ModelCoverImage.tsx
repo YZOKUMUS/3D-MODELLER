@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -13,10 +14,22 @@ type Props = {
   source: ImageSourcePropType;
   accent: string;
   fallbackLetter: string;
-  /** Kart / detay için ~44–72, sepet küçük önizleme için ~22 */
   fallbackFontSize?: number;
   style?: StyleProp<ViewStyle>;
+  /** Grid kartlari gibi cok sayida resim varsa true; tarayici lazy yukler */
+  lazy?: boolean;
 };
+
+function resolveWebUri(source: ImageSourcePropType): string | null {
+  if (typeof source === 'number') {
+    const resolved = Image.resolveAssetSource?.(source);
+    return resolved?.uri ?? null;
+  }
+  if (typeof source === 'object' && source !== null && 'uri' in source) {
+    return (source as { uri: string }).uri;
+  }
+  return null;
+}
 
 export function ModelCoverImage({
   source,
@@ -24,6 +37,7 @@ export function ModelCoverImage({
   fallbackLetter,
   fallbackFontSize = 44,
   style,
+  lazy = false,
 }: Props) {
   const [failed, setFailed] = useState(false);
 
@@ -33,6 +47,28 @@ export function ModelCoverImage({
         <Text style={[styles.fallbackLetter, { fontSize: fallbackFontSize }]}>{fallbackLetter}</Text>
       </View>
     );
+  }
+
+  if (Platform.OS === 'web' && lazy) {
+    const uri = resolveWebUri(source);
+    if (uri) {
+      return (
+        <View style={[styles.clip, style]}>
+          <img
+            src={uri}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailed(true)}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+            }}
+          />
+        </View>
+      );
+    }
   }
 
   return (
@@ -53,7 +89,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#1a1a1e',
   },
-  /** Web’de absoluteFill + % yükseklik kartları taşır; kapak her zaman kutu içinde kalır */
   fillCover: {
     width: '100%',
     height: '100%',

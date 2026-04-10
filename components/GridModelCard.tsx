@@ -40,6 +40,7 @@ export function GridModelCard({ model, width, isDark }: Props) {
           fallbackLetter={model.title.slice(0, 1)}
           fallbackFontSize={32}
           style={[styles.cover, { width: imgSize, height: imgSize }]}
+          lazy
         />
       </View>
       <Text style={[styles.title, { color: isDark ? '#f4f4f5' : '#18181b' }]} numberOfLines={2}>
