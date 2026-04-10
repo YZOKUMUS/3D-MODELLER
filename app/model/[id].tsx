@@ -1,13 +1,15 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useCart } from '@/context/CartContext';
-import { getModelById } from '@/data/catalog';
+import { CATALOG, getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
+
+const WHATSAPP_NUMBER = '905551234567';
 
 export default function ModelDetailScreen() {
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
@@ -36,6 +38,20 @@ export default function ModelDetailScreen() {
     add(model);
     successNotification();
   };
+
+  const openWhatsApp = () => {
+    const msg = encodeURIComponent(`Merhaba, "${model.title}" modeli hakkında bilgi almak istiyorum. (${formatTry(model.price)})`);
+    Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`);
+  };
+
+  const shareModel = async () => {
+    lightImpact();
+    try {
+      await Share.share({ message: `${model.title} - ${formatTry(model.price)} | YZOKUMUS 3D Modelleri` });
+    } catch (_) {}
+  };
+
+  const similarModels = CATALOG.filter((m) => m.category === model.category && m.id !== model.id).slice(0, 6);
 
   return (
     <>
@@ -89,8 +105,43 @@ export default function ModelDetailScreen() {
 
             <View style={styles.divider} />
 
+            <View style={styles.actionRow}>
+              <Pressable onPress={shareModel} style={styles.actionBtn}>
+                <Icon name="arrow-right" size={16} color="#a1a1aa" />
+                <Text style={styles.actionText}>Paylaş</Text>
+              </Pressable>
+              <Pressable onPress={openWhatsApp} style={styles.whatsappBtn}>
+                <Text style={styles.whatsappText}>WhatsApp ile Sor</Text>
+              </Pressable>
+            </View>
+
             <Text style={styles.sectionTitle}>Açıklama</Text>
             <Text style={styles.description}>{model.description}</Text>
+
+            {similarModels.length > 0 && (
+              <>
+                <View style={styles.divider} />
+                <Text style={styles.sectionTitle}>Benzer Modeller</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.similarScroll}>
+                  {similarModels.map((sm) => (
+                    <Pressable
+                      key={sm.id}
+                      onPress={() => { lightImpact(); router.push(`/model/${sm.id}`); }}
+                      style={styles.similarCard}>
+                      <ModelCoverImage
+                        source={sm.coverImage}
+                        accent={sm.accent}
+                        fallbackLetter={sm.title.slice(0, 1)}
+                        fallbackFontSize={20}
+                        style={styles.similarImg}
+                      />
+                      <Text style={styles.similarTitle} numberOfLines={1}>{sm.title}</Text>
+                      <Text style={styles.similarPrice}>{formatTry(sm.price)}</Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </>
+            )}
           </View>
         </ScrollView>
 
@@ -204,6 +255,70 @@ const styles = StyleSheet.create({
     color: '#a1a1aa',
     fontSize: 14,
     lineHeight: 22,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 16,
+    marginBottom: 18,
+  },
+  actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#1e1e24',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  actionText: {
+    color: '#a1a1aa',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  whatsappBtn: {
+    flex: 1,
+    backgroundColor: '#25D366',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  whatsappText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  similarScroll: {
+    gap: 10,
+    paddingBottom: 8,
+  },
+  similarCard: {
+    width: 130,
+    backgroundColor: '#1a1a1e',
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  similarImg: {
+    width: 130,
+    height: 100,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  similarTitle: {
+    color: '#e4e4e7',
+    fontSize: 12,
+    fontWeight: '600',
+    paddingHorizontal: 6,
+    marginTop: 6,
+  },
+  similarPrice: {
+    color: '#00c853',
+    fontSize: 12,
+    fontWeight: '800',
+    paddingHorizontal: 6,
+    paddingBottom: 8,
+    marginTop: 3,
   },
   bottomBar: {
     position: 'absolute',
