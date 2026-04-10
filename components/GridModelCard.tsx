@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
-import type { CatalogModel } from '@/data/catalog';
+import { CATALOG, type CatalogModel } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
 
@@ -15,6 +15,7 @@ type Props = {
 export function GridModelCard({ model, width, isDark }: Props) {
   const router = useRouter();
   const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
+  const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
 
   return (
     <Pressable
@@ -27,13 +28,20 @@ export function GridModelCard({ model, width, isDark }: Props) {
         styles.root,
         { width, opacity: pressed ? 0.85 : 1 },
       ]}>
-      <ModelCoverImage
-        source={model.coverImage}
-        accent={model.accent}
-        fallbackLetter={model.title.slice(0, 1)}
-        fallbackFontSize={28}
-        style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
-      />
+      <View>
+        <ModelCoverImage
+          source={model.coverImage}
+          accent={model.accent}
+          fallbackLetter={model.title.slice(0, 1)}
+          fallbackFontSize={28}
+          style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+        />
+        {isNew && (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>YENİ</Text>
+          </View>
+        )}
+      </View>
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
         <View style={styles.row}>
@@ -76,6 +84,20 @@ const styles = StyleSheet.create({
   price: {
     color: '#00c853',
     fontSize: 13,
+    fontWeight: '800',
+  },
+  newBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: '#00c853',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  newBadgeText: {
+    color: '#fff',
+    fontSize: 10,
     fontWeight: '800',
   },
 });
