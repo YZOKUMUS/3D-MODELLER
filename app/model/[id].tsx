@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
@@ -8,8 +8,6 @@ import { CATALOG, getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
-
-const WHATSAPP_NUMBER = '905357685477';
 
 export default function ModelDetailScreen() {
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
@@ -59,18 +57,6 @@ export default function ModelDetailScreen() {
     successNotification();
   };
 
-  const openWhatsApp = () => {
-    const msg = encodeURIComponent(`Merhaba, "${model.title}" modeli hakkında bilgi almak istiyorum. (${formatTry(model.price)})`);
-    Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`);
-  };
-
-  const shareModel = async () => {
-    lightImpact();
-    try {
-      await Share.share({ message: `${model.title} - ${formatTry(model.price)} | YZOKUMUS 3D Modelleri` });
-    } catch (_) {}
-  };
-
   const similarModels = CATALOG.filter((m) => m.category === model.category && m.id !== model.id).slice(0, 6);
 
   return (
@@ -117,16 +103,6 @@ export default function ModelDetailScreen() {
             </View>
 
             <View style={styles.divider} />
-
-            <View style={styles.actionRow}>
-              <Pressable onPress={shareModel} style={styles.actionBtn}>
-                <Icon name="arrow-right" size={16} color="#a1a1aa" />
-                <Text style={styles.actionText}>Paylaş</Text>
-              </Pressable>
-              <Pressable onPress={openWhatsApp} style={styles.whatsappBtn}>
-                <Text style={styles.whatsappText}>WhatsApp ile Sor</Text>
-              </Pressable>
-            </View>
 
             <Text style={styles.sectionTitle}>Açıklama</Text>
             <Text style={styles.description}>{model.description}</Text>
@@ -309,39 +285,6 @@ const styles = StyleSheet.create({
     color: '#a1a1aa',
     fontSize: 14,
     lineHeight: 22,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 16,
-    marginBottom: 18,
-  },
-  actionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#1e1e24',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  actionText: {
-    color: '#a1a1aa',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  whatsappBtn: {
-    flex: 1,
-    backgroundColor: '#25D366',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  whatsappText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
   },
   similarScroll: {
     gap: 10,
