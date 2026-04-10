@@ -1,6 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
 
-export type ModelCategory = 'Karakter' | 'Mimari' | 'Araç' | 'Aksesuar' | 'Doğa';
+export type ModelCategory = 'Araç' | 'Motorsiklet' | 'Silah' | 'Tank' | 'Figür' | 'Aksesuar';
 
 export type CatalogModel = {
   id: string;
@@ -17,11 +17,12 @@ export type CatalogModel = {
 };
 
 export const CATEGORIES: ModelCategory[] = [
-  'Karakter',
-  'Mimari',
   'Araç',
+  'Motorsiklet',
+  'Silah',
+  'Tank',
+  'Figür',
   'Aksesuar',
-  'Doğa',
 ];
 
 export const CATALOG: CatalogModel[] = [
@@ -31,7 +32,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20221227_220524.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-001.jpg'),
@@ -45,7 +46,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230101_231213.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-002.jpg'),
@@ -87,7 +88,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230103_181647.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-005.jpg'),
@@ -101,7 +102,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230103_191424.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-006.jpg'),
@@ -115,7 +116,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230103_191433.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-007.jpg'),
@@ -157,7 +158,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230108_140704.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-010.jpg'),
@@ -171,7 +172,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230108_140948.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-011.jpg'),
@@ -185,7 +186,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230108_140950.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-012.jpg'),
@@ -227,7 +228,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230108_141209.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-015.jpg'),
@@ -241,7 +242,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230112_162001.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-016.jpg'),
@@ -255,7 +256,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230114_000732.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-017.jpg'),
@@ -297,7 +298,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230202_194604.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-020.jpg'),
@@ -311,7 +312,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230203_124903.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-021.jpg'),
@@ -325,7 +326,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230203_124924.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-022.jpg'),
@@ -367,7 +368,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230205_195739.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-025.jpg'),
@@ -381,7 +382,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230205_195828.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-026.jpg'),
@@ -395,7 +396,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230207_224119.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-027.jpg'),
@@ -437,7 +438,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230213_193821.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-030.jpg'),
@@ -451,7 +452,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230215_005352.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-031.jpg'),
@@ -465,7 +466,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230215_005406.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-032.jpg'),
@@ -507,7 +508,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230215_005514.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-035.jpg'),
@@ -521,7 +522,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230215_005546.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-036.jpg'),
@@ -535,7 +536,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230215_005635.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-037.jpg'),
@@ -577,7 +578,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230227_121129.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-040.jpg'),
@@ -591,7 +592,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230227_121137.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-041.jpg'),
@@ -605,7 +606,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230227_121157.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-042.jpg'),
@@ -647,7 +648,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230306_190615.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-045.jpg'),
@@ -661,7 +662,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230309_000536.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-046.jpg'),
@@ -675,7 +676,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230309_000538.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-047.jpg'),
@@ -717,7 +718,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230310_124326.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-050.jpg'),
@@ -731,7 +732,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230314_200118.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-051.jpg'),
@@ -745,7 +746,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230314_200153.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-052.jpg'),
@@ -787,7 +788,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230321_124721.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-055.jpg'),
@@ -801,7 +802,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230321_124755.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-056.jpg'),
@@ -815,7 +816,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230321_124823.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-057.jpg'),
@@ -857,7 +858,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230326_204240.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-060.jpg'),
@@ -871,7 +872,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230328_002131.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-061.jpg'),
@@ -885,7 +886,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230328_002135.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-062.jpg'),
@@ -927,7 +928,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230403_051337.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-065.jpg'),
@@ -941,7 +942,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230403_061710.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-066.jpg'),
@@ -955,7 +956,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230403_061732.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-067.jpg'),
@@ -997,7 +998,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230411_011310.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-070.jpg'),
@@ -1011,7 +1012,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230412_005134.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-071.jpg'),
@@ -1025,7 +1026,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230412_005139.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-072.jpg'),
@@ -1067,7 +1068,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230412_005518.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-075.jpg'),
@@ -1081,7 +1082,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230415_011350.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-076.jpg'),
@@ -1095,7 +1096,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230415_011413.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-077.jpg'),
@@ -1137,7 +1138,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20230416_184901.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-080.jpg'),
@@ -1151,7 +1152,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20230419_044729.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-081.jpg'),
@@ -1165,7 +1166,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20230422_123923.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-082.jpg'),
@@ -1207,7 +1208,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20240624_171458.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-085.jpg'),
@@ -1221,7 +1222,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20240625_232544.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-086.jpg'),
@@ -1235,7 +1236,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20240625_232608.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-087.jpg'),
@@ -1277,7 +1278,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20240708_231137.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-090.jpg'),
@@ -1291,7 +1292,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20240708_231228.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-091.jpg'),
@@ -1305,7 +1306,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20240708_231259.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-092.jpg'),
@@ -1347,7 +1348,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20241121_230354.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-095.jpg'),
@@ -1361,7 +1362,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20241122_222626.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-096.jpg'),
@@ -1375,7 +1376,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20241128_105433.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-097.jpg'),
@@ -1417,7 +1418,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20250111_001338.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-100.jpg'),
@@ -1431,7 +1432,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20250111_001344.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-101.jpg'),
@@ -1445,7 +1446,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20250111_001455.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-102.jpg'),
@@ -1487,7 +1488,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20250304_155833.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-105.jpg'),
@@ -1501,7 +1502,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20250304_155844.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-106.jpg'),
@@ -1515,7 +1516,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20250304_155852.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-107.jpg'),
@@ -1557,7 +1558,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20250318_164027.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-110.jpg'),
@@ -1571,7 +1572,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20250318_164051.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-111.jpg'),
@@ -1585,7 +1586,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 20250318_164103.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-112.jpg'),
@@ -1627,7 +1628,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki 20250318_211048.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-115.jpg'),
@@ -1641,7 +1642,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki 20250329_171436.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-116.jpg'),
@@ -1655,7 +1656,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki 29518AA2-D166-4893-9C22-8114A94D4B28.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-117.jpg'),
@@ -1697,7 +1698,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0113.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-120.jpg'),
@@ -1711,7 +1712,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0118.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-121.jpg'),
@@ -1725,7 +1726,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0131.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-122.jpg'),
@@ -1767,7 +1768,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0157.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-125.jpg'),
@@ -1781,7 +1782,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0158.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-126.jpg'),
@@ -1795,7 +1796,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0159.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-127.jpg'),
@@ -1837,7 +1838,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0163.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-130.jpg'),
@@ -1851,7 +1852,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0164.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-131.jpg'),
@@ -1865,7 +1866,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0165.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-132.jpg'),
@@ -1907,7 +1908,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0168.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-135.jpg'),
@@ -1921,7 +1922,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0169.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-136.jpg'),
@@ -1935,7 +1936,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0170.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-137.jpg'),
@@ -1977,7 +1978,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0173.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-140.jpg'),
@@ -1991,7 +1992,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0174.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-141.jpg'),
@@ -2005,7 +2006,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0175.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-142.jpg'),
@@ -2047,7 +2048,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0180.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-145.jpg'),
@@ -2061,7 +2062,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0181.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-146.jpg'),
@@ -2075,7 +2076,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0183.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-147.jpg'),
@@ -2117,7 +2118,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0214.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-150.jpg'),
@@ -2131,7 +2132,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0215.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-151.jpg'),
@@ -2145,7 +2146,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0216.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-152.jpg'),
@@ -2187,7 +2188,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0220.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-155.jpg'),
@@ -2201,7 +2202,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0283.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-156.jpg'),
@@ -2215,7 +2216,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0284.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-157.jpg'),
@@ -2257,7 +2258,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0287.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-160.jpg'),
@@ -2271,7 +2272,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0288.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-161.jpg'),
@@ -2285,7 +2286,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0323.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-162.jpg'),
@@ -2327,7 +2328,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0433.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-165.jpg'),
@@ -2341,7 +2342,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0434.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-166.jpg'),
@@ -2355,7 +2356,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0436.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-167.jpg'),
@@ -2397,7 +2398,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0536.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-170.jpg'),
@@ -2411,7 +2412,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0552.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-171.jpg'),
@@ -2425,7 +2426,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0682.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-172.jpg'),
@@ -2467,7 +2468,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0703.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-175.jpg'),
@@ -2481,7 +2482,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0713.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-176.jpg'),
@@ -2495,7 +2496,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0729.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-177.jpg'),
@@ -2537,7 +2538,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0759.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-180.jpg'),
@@ -2551,7 +2552,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0769.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-181.jpg'),
@@ -2565,7 +2566,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_0779.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-182.jpg'),
@@ -2607,7 +2608,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_0872.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-185.jpg'),
@@ -2621,7 +2622,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_0893.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-186.jpg'),
@@ -2635,7 +2636,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1381.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-187.jpg'),
@@ -2677,7 +2678,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1384.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-190.jpg'),
@@ -2691,7 +2692,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1418.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-191.jpg'),
@@ -2705,7 +2706,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1421.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-192.jpg'),
@@ -2747,7 +2748,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1589.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-195.jpg'),
@@ -2761,7 +2762,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1598.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-196.jpg'),
@@ -2775,7 +2776,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1635.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-197.jpg'),
@@ -2817,7 +2818,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1645.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-200.jpg'),
@@ -2831,7 +2832,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1646.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-201.jpg'),
@@ -2845,7 +2846,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1647.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-202.jpg'),
@@ -2887,7 +2888,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1650.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-205.jpg'),
@@ -2901,7 +2902,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1651.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-206.jpg'),
@@ -2915,7 +2916,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1652.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-207.jpg'),
@@ -2957,7 +2958,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1690.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-210.jpg'),
@@ -2971,7 +2972,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1691.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-211.jpg'),
@@ -2985,7 +2986,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1692.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-212.jpg'),
@@ -3027,7 +3028,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 459,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1696.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-215.jpg'),
@@ -3041,7 +3042,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1713.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-216.jpg'),
@@ -3055,7 +3056,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1721.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-217.jpg'),
@@ -3097,7 +3098,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 784,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1726.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-220.jpg'),
@@ -3111,7 +3112,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1727.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-221.jpg'),
@@ -3125,7 +3126,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1728.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-222.jpg'),
@@ -3167,7 +3168,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 199,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1808.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-225.jpg'),
@@ -3181,7 +3182,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1809.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-226.jpg'),
@@ -3195,7 +3196,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1811.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-227.jpg'),
@@ -3237,7 +3238,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 524,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1816.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-230.jpg'),
@@ -3251,7 +3252,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1850.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-231.jpg'),
@@ -3265,7 +3266,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1856.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-232.jpg'),
@@ -3307,7 +3308,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_1872.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-235.jpg'),
@@ -3321,7 +3322,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_1914.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-236.jpg'),
@@ -3335,7 +3336,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_1959.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-237.jpg'),
@@ -3377,7 +3378,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_2131.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-240.jpg'),
@@ -3391,7 +3392,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 329,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_2324.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-241.jpg'),
@@ -3405,7 +3406,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 394,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_2330.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-242.jpg'),
@@ -3447,7 +3448,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 589,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_8919.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-245.jpg'),
@@ -3461,7 +3462,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 654,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_8924.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-246.jpg'),
@@ -3475,7 +3476,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 719,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
       'Bu kayıt klasördeki IMG_8957.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-247.jpg'),
@@ -3517,7 +3518,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Doğa',
+    category: 'Aksesuar',
     description:
       'Bu kayıt klasördeki IMG_9669.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-250.jpg'),
@@ -3531,7 +3532,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
     price: 979,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description:
       'Bu kayıt klasördeki IMG_9734.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-251.jpg'),
@@ -3541,13 +3542,13 @@ export const CATALOG: CatalogModel[] = [
   },
   {
     id: '252',
-    title: 'IMG 9873',
-    tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
+    title: 'TANK',
+    tagline: 'TANK',
     price: 1044,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Mimari',
+    category: 'Araç',
     description:
-      'Bu kayıt klasördeki IMG_9873.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
+      'TANK M44',
     coverImage: require('../assets/covers/cover-252.jpg'),
     accent: '#FBBF24',
     polyCount: '—',
@@ -3569,13 +3570,13 @@ export const CATALOG: CatalogModel[] = [
   },
   {
     id: '254',
-    title: 'IMG 9973',
-    tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
+    title: 'EV',
+    tagline: 'EV',
     price: 264,
     formats: ['GLB', 'OBJ', 'FBX'],
     category: 'Aksesuar',
     description:
-      'Bu kayıt klasördeki IMG_9973.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
+      '',
     coverImage: require('../assets/covers/cover-254.jpg'),
     accent: '#94A3B8',
     polyCount: '—',
@@ -3587,7 +3588,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'Silah · GLB, OBJ, FBX',
     price: 300,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Karakter',
+    category: 'Figür',
     description: 'Silah modeli',
     coverImage: require('../assets/covers/cover-255.jpg'),
     accent: '#f472b6',

@@ -187,11 +187,12 @@ button[type=submit]:disabled{opacity:.5;cursor:wait}
     <label>Kategori</label>
     <select name="category" required>
       <option value="">Sec...</option>
-      <option value="Karakter">Karakter</option>
-      <option value="Mimari">Mimari</option>
       <option value="Arac">Arac</option>
+      <option value="Motorsiklet">Motorsiklet</option>
+      <option value="Silah">Silah</option>
+      <option value="Tank">Tank</option>
+      <option value="Figur">Figur</option>
       <option value="Aksesuar">Aksesuar</option>
-      <option value="Doga">Doga</option>
     </select>
 
     <label>Dosya Formatlari</label>
