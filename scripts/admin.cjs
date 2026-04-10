@@ -57,13 +57,53 @@ function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
 function listModels() {
   const src = fs.readFileSync(CATALOG, 'utf8');
-  const re = /\{\s*id:\s*'(\d+)',\s*title:\s*'([^']*)',[\s\S]*?coverImage:\s*require\('\.\.\/(assets\/covers\/[^']+)'\)/g;
+  const re = /\{\s*id:\s*'(\d+)',\s*title:\s*'([^']*)',[\s\S]*?price:\s*(\d+),[\s\S]*?description:\s*(?:'([^']*)'|[\s\S]*?'([^']*)'),[\s\S]*?coverImage:\s*require\('\.\.\/(assets\/covers\/[^']+)'\)/g;
   const models = [];
   let m;
   while ((m = re.exec(src)) !== null) {
-    models.push({ id: m[1], title: m[2].replace(/\\'/g, "'"), cover: m[3] });
+    models.push({
+      id: m[1],
+      title: m[2].replace(/\\'/g, "'"),
+      price: parseInt(m[3], 10),
+      description: (m[4] || m[5] || '').replace(/\\'/g, "'"),
+      cover: m[6],
+    });
   }
   return models.reverse();
+}
+
+function updateModel(id, fields) {
+  let src = fs.readFileSync(CATALOG, 'utf8');
+  const lines = src.split('\n');
+
+  const idLine = lines.findIndex(l => l.match(new RegExp(`^\\s*id:\\s*'${id}'\\s*,?\\s*$`)));
+  if (idLine === -1) return false;
+
+  let start = idLine;
+  while (start > 0 && !lines[start].match(/^\s*\{/)) start--;
+  let end = idLine;
+  while (end < lines.length - 1 && !lines[end].match(/^\s*\},?/)) end++;
+
+  for (let i = start; i <= end; i++) {
+    if (fields.title != null) {
+      lines[i] = lines[i].replace(/^(\s*title:\s*)'[^']*'/, `$1'${esc(fields.title)}'`);
+      lines[i] = lines[i].replace(/^(\s*tagline:\s*)'[^']*'/, `$1'${esc(fields.title)}'`);
+    }
+    if (fields.price != null) {
+      lines[i] = lines[i].replace(/^(\s*price:\s*)\d+/, `$1${parseInt(fields.price, 10)}`);
+    }
+    if (fields.description != null) {
+      lines[i] = lines[i].replace(/^(\s*description:\s*)'[^']*'/, `$1'${esc(fields.description)}'`);
+      if (lines[i].match(/^\s*description:\s*$/)) {
+        if (i + 1 <= end && lines[i + 1].match(/^\s*'/)) {
+          lines[i + 1] = lines[i + 1].replace(/^\s*'[^']*'/, `      '${esc(fields.description)}'`);
+        }
+      }
+    }
+  }
+
+  fs.writeFileSync(CATALOG, lines.join('\n'), 'utf8');
+  return true;
 }
 
 function removeFromCatalog(id) {
@@ -236,21 +276,30 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 .item-body{padding:12px 14px 14px}
 .item-title{font-size:15px;font-weight:700;color:#18181b;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item-id{font-size:12px;color:#94a3b8;margin-bottom:10px}
-.del-btn{width:100%;padding:10px;border:none;border-radius:10px;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-row{display:flex;gap:6px}
+.edit-btn{flex:1;padding:10px;border:none;border-radius:10px;background:#e0f2fe;color:#0369a1;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
+.edit-btn:hover{background:#bae6fd}
+.del-btn{flex:1;padding:10px;border:none;border-radius:10px;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
 .del-btn:hover{background:#fecaca}
-.del-btn:disabled{opacity:.5;cursor:wait}
+.del-btn:disabled,.edit-btn:disabled{opacity:.5;cursor:wait}
 .empty{text-align:center;padding:48px 20px;color:#94a3b8;font-size:16px}
 .total{max-width:800px;margin:16px auto 0;font-size:13px;color:#94a3b8}
-.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:99;display:none}
-.confirm-box{background:#fff;border-radius:20px;padding:28px;max-width:360px;width:90%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.15)}
-.confirm-box h2{font-size:18px;font-weight:800;color:#7f1d1d;margin-bottom:8px}
-.confirm-box p{font-size:14px;color:#64748b;margin-bottom:20px}
-.confirm-btns{display:flex;gap:10px;justify-content:center}
-.confirm-btns button{padding:12px 24px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:99;display:none}
+.modal{background:#fff;border-radius:20px;padding:28px;max-width:420px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:16px}
+.modal label{display:block;font-weight:700;font-size:13px;color:#334155;margin-bottom:6px;margin-top:14px}
+.modal input,.modal textarea{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit}
+.modal input:focus,.modal textarea:focus{border-color:#0369a1}
+.modal textarea{resize:vertical;min-height:80px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.modal-btns button{padding:12px 24px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
 .btn-cancel{background:#f1f5f9;color:#334155}
 .btn-cancel:hover{background:#e2e8f0}
+.btn-save{background:#0369a1;color:#fff}
+.btn-save:hover{background:#075985}
 .btn-confirm{background:#dc2626;color:#fff}
 .btn-confirm:hover{background:#b91c1c}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#065f46;color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;display:none;z-index:100}
 </style>
 </head>
 <body>
@@ -264,20 +313,45 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 <div class="grid" id="grid"></div>
 <p class="total" id="total"></p>
 
-<div class="confirm-overlay" id="overlay">
-  <div class="confirm-box">
-    <h2>Modeli Sil</h2>
-    <p id="confirm-text"></p>
-    <div class="confirm-btns">
-      <button class="btn-cancel" onclick="closeConfirm()">Vazgec</button>
+<div class="overlay" id="del-overlay">
+  <div class="modal" style="text-align:center">
+    <h2 style="color:#7f1d1d">Modeli Sil</h2>
+    <p id="confirm-text" style="font-size:14px;color:#64748b;margin-bottom:20px"></p>
+    <div class="modal-btns" style="justify-content:center">
+      <button class="btn-cancel" onclick="closeDelete()">Vazgec</button>
       <button class="btn-confirm" id="confirm-del-btn" onclick="confirmDelete()">Evet, Sil</button>
     </div>
   </div>
 </div>
 
+<div class="overlay" id="edit-overlay">
+  <div class="modal">
+    <h2 style="color:#0369a1">Modeli Duzenle</h2>
+    <label>Model Ismi</label>
+    <input type="text" id="edit-title">
+    <label>Fiyat (TL)</label>
+    <input type="number" id="edit-price" min="1">
+    <label>Aciklama</label>
+    <textarea id="edit-desc"></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEdit()">Vazgec</button>
+      <button class="btn-save" id="edit-save-btn" onclick="saveEdit()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
 let allModels=[];
 let deleteId=null;
+let editId=null;
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  setTimeout(()=>{t.style.display='none'},2500);
+}
 
 async function load(){
   const r=await fetch('/api/list');
@@ -300,22 +374,61 @@ function filterList(){
       <img src="/cover/\${m.cover.split('/').pop()}" alt="\${m.title}" onerror="this.style.background='#e2e8f0'">
       <div class="item-body">
         <div class="item-title">\${m.title}</div>
-        <div class="item-id">ID: \${m.id}</div>
-        <button class="del-btn" onclick="askDelete('\${m.id}','\${m.title.replace(/'/g,"\\\\'")}')">Sil</button>
+        <div class="item-id">ID: \${m.id} · \${m.price} TL</div>
+        <div class="btn-row">
+          <button class="edit-btn" onclick="openEdit('\${m.id}')">Duzenle</button>
+          <button class="del-btn" onclick="askDelete('\${m.id}','\${m.title.replace(/'/g,"\\\\'")}')">Sil</button>
+        </div>
       </div>
     </div>
   \`).join('');
 }
 
+function openEdit(id){
+  const m=allModels.find(x=>x.id===id);
+  if(!m)return;
+  editId=id;
+  document.getElementById('edit-title').value=m.title;
+  document.getElementById('edit-price').value=m.price;
+  document.getElementById('edit-desc').value=m.description||'';
+  document.getElementById('edit-overlay').style.display='flex';
+}
+
+function closeEdit(){
+  editId=null;
+  document.getElementById('edit-overlay').style.display='none';
+}
+
+async function saveEdit(){
+  if(!editId)return;
+  const btn=document.getElementById('edit-save-btn');
+  btn.disabled=true;btn.textContent='Kaydediliyor...';
+  const title=document.getElementById('edit-title').value.trim();
+  const price=parseInt(document.getElementById('edit-price').value,10);
+  const description=document.getElementById('edit-desc').value.trim();
+  try{
+    const r=await fetch('/api/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editId,title,price,description})});
+    const j=await r.json();
+    if(j.ok){
+      const m=allModels.find(x=>x.id===editId);
+      if(m){m.title=title;m.price=price;m.description=description;}
+      filterList();
+      showToast('Kaydedildi!');
+    }else{alert('Hata: '+j.error);}
+  }catch(e){alert(e.message);}
+  btn.disabled=false;btn.textContent='Kaydet';
+  closeEdit();
+}
+
 function askDelete(id,title){
   deleteId=id;
   document.getElementById('confirm-text').textContent='"'+title+'" (ID: '+id+') modeli silinecek. Bu islem geri alinamaz!';
-  document.getElementById('overlay').style.display='flex';
+  document.getElementById('del-overlay').style.display='flex';
 }
 
-function closeConfirm(){
+function closeDelete(){
   deleteId=null;
-  document.getElementById('overlay').style.display='none';
+  document.getElementById('del-overlay').style.display='none';
 }
 
 async function confirmDelete(){
@@ -329,10 +442,11 @@ async function confirmDelete(){
       allModels=allModels.filter(m=>m.id!==deleteId);
       filterList();
       document.getElementById('total').textContent='Toplam: '+allModels.length+' model';
+      showToast('Silindi!');
     }else{alert('Hata: '+j.error);}
   }catch(e){alert(e.message);}
   btn.disabled=false;btn.textContent='Evet, Sil';
-  closeConfirm();
+  closeDelete();
 }
 
 load();
@@ -396,6 +510,25 @@ const server = http.createServer((req, res) => {
     const models = listModels();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ models }));
+  }
+
+  if (req.url === '/api/update' && req.method === 'POST') {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    return req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      try {
+        const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+        const id = String(body.id || '').trim();
+        if (!id) return res.end(JSON.stringify({ ok: false, error: 'ID gerekli' }));
+        const ok = updateModel(id, body);
+        if (!ok) return res.end(JSON.stringify({ ok: false, error: 'Model bulunamadi' }));
+        console.log('Guncellendi: id=' + id, body.title || '', body.price || '', body.description ? '(aciklama)' : '');
+        res.end(JSON.stringify({ ok: true }));
+      } catch (e) {
+        res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+    });
   }
 
   if (req.url === '/api/delete' && req.method === 'POST') {

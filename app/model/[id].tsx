@@ -79,19 +79,7 @@ export default function ModelDetailScreen() {
           <Text style={[styles.body, { color: isDark ? '#d4d4d8' : '#475569' }]}>
             {model.description}
           </Text>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Dosya formatları</Text>
-          <View style={styles.formats}>
-            {model.formats.map((f) => (
-              <View
-                key={f}
-                style={[
-                  styles.formatChip,
-                  { borderColor: isDark ? '#3f3f46' : '#e2e8f0', backgroundColor: isDark ? '#18181b' : '#fff' },
-                ]}>
-                <Text style={[styles.formatText, { color: colors.text }]}>{f}</Text>
-              </View>
-            ))}
-          </View>
+
           <Pressable
             onPress={addToCart}
             style={({ pressed }) => [
