@@ -2,6 +2,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+let sharp;
+try { sharp = require('sharp'); } catch (_) { sharp = null; }
 
 const PORT = 3333;
 const ROOT = path.join(__dirname, '..');
@@ -559,7 +561,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url === '/api/add' && req.method === 'POST') {
-    return parseMultipart(req, (err, fields, fileData, fileName) => {
+    return parseMultipart(req, async (err, fields, fileData, fileName) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       if (err || !fileData) return res.end(JSON.stringify({ ok: false, error: 'Dosya okunamadi' }));
 
@@ -576,6 +578,11 @@ const server = http.createServer((req, res) => {
 
       const idx = nextCoverIndex();
       const coverFile = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
+      if (sharp) {
+        try {
+          fileData = await sharp(fileData).resize(400, null, { withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+        } catch (_) {}
+      }
       fs.writeFileSync(path.join(COVERS, coverFile), fileData);
 
       const id = nextCatalogId();
