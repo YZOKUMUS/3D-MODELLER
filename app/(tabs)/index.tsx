@@ -3,8 +3,11 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   Pressable,
   ScrollView,
@@ -58,6 +61,31 @@ export default function StoreScreen() {
   const [category, setCategory] = useState<ModelCategory | 'Tümü'>('Tümü');
   const [feedTab, setFeedTab] = useState<FeedTab>('foryou');
 
+  const scrollRef = useRef<ScrollView>(null);
+  const fabOpacity = useRef(new Animated.Value(0)).current;
+  const showFab = useRef(false);
+
+  const onScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      const shouldShow = y > 600;
+      if (shouldShow !== showFab.current) {
+        showFab.current = shouldShow;
+        Animated.timing(fabOpacity, {
+          toValue: shouldShow ? 1 : 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+    [fabOpacity],
+  );
+
+  const scrollToTop = useCallback(() => {
+    lightImpact();
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
+
   const filtered = useMemo(() => {
     let list = [...CATALOG];
     if (category !== 'Tümü') {
@@ -108,6 +136,9 @@ export default function StoreScreen() {
     <View style={[styles.root, { backgroundColor: isDark ? '#0a0a0c' : BAMBU.gradient[0] }]}>
       <StatusBar style="light" />
       <ScrollView
+        ref={scrollRef}
+        onScroll={onScroll}
+        scrollEventThrottle={100}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -324,6 +355,21 @@ export default function StoreScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <Animated.View
+        pointerEvents="box-none"
+        style={[
+          styles.fabWrap,
+          { bottom: tabBarHeight + 16, opacity: fabOpacity },
+        ]}>
+        <Pressable
+          onPress={scrollToTop}
+          style={styles.fab}
+          accessibilityLabel="Başa dön"
+          accessibilityRole="button">
+          <FontAwesome name="chevron-up" size={20} color="#fff" />
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }
@@ -491,5 +537,23 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  fabWrap: {
+    position: 'absolute',
+    right: 20,
+    alignItems: 'center',
+  },
+  fab: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: BAMBU.tabActive,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });
