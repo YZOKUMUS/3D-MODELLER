@@ -34,6 +34,11 @@ export default function ModelDetailScreen() {
     router.replace('/(tabs)' as const);
   };
 
+  const goToCart = () => {
+    lightImpact();
+    router.push('/(tabs)/cart' as const);
+  };
+
   if (!model) {
     return (
       <>
@@ -171,12 +176,20 @@ export default function ModelDetailScreen() {
         </View>
 
         <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 12 }]}>
-          <Pressable
-            onPress={addToCart}
-            style={({ pressed }) => [styles.ctaBtn, { opacity: pressed ? 0.9 : 1 }]}>
-            <Icon name="shopping-cart" size={18} color="#fff" />
-            <Text style={styles.ctaText}>Sepete Ekle</Text>
-          </Pressable>
+          <View style={styles.bottomBarRow}>
+            <Pressable
+              onPress={goToCart}
+              style={({ pressed }) => [styles.goCartBtn, { opacity: pressed ? 0.85 : 1 }]}>
+              <Icon name="shopping-bag" size={17} color="#00c853" />
+              <Text style={styles.goCartText}>Sepete Git</Text>
+            </Pressable>
+            <Pressable
+              onPress={addToCart}
+              style={({ pressed }) => [styles.ctaBtn, { opacity: pressed ? 0.9 : 1 }]}>
+              <Icon name="shopping-cart" size={18} color="#fff" />
+              <Text style={styles.ctaText}>Sepete Ekle</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </>
@@ -372,7 +385,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
   },
+  bottomBarRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 10,
+  },
+  goCartBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#00c853',
+    backgroundColor: '#151518',
+  },
+  goCartText: {
+    color: '#00c853',
+    fontSize: 15,
+    fontWeight: '800',
+  },
   ctaBtn: {
+    flex: 1,
     backgroundColor: '#00c853',
     flexDirection: 'row',
     alignItems: 'center',
