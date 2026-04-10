@@ -22,7 +22,7 @@ B) EN KOLAY CALISAN YOL (Actions gerekmez)
       npm run publish:docs
       (biraz surer, cok sayida resim var)
       Not: export sonrasi dist/404.html otomatik; sayfa yenileme / model linki GitHub'da duzgun acilir.
-      Masaustu kisayolu tarayiciyi http://localhost:8082/3D-MODELLER/ acar (GitHub ile ayni base yol).
+      Masaustu kisayolu: http://localhost:8082/ (yerel Metro). Canli site: .../3D-MODELLER/
       Ana ekrana eklenen PWA: ilk kez bu manifest ile yayindan sonra kisayolu silip
       siteden tekrar "Ana ekrana ekle" dene; her yeni deploy farkli ?build= ile guncellenir.
 

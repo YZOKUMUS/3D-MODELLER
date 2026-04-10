@@ -23,11 +23,11 @@ start /B npx expo start --port 8082
 echo  Sunucu baslatiliyor, lutfen bekleyin...
 timeout /t 6 /nobreak >nul
 
-REM app.json baseUrl (/3D-MODELLER/) ile GitHub Pages ayni yolu kullanir
-start "" http://localhost:8082/3D-MODELLER/
+REM Yerel Metro web kokte acilir (/). /3D-MODELLER/ sadece GitHub static export icin.
+start "" http://localhost:8082/
 
 echo.
-echo  Tarayici acildi: http://localhost:8082/3D-MODELLER/
+echo  Tarayici acildi: http://localhost:8082/
 echo  Kapatmak icin bu pencereyi kapatin veya Ctrl+C basin.
 echo.
 
