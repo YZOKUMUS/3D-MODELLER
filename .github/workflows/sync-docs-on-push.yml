@@ -1,28 +1,26 @@
-# docs/ klasorunu export edip commit + push eder (Pages: main + /docs).
+# Her main push'unda (docs haric) web export -> docs/ -> commit -> push.
+# Ayrica: Actions -> "docs web export" -> Run workflow.
 #
-# NOT: Hesapta GitHub Actions "billing" kilidi varken push tetikleyicisi HER COMMIT'te
-# kirmizi X uretir (job baslamaz). Bu yuzden varsayilan: sadece MANUEL calistirma.
-# Billing duzelince asagidaki "on: push" blogunun yorumunu kaldirabilirsiniz.
+# Sadece docs/ degisen commit workflow'u tetiklemez (sonsuz dongu yok).
 #
-# Sonsuz dongu yok (push acikken): paths-ignore docs/** -> sadece docs degisen bot
-# commit'i workflow'u tetiklemez.
+# Hesapta GitHub "billing" kilidi varsa job yine baslamaz; bu repo ayari degil,
+# https://github.com/settings/billing
 
 name: docs web export
 
 on:
   workflow_dispatch:
-  # Billing / Actions aktif olunca otomatik icin acin:
-  # push:
-  #   branches: [main]
-  #   paths-ignore:
-  #     - 'docs/**'
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
 
 permissions:
   contents: write
 
 concurrency:
   group: sync-docs-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   export-and-push-docs:
