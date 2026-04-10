@@ -9,8 +9,11 @@ A) NEDEN 404?
 
 B) EN KOLAY CALISAN YOL (Actions gerekmez)
 
-   Otomatik: main'e kod push'ladiginda "docs otomatik web export" workflow'u
-   docs/ klasorunu guncelleyip pushlar (repo -> Actions). Pages yine branch /docs.
+   Kirmizi X / "billing issue": Push'ta Actions calismiyorsa bu NORMAL; commit bozuk degil.
+   Siteyi guncellemek icin asagidaki npm run publish:docs + git push yeterli.
+
+   (Istege bagli) Actions hesabi aciksa: Repo -> Actions -> "docs web export" -> Run workflow.
+   Otomatik push tetikleyicisi .github/workflows/sync-docs-on-push.yml icinde yorum satirinda.
 
    1) GitHub: https://github.com/YZOKUMUS/3D-MODELLER/settings/pages
       "Build and deployment" -> Source: "Deploy from a branch"

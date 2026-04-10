@@ -1,18 +1,21 @@
-# main'e kod push'inda docs/ klasorunu export edip commitler.
-# Pages: "Deploy from a branch" -> main + /docs ile uyumludur.
+# docs/ klasorunu export edip commit + push eder (Pages: main + /docs).
 #
-# Sonsuz dongu yok: Bu job sadece docs disinda dosya degisince calisir (paths-ignore).
-# Sadece docs/ degisen commit (bu botun push'i) workflow'u tetiklemez.
+# NOT: Hesapta GitHub Actions "billing" kilidi varken push tetikleyicisi HER COMMIT'te
+# kirmizi X uretir (job baslamaz). Bu yuzden varsayilan: sadece MANUEL calistirma.
+# Billing duzelince asagidaki "on: push" blogunun yorumunu kaldirabilirsiniz.
 #
-# Hesapta Actions / billing kapaliysa bu is kirmizi olur; o zaman manuel publish:docs kullanin.
+# Sonsuz dongu yok (push acikken): paths-ignore docs/** -> sadece docs degisen bot
+# commit'i workflow'u tetiklemez.
 
-name: docs otomatik web export
+name: docs web export
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'docs/**'
+  workflow_dispatch:
+  # Billing / Actions aktif olunca otomatik icin acin:
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - 'docs/**'
 
 permissions:
   contents: write
