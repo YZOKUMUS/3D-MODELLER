@@ -1,14 +1,11 @@
-# Her push'ta siteyi otomatik derleyip GitHub Pages'e yükler.
-# Ayar: Repo -> Settings -> Pages -> Source: GitHub Actions
+# Sadece MANUEL calisir (Actions -> bu workflow -> Run workflow).
+# Push'ta calismasin diye boyle: hesapta billing kilidi vb. varsa her push KIRMIZI hata veriyordu.
 #
-# NOT: Hesapta "billing" kilidi varsa bu is AKISMAZ. O zaman KOLAY-GITHUB-PAGES.txt
-# icindeki "Deploy from a branch" + docs/ yontemini kullanin (npm run publish:docs).
+# Guncel site icin: Pages kaynagi "Deploy from a branch" -> main + /docs (KOLAY-GITHUB-PAGES.txt).
 
 name: GitHub Pages web yayini
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

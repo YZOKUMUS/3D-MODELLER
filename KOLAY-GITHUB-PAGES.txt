@@ -25,9 +25,9 @@ B) EN KOLAY CALISAN YOL (Actions gerekmez)
    4) 2-5 dakika bekleyin, sonra acin:
       https://YZOKUMUS.github.io/3D-MODELLER/
 
-C) Faturalandirma duzelirse
-   .github/workflows/deploy-pages.yml tekrar otomatik calisir;
-   Pages kaynagi "GitHub Actions" ise branch/docs yerine o da kullanilabilir.
+C) (Istege bagli) GitHub Actions ile yayin
+   Repo -> Actions -> "GitHub Pages web yayini" -> "Run workflow" (manuel).
+   Hesapta billing/Actions sorunu varsa bu da calismayabilir; o zaman B maddesi yeterli.
 
 D) Hala istemezseniz
    Netlify veya Cloudflare Pages: ucretsiz, surukle-birak veya repo bagla (ayri anlatilir).
