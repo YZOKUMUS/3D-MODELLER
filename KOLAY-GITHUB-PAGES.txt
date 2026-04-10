@@ -1,0 +1,19 @@
+KOLAY YOL — GitHub'da siteyi acmak (otomatik)
+
+1) Bu klasorde degisiklik yaptiktan sonra her zamanki gibi:
+   git add .
+   git commit -m "mesaj"
+   git push origin main
+
+2) GitHub'da: https://github.com/YZOKUMUS/3D-MODELLER
+   Settings (Ayarlar) → sol menuden "Pages"
+
+3) "Build and deployment" bolumunde Source: GitHub Actions secili olsun.
+   (Ilk seferde "GitHub Actions" sozlugu gorunursa onu sec.)
+
+4) Ust menuden "Actions" sekmesine git; sari is calissin bitsin (2-10 dk).
+
+5) Site adresi (genelde birkac dakika sonra):
+   https://YZOKUMUS.github.io/3D-MODELLER/
+
+Not: Yerelde denemek icin: npm run export:web  sonra dist klasorunu acabilirsin.
