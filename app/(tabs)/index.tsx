@@ -38,15 +38,15 @@ const FEED_TABS: { id: FeedTab; label: string }[] = [
 
 const QUICK_NAV: {
   label: string;
-  icon: 'th' | 'user' | 'car' | 'building';
+  icon: 'th' | 'car' | 'star' | 'cube' | 'user';
   category: ModelCategory | 'Tümü';
   color: string;
   bg: string;
 }[] = [
   { label: 'Tüm modeller', icon: 'th', category: 'Tümü', color: BAMBU.iconColor[0], bg: BAMBU.iconBg[0] },
-  { label: 'Karakter', icon: 'user', category: 'Karakter', color: BAMBU.iconColor[1], bg: BAMBU.iconBg[1] },
-  { label: 'Araç', icon: 'car', category: 'Araç', color: BAMBU.iconColor[2], bg: BAMBU.iconBg[2] },
-  { label: 'Mimari', icon: 'building', category: 'Mimari', color: BAMBU.iconColor[3], bg: BAMBU.iconBg[3] },
+  { label: 'Araç', icon: 'car', category: 'Araç', color: BAMBU.iconColor[1], bg: BAMBU.iconBg[1] },
+  { label: 'Motorsiklet', icon: 'star', category: 'Motorsiklet', color: BAMBU.iconColor[2], bg: BAMBU.iconBg[2] },
+  { label: 'Silah', icon: 'cube', category: 'Silah', color: BAMBU.iconColor[3], bg: BAMBU.iconBg[3] },
 ];
 
 export default function StoreScreen() {

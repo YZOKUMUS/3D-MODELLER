@@ -492,7 +492,7 @@ function parseMultipart(req, cb) {
   });
 }
 
-const CATEGORY_MAP = { Arac: 'Araç', Doga: 'Doğa' };
+const CATEGORY_MAP = { Arac: 'Araç', Figur: 'Figür' };
 
 const server = http.createServer((req, res) => {
   if (req.url === '/' && req.method === 'GET') {
