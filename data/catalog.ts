@@ -3580,7 +3580,20 @@ export const CATALOG: CatalogModel[] = [
     accent: '#94A3B8',
     polyCount: '—',
     rating: 4.2,
-  }
+  },
+  {
+    id: '255',
+    title: 'Silah',
+    tagline: 'Silah · GLB, OBJ, FBX',
+    price: 300,
+    formats: ['GLB', 'OBJ', 'FBX'],
+    category: 'Karakter',
+    description: 'Silah modeli',
+    coverImage: require('../assets/covers/cover-255.jpg'),
+    accent: '#f472b6',
+    polyCount: '—',
+    rating: 4.8,
+  },
 ];
 
 export function getModelById(id: string): CatalogModel | undefined {

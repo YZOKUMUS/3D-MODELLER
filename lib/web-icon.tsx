@@ -13,6 +13,7 @@ const MI: Record<string, string> = {
   search: 'search',
   star: 'star',
   'chevron-up': 'expand_less',
+  'chevron-down': 'expand_more',
   cube: 'view_in_ar',
   'shopping-bag': 'shopping_bag',
   plus: 'add',

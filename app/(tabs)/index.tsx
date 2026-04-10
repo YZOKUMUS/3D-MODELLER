@@ -62,23 +62,33 @@ export default function StoreScreen() {
   const [feedTab, setFeedTab] = useState<FeedTab>('foryou');
 
   const scrollRef = useRef<ScrollView>(null);
-  const fabOpacity = useRef(new Animated.Value(0)).current;
-  const showFab = useRef(false);
+  const fabUpOpacity = useRef(new Animated.Value(0)).current;
+  const fabDownOpacity = useRef(new Animated.Value(1)).current;
+  const showUp = useRef(false);
+  const contentHeight = useRef(0);
+  const layoutHeight = useRef(0);
 
   const onScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const y = e.nativeEvent.contentOffset.y;
-      const shouldShow = y > 600;
-      if (shouldShow !== showFab.current) {
-        showFab.current = shouldShow;
-        Animated.timing(fabOpacity, {
-          toValue: shouldShow ? 1 : 0,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
+      const shouldShowUp = y > 600;
+      if (shouldShowUp !== showUp.current) {
+        showUp.current = shouldShowUp;
+        Animated.parallel([
+          Animated.timing(fabUpOpacity, {
+            toValue: shouldShowUp ? 1 : 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(fabDownOpacity, {
+            toValue: shouldShowUp ? 0 : 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
     },
-    [fabOpacity],
+    [fabUpOpacity, fabDownOpacity],
   );
 
   const scrollToTop = useCallback(() => {
@@ -86,8 +96,16 @@ export default function StoreScreen() {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   }, []);
 
+  const scrollToBottom = useCallback(() => {
+    lightImpact();
+    const maxY = contentHeight.current - layoutHeight.current;
+    if (maxY > 0) {
+      scrollRef.current?.scrollTo({ y: maxY, animated: true });
+    }
+  }, []);
+
   const filtered = useMemo(() => {
-    let list = [...CATALOG];
+    let list = [...CATALOG].reverse();
     if (category !== 'Tümü') {
       list = list.filter((m) => m.category === category);
     }
@@ -112,8 +130,8 @@ export default function StoreScreen() {
     }
   }, [query, category, feedTab]);
 
-  const featuredCarousel = useMemo(() => CATALOG.slice(0, 3), []);
-  const collectionsCarousel = useMemo(() => CATALOG.slice(3, 6), []);
+  const featuredCarousel = useMemo(() => [...CATALOG].reverse().slice(0, 3), []);
+  const collectionsCarousel = useMemo(() => [...CATALOG].reverse().slice(3, 6), []);
 
   const sheetHMargin = 12 * 2;
   const sheetPadding = 16 * 2;
@@ -143,6 +161,8 @@ export default function StoreScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         nestedScrollEnabled={Platform.OS === 'android'}
+        onContentSizeChange={(_w, h) => { contentHeight.current = h; }}
+        onLayout={(e) => { layoutHeight.current = e.nativeEvent.layout.height; }}
         contentContainerStyle={{ paddingBottom: scrollBottomPad + insets.bottom }}>
         <LinearGradient
           colors={[BAMBU.gradient[0], BAMBU.gradient[1], BAMBU.gradient[2]]}
@@ -356,20 +376,26 @@ export default function StoreScreen() {
         </View>
       </ScrollView>
 
-      <Animated.View
-        pointerEvents="box-none"
-        style={[
-          styles.fabWrap,
-          { bottom: tabBarHeight + 16, opacity: fabOpacity },
-        ]}>
-        <Pressable
-          onPress={scrollToTop}
-          style={styles.fab}
-          accessibilityLabel="Başa dön"
-          accessibilityRole="button">
-          <Icon name="chevron-up" size={20} color="#fff" />
-        </Pressable>
-      </Animated.View>
+      <View pointerEvents="box-none" style={[styles.fabWrap, { bottom: tabBarHeight + 16 }]}>
+        <Animated.View style={{ opacity: fabUpOpacity }}>
+          <Pressable
+            onPress={scrollToTop}
+            style={styles.fab}
+            accessibilityLabel="Başa dön"
+            accessibilityRole="button">
+            <Icon name="chevron-up" size={20} color="#fff" />
+          </Pressable>
+        </Animated.View>
+        <Animated.View style={{ opacity: fabDownOpacity }}>
+          <Pressable
+            onPress={scrollToBottom}
+            style={styles.fab}
+            accessibilityLabel="Sona git"
+            accessibilityRole="button">
+            <Icon name="chevron-down" size={20} color="#fff" />
+          </Pressable>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -542,6 +568,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     alignItems: 'center',
+    gap: 10,
   },
   fab: {
     width: 48,
