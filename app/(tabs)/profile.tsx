@@ -1,4 +1,3 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -6,6 +5,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import { CATALOG } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
+import { Icon } from '@/lib/web-icon';
 
 export default function ProfileScreen() {
   const scheme = useColorScheme() ?? 'light';
@@ -16,7 +16,7 @@ export default function ProfileScreen() {
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={[styles.card, { backgroundColor: isDark ? '#1a1a1e' : '#f8fafc', borderColor: isDark ? '#2d2d35' : '#e2e8f0' }]}>
         <View style={[styles.avatar, { backgroundColor: colors.tint }]}>
-          <FontAwesome name="user" size={32} color="#fff" />
+          <Icon name="user" size={32} color="#fff" />
         </View>
         <Text style={[styles.name, { color: colors.text }]}>Sizin mağazanız</Text>
         <Text style={[styles.bio, { color: isDark ? '#94a3b8' : '#64748b' }]}>
@@ -46,9 +46,9 @@ export default function ProfileScreen() {
               opacity: pressed ? 0.85 : 1,
             },
           ]}>
-          <FontAwesome name="question-circle" size={20} color={colors.tint} />
+          <Icon name="question-circle" size={20} color={colors.tint} />
           <Text style={[styles.linkText, { color: colors.text }]}>Satış ve uygulama hakkında</Text>
-          <FontAwesome name="chevron-right" size={14} color={isDark ? '#52525b' : '#94a3b8'} />
+          <Icon name="chevron-right" size={14} color={isDark ? '#52525b' : '#94a3b8'} />
         </Pressable>
       </Link>
     </View>

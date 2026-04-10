@@ -1,9 +1,9 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
+import { Icon } from '@/lib/web-icon';
 
 const BULLETS = [
   'Ürünleri `data/catalog.ts` içinden düzenleyin; fiyat, format ve açıklamalar buradan gelir.',
@@ -22,7 +22,7 @@ export default function ModalScreen() {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.container}>
       <View style={[styles.iconWrap, { backgroundColor: colors.tint }]}>
-        <FontAwesome name="info" size={28} color="#fff" />
+        <Icon name="info-circle" size={28} color="#fff" />
       </View>
       <Text style={[styles.title, { color: colors.text }]}>Model Market</Text>
       <Text style={[styles.lead, { color: isDark ? '#94a3b8' : '#64748b' }]}>
@@ -31,7 +31,7 @@ export default function ModalScreen() {
       </Text>
       {BULLETS.map((line) => (
         <View key={line} style={styles.row}>
-          <FontAwesome name="check-circle" size={18} color={colors.tint} style={styles.rowIcon} />
+          <Icon name="check-circle" size={18} color={colors.tint} style={styles.rowIcon} />
           <Text style={[styles.bullet, { color: isDark ? '#e4e4e7' : '#334155' }]}>{line}</Text>
         </View>
       ))}

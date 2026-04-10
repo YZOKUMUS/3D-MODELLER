@@ -1,4 +1,3 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +9,7 @@ import Colors from '@/constants/Colors';
 import { getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
+import { Icon } from '@/lib/web-icon';
 
 export default function ModelDetailScreen() {
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
@@ -67,11 +67,11 @@ export default function ModelDetailScreen() {
           </Text>
           <View style={styles.metaRow}>
             <View style={[styles.pill, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
-              <FontAwesome name="cube" size={14} color={colors.tint} />
+              <Icon name="cube" size={14} color={colors.tint} />
               <Text style={[styles.pillText, { color: colors.text }]}>{model.polyCount}</Text>
             </View>
             <View style={[styles.pill, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
-              <FontAwesome name="star" size={14} color="#fbbf24" />
+              <Icon name="star" size={14} color="#fbbf24" />
               <Text style={[styles.pillText, { color: colors.text }]}>{model.rating}</Text>
             </View>
           </View>
@@ -98,7 +98,7 @@ export default function ModelDetailScreen() {
               styles.cta,
               { backgroundColor: colors.tint, opacity: pressed ? 0.92 : 1 },
             ]}>
-            <FontAwesome name="shopping-cart" size={18} color="#fff" />
+            <Icon name="shopping-cart" size={18} color="#fff" />
             <Text style={styles.ctaText}>Sepete ekle</Text>
           </Pressable>
         </View>

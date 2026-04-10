@@ -1,4 +1,3 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import Colors from '@/constants/Colors';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
+import { Icon } from '@/lib/web-icon';
 
 export default function CartScreen() {
   const scheme = useColorScheme() ?? 'light';
@@ -53,7 +53,7 @@ export default function CartScreen() {
         }}>
         {lines.length === 0 ? (
           <View style={styles.emptyWrap}>
-            <FontAwesome name="shopping-cart" size={48} color={isDark ? '#3f3f46' : '#cbd5e1'} />
+            <Icon name="shopping-cart" size={48} color={isDark ? '#3f3f46' : '#cbd5e1'} />
             <Text style={[styles.emptyTitle, { color: colors.text }]}>Sepet boş</Text>
             <Text style={[styles.emptySub, { color: isDark ? '#94a3b8' : '#64748b' }]}>
               Mağazadan modeller ekleyerek başlayın.
@@ -92,7 +92,7 @@ export default function CartScreen() {
                       setQuantity(line.model.id, line.quantity - 1);
                     }}
                     style={[styles.qtyBtn, { borderColor: colors.tint }]}>
-                    <FontAwesome name="minus" size={14} color={colors.tint} />
+                    <Icon name="minus" size={14} color={colors.tint} />
                   </Pressable>
                   <Text style={[styles.qty, { color: colors.text }]}>{line.quantity}</Text>
                   <Pressable
@@ -102,7 +102,7 @@ export default function CartScreen() {
                       setQuantity(line.model.id, line.quantity + 1);
                     }}
                     style={[styles.qtyBtn, { borderColor: colors.tint }]}>
-                    <FontAwesome name="plus" size={14} color={colors.tint} />
+                    <Icon name="plus" size={14} color={colors.tint} />
                   </Pressable>
                   <Pressable
                     onPress={() => {
@@ -110,7 +110,7 @@ export default function CartScreen() {
                       remove(line.model.id);
                     }}
                     style={styles.trash}>
-                    <FontAwesome name="trash" size={16} color="#ef4444" />
+                    <Icon name="trash" size={16} color="#ef4444" />
                   </Pressable>
                 </View>
               </View>
@@ -143,7 +143,7 @@ export default function CartScreen() {
               { backgroundColor: colors.tint, opacity: pressed ? 0.9 : 1 },
             ]}>
             <Text style={styles.ctaText}>Ödemeye geç</Text>
-            <FontAwesome name="arrow-right" size={16} color="#fff" />
+            <Icon name="arrow-right" size={16} color="#fff" />
           </Pressable>
         </View>
       )}

@@ -1,5 +1,4 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
@@ -26,6 +25,7 @@ import { BAMBU } from '@/constants/bambuTheme';
 import { CATALOG, CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
 import { HIT_SLOP } from '@/lib/layout';
+import { Icon } from '@/lib/web-icon';
 
 type FeedTab = 'foryou' | 'featured' | 'trending' | 'print';
 
@@ -38,7 +38,7 @@ const FEED_TABS: { id: FeedTab; label: string }[] = [
 
 const QUICK_NAV: {
   label: string;
-  icon: React.ComponentProps<typeof FontAwesome>['name'];
+  icon: 'th' | 'user' | 'car' | 'building';
   category: ModelCategory | 'Tümü';
   color: string;
   bg: string;
@@ -159,7 +159,7 @@ export default function StoreScreen() {
 
         <View style={[styles.sheet, { backgroundColor: cardSurface, marginTop: -52 }]}>
           <View style={[styles.searchRow, { backgroundColor: searchBg }]}>
-            <FontAwesome name="search" size={16} color={textMuted} />
+            <Icon name="search" size={16} color={textMuted} />
             <TextInput
               value={query}
               onChangeText={setQuery}
@@ -192,7 +192,7 @@ export default function StoreScreen() {
                       styles.quickIcon,
                       { backgroundColor: active ? item.bg : isDark ? '#27272a' : '#f4f4f5' },
                     ]}>
-                    <FontAwesome name={item.icon} size={22} color={active ? item.color : textMuted} />
+                    <Icon name={item.icon} size={22} color={active ? item.color : textMuted} />
                   </View>
                   <Text style={[styles.quickLabel, { color: textMuted }]} numberOfLines={2}>
                     {item.label}
@@ -367,7 +367,7 @@ export default function StoreScreen() {
           style={styles.fab}
           accessibilityLabel="Başa dön"
           accessibilityRole="button">
-          <FontAwesome name="chevron-up" size={20} color="#fff" />
+          <Icon name="chevron-up" size={20} color="#fff" />
         </Pressable>
       </Animated.View>
     </View>

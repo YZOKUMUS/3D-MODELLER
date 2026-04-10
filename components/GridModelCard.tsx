@@ -1,4 +1,3 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -7,6 +6,7 @@ import { BAMBU } from '@/constants/bambuTheme';
 import type { CatalogModel } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
+import { Icon } from '@/lib/web-icon';
 
 type Props = {
   model: CatalogModel;
@@ -48,7 +48,7 @@ export function GridModelCard({ model, width, isDark }: Props) {
       <View style={styles.meta}>
         <Text style={[styles.price, { color: BAMBU.tabActive }]}>{formatTry(model.price)}</Text>
         <View style={styles.rating}>
-          <FontAwesome name="star" size={10} color="#fbbf24" />
+          <Icon name="star" size={10} color="#fbbf24" />
           <Text style={[styles.ratingText, { color: isDark ? '#a1a1aa' : '#71717a' }]}>
             {model.rating}
           </Text>
