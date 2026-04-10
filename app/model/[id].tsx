@@ -19,6 +19,21 @@ export default function ModelDetailScreen() {
   const insets = useSafeAreaInsets();
   const { add } = useCart();
 
+  const goBackOne = () => {
+    lightImpact();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)' as const);
+    }
+  };
+
+  /** Benzer modellerde push ile yığılmış ekranları atlayıp doğrudan ana listeye döner. */
+  const goToMainFeed = () => {
+    lightImpact();
+    router.replace('/(tabs)' as const);
+  };
+
   if (!model) {
     return (
       <>
@@ -55,14 +70,7 @@ export default function ModelDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: '',
-          headerTransparent: true,
-          headerBackTitle: 'Geri',
-          headerTintColor: '#fff',
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.screen}>
         <ScrollView
           style={styles.scroll}
@@ -145,6 +153,23 @@ export default function ModelDetailScreen() {
           </View>
         </ScrollView>
 
+        <View style={[styles.floatingBackWrap, { top: insets.top + 8 }]} pointerEvents="box-none">
+          <Pressable
+            onPress={goBackOne}
+            hitSlop={12}
+            accessibilityLabel="Bir önceki ekrana dön"
+            style={({ pressed }) => [styles.floatingBackBtn, { opacity: pressed ? 0.85 : 1 }]}>
+            <Icon name="arrow-left" size={22} color="#fff" />
+          </Pressable>
+          <Pressable
+            onPress={goToMainFeed}
+            hitSlop={12}
+            accessibilityLabel="Ana sayfa, model listesi"
+            style={({ pressed }) => [styles.floatingBackBtn, { opacity: pressed ? 0.85 : 1 }]}>
+            <Icon name="home" size={20} color="#fff" />
+          </Pressable>
+        </View>
+
         <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 12 }]}>
           <Pressable
             onPress={addToCart}
@@ -165,6 +190,22 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
+  },
+  floatingBackWrap: {
+    position: 'absolute',
+    left: 12,
+    zIndex: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  floatingBackBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imageWrap: {
     width: '100%',

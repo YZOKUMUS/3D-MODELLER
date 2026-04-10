@@ -28,6 +28,7 @@ const MI: Record<string, string> = {
   'question-circle': 'help',
   'chevron-right': 'chevron_right',
   info: 'info',
+  home: 'home',
 };
 
 type Props = {
