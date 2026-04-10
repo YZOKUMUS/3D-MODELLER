@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
+  Image as RNImage,
   Platform,
   StyleSheet,
   Text,
@@ -16,16 +17,20 @@ type Props = {
   fallbackLetter: string;
   fallbackFontSize?: number;
   style?: StyleProp<ViewStyle>;
-  /** Grid kartlari gibi cok sayida resim varsa true; tarayici lazy yukler */
   lazy?: boolean;
 };
 
 function resolveWebUri(source: ImageSourcePropType): string | null {
+  if (typeof source === 'string') return source;
   if (typeof source === 'number') {
-    const resolved = Image.resolveAssetSource?.(source);
-    return resolved?.uri ?? null;
+    try {
+      const resolved = RNImage.resolveAssetSource(source);
+      return resolved?.uri ?? null;
+    } catch {
+      return null;
+    }
   }
-  if (typeof source === 'object' && source !== null && 'uri' in source) {
+  if (source && typeof source === 'object' && 'uri' in source) {
     return (source as { uri: string }).uri;
   }
   return null;
@@ -49,14 +54,14 @@ export function ModelCoverImage({
     );
   }
 
-  if (Platform.OS === 'web' && lazy) {
+  if (Platform.OS === 'web') {
     const uri = resolveWebUri(source);
     if (uri) {
       return (
         <View style={[styles.clip, style]}>
           <img
             src={uri}
-            loading="lazy"
+            loading={lazy ? 'lazy' : 'eager'}
             decoding="async"
             onError={() => setFailed(true)}
             style={{
