@@ -1,19 +1,18 @@
-# Her main push'unda (docs haric) web export -> docs/ -> commit -> push.
-# Ayrica: Actions -> "docs web export" -> Run workflow.
+# docs/ export + commit + push. Varsayilan: SADECE MANUEL (workflow_dispatch).
+# Push tetikleyicisi kapali: billing kilidinde her commit'te kirmizi X olmasin.
+# Billing duzelince asagidaki "push" blogunun yorumunu kaldirabilirsiniz.
 #
-# Sadece docs/ degisen commit workflow'u tetiklemez (sonsuz dongu yok).
-#
-# Hesapta GitHub "billing" kilidi varsa job yine baslamaz; bu repo ayari degil,
-# https://github.com/settings/billing
+# Elle: Actions -> "docs web export" -> Run workflow.
+# Yerel: npm run publish:docs + git push (docs/)
 
 name: docs web export
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'docs/**'
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - 'docs/**'
 
 permissions:
   contents: write

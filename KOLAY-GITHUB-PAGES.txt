@@ -9,10 +9,10 @@ A) NEDEN 404?
 
 B) EN KOLAY CALISAN YOL (Actions gerekmez)
 
-   Otomatik: main'e kod push -> "docs web export" workflow'u docs/ gunceller (docs/ haric degisiklikte).
-   Billing hatasi alirsan: https://github.com/settings/billing — yoksa manuel: npm run publish:docs + push.
+   Push workflow'u kapali (kirmizi X onlemek icin). Site: npm run publish:docs + docs commit + push.
+   Actions aciksa: "docs web export" -> Run workflow. Otomatik push icin sync-docs-on-push.yml icinde push yorumunu ac.
 
-   Elle calistir: Actions -> "docs web export" -> Run workflow.
+   Billing: https://github.com/settings/billing
 
    1) GitHub: https://github.com/YZOKUMUS/3D-MODELLER/settings/pages
       "Build and deployment" -> Source: "Deploy from a branch"
