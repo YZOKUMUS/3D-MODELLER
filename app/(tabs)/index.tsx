@@ -327,7 +327,7 @@ export default function StoreScreen() {
                     lightImpact();
                     setFeedTab(t.id);
                     setVisibleCount(20);
-                  }
+                  }}
                   style={[styles.feedTabBtn, active && styles.feedTabBtnActive]}>
                   <Text
                     style={[

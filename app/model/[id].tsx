@@ -55,10 +55,10 @@ export default function ModelDetailScreen() {
             fallbackLetter={model.title.slice(0, 1)}
             fallbackFontSize={72}
             style={styles.heroImage}
+            contain
           />
-          <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>{model.category}</Text>
-          </View>
+
+
         </View>
         <View style={styles.pad}>
           <Text style={[styles.price, { color: colors.tint }]}>{formatTry(model.price)}</Text>
@@ -98,13 +98,12 @@ export default function ModelDetailScreen() {
 const styles = StyleSheet.create({
   hero: {
     width: '100%',
-    height: 220,
+    height: 350,
     position: 'relative',
-    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',
-    height: 220,
+    height: 350,
   },
   heroBadge: {
     position: 'absolute',

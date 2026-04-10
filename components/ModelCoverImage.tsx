@@ -18,6 +18,7 @@ type Props = {
   fallbackFontSize?: number;
   style?: StyleProp<ViewStyle>;
   lazy?: boolean;
+  contain?: boolean;
 };
 
 function resolveWebUri(source: ImageSourcePropType): string | null {
@@ -43,6 +44,7 @@ export function ModelCoverImage({
   fallbackFontSize = 44,
   style,
   lazy = false,
+  contain = false,
 }: Props) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -76,7 +78,7 @@ export function ModelCoverImage({
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: contain ? 'contain' : 'cover',
               display: 'block',
               opacity: loaded ? 1 : 0,
               transition: 'opacity 0.3s',
@@ -93,7 +95,7 @@ export function ModelCoverImage({
       <Image
         source={source}
         style={styles.fillCover}
-        contentFit="cover"
+        contentFit={contain ? 'contain' : 'cover'}
         transition={300}
         cachePolicy="memory-disk"
         recyclingKey={typeof source === 'number' ? String(source) : undefined}
