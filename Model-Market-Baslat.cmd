@@ -23,11 +23,11 @@ start /B npx expo start --port 8082
 echo  Sunucu baslatiliyor, lutfen bekleyin...
 timeout /t 6 /nobreak >nul
 
-REM Tarayiciyi tek seferlik ac
-start "" http://localhost:8082
+REM app.json baseUrl (/3D-MODELLER/) ile GitHub Pages ayni yolu kullanir
+start "" http://localhost:8082/3D-MODELLER/
 
 echo.
-echo  Tarayici acildi: http://localhost:8082
+echo  Tarayici acildi: http://localhost:8082/3D-MODELLER/
 echo  Kapatmak icin bu pencereyi kapatin veya Ctrl+C basin.
 echo.
 

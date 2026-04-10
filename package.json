@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "admin": "node scripts/admin.cjs",
     "sync-covers": "node scripts/sync-covers-and-catalog.cjs",
-    "export:web": "expo export -p web && node -e \"require('fs').writeFileSync(require('path').join('dist','.nojekyll'),'')\"",
+    "export:web": "expo export -p web && node scripts/post-web-export.cjs",
     "publish:docs": "npm run export:web && node scripts/copy-dist-to-docs.cjs"
   },
   "dependencies": {

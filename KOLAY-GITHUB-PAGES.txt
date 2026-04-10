@@ -9,6 +9,9 @@ A) NEDEN 404?
 
 B) EN KOLAY CALISAN YOL (Actions gerekmez)
 
+   Otomatik: main'e kod push'ladiginda "docs otomatik web export" workflow'u
+   docs/ klasorunu guncelleyip pushlar (repo -> Actions). Pages yine branch /docs.
+
    1) GitHub: https://github.com/YZOKUMUS/3D-MODELLER/settings/pages
       "Build and deployment" -> Source: "Deploy from a branch"
       Branch: main   Folder: /docs   Save
@@ -16,6 +19,8 @@ B) EN KOLAY CALISAN YOL (Actions gerekmez)
    2) Bilgisayarda (model-market klasorunde):
       npm run publish:docs
       (biraz surer, cok sayida resim var)
+      Not: export sonrasi dist/404.html otomatik; sayfa yenileme / model linki GitHub'da duzgun acilir.
+      Masaustu kisayolu tarayiciyi http://localhost:8082/3D-MODELLER/ acar (GitHub ile ayni base yol).
 
    3) Yukle:
       git add docs

@@ -1,0 +1,59 @@
+# main'e kod push'inda docs/ klasorunu export edip commitler.
+# Pages: "Deploy from a branch" -> main + /docs ile uyumludur.
+#
+# Sonsuz dongu yok: Bu job sadece docs disinda dosya degisince calisir (paths-ignore).
+# Sadece docs/ degisen commit (bu botun push'i) workflow'u tetiklemez.
+#
+# Hesapta Actions / billing kapaliysa bu is kirmizi olur; o zaman manuel publish:docs kullanin.
+
+name: docs otomatik web export
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-and-push-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu al
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Bagimliliklari yukle
+        run: npm ci
+
+      - name: Web export (dist + 404.html)
+        run: npm run export:web
+
+      - name: dist -> docs
+        run: node scripts/copy-dist-to-docs.cjs
+
+      - name: Commit ve push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --staged --quiet; then
+            echo "docs degismedi, push yok"
+            exit 0
+          fi
+          git commit -m "chore(docs): web export (otomatik)"
+          git pull --rebase origin main
+          git push origin main
