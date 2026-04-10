@@ -60,6 +60,7 @@ export default function StoreScreen() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<ModelCategory | 'Tümü'>('Tümü');
   const [feedTab, setFeedTab] = useState<FeedTab>('foryou');
+  const [visibleCount, setVisibleCount] = useState(20);
 
   const scrollRef = useRef<ScrollView>(null);
   const fabUpOpacity = useRef(new Animated.Value(0)).current;
@@ -129,6 +130,9 @@ export default function StoreScreen() {
         return list;
     }
   }, [query, category, feedTab]);
+
+  const visibleModels = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+  const hasMore = filtered.length > visibleCount;
 
   const featuredCarousel = useMemo(() => [...CATALOG].reverse().slice(0, 3), []);
   const collectionsCarousel = useMemo(() => [...CATALOG].reverse().slice(3, 6), []);
@@ -205,6 +209,7 @@ export default function StoreScreen() {
                   onPress={() => {
                     lightImpact();
                     setCategory(item.category);
+                    setVisibleCount(20);
                   }}
                   style={styles.quickItem}>
                   <View
@@ -321,7 +326,8 @@ export default function StoreScreen() {
                   onPress={() => {
                     lightImpact();
                     setFeedTab(t.id);
-                  }}
+                    setVisibleCount(20);
+                  }
                   style={[styles.feedTabBtn, active && styles.feedTabBtnActive]}>
                   <Text
                     style={[
@@ -343,11 +349,20 @@ export default function StoreScreen() {
                 Sonuç yok. Aramayı veya sekmeyi değiştirin.
               </Text>
             ) : (
-              filtered.map((model) => (
+              visibleModels.map((model) => (
                 <GridModelCard key={model.id} model={model} width={colWidth} isDark={isDark} />
               ))
             )}
           </View>
+          {hasMore && (
+            <Pressable
+              onPress={() => { lightImpact(); setVisibleCount((c) => c + 20); }}
+              style={[styles.loadMore, { backgroundColor: isDark ? '#27272a' : '#f1f5f9' }]}>
+              <Text style={[styles.loadMoreText, { color: BAMBU.tabActive }]}>
+                Daha fazla göster ({filtered.length - visibleCount} kaldı)
+              </Text>
+            </Pressable>
+          )}
 
           <View style={styles.moreCats}>
             <Text style={[styles.moreCatsTitle, { color: textPrimary }]}>Tüm kategoriler</Text>
@@ -545,6 +560,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 28,
     fontSize: 15,
+  },
+  loadMore: {
+    marginTop: 4,
+    marginBottom: 12,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+  loadMoreText: {
+    fontSize: 15,
+    fontWeight: '700',
   },
   moreCats: {
     marginTop: 8,

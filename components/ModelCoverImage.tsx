@@ -45,6 +45,13 @@ export function ModelCoverImage({
   lazy = false,
 }: Props) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const placeholder = (
+    <View style={[StyleSheet.absoluteFill, styles.fallback, { backgroundColor: accent }]}>
+      <Text style={[styles.fallbackLetter, { fontSize: fallbackFontSize }]}>{fallbackLetter}</Text>
+    </View>
+  );
 
   if (failed) {
     return (
@@ -58,17 +65,21 @@ export function ModelCoverImage({
     const uri = resolveWebUri(source);
     if (uri) {
       return (
-        <View style={[styles.clip, style]}>
+        <View style={[styles.clip, style, { backgroundColor: accent }]}>
+          {!loaded && placeholder}
           <img
             src={uri}
             loading={lazy ? 'lazy' : 'eager'}
             decoding="async"
+            onLoad={() => setLoaded(true)}
             onError={() => setFailed(true)}
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
               display: 'block',
+              opacity: loaded ? 1 : 0,
+              transition: 'opacity 0.3s',
             }}
           />
         </View>
@@ -77,12 +88,16 @@ export function ModelCoverImage({
   }
 
   return (
-    <View style={[styles.clip, style]}>
+    <View style={[styles.clip, style, { backgroundColor: accent }]}>
+      {!loaded && placeholder}
       <Image
         source={source}
         style={styles.fillCover}
         contentFit="cover"
-        transition={200}
+        transition={300}
+        cachePolicy="memory-disk"
+        recyclingKey={typeof source === 'number' ? String(source) : undefined}
+        onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
       />
     </View>
