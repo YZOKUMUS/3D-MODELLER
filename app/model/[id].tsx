@@ -9,7 +9,7 @@ import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
 
-const WHATSAPP_NUMBER = '905551234567';
+const WHATSAPP_NUMBER = '905357685477';
 
 export default function ModelDetailScreen() {
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
