@@ -1,5 +1,8 @@
 # Her push'ta siteyi otomatik derleyip GitHub Pages'e yükler.
-# Ayar: Repo → Settings → Pages → "Build and deployment" → Source: GitHub Actions
+# Ayar: Repo -> Settings -> Pages -> Source: GitHub Actions
+#
+# NOT: Hesapta "billing" kilidi varsa bu is AKISMAZ. O zaman KOLAY-GITHUB-PAGES.txt
+# icindeki "Deploy from a branch" + docs/ yontemini kullanin (npm run publish:docs).
 
 name: GitHub Pages web yayini
 

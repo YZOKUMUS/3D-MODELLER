@@ -1,19 +1,33 @@
-KOLAY YOL — GitHub'da siteyi acmak (otomatik)
+GITHUB PAGES — 404 cozumu (acele)
 
-1) Bu klasorde degisiklik yaptiktan sonra her zamanki gibi:
-   git add .
-   git commit -m "mesaj"
-   git push origin main
+A) NEDEN 404?
+   1) GitHub Actions hesabinizda "billing" kilidi varsa OTOMATIK workflow CALISMAZ.
+      Actions sekmesinde kirmizi hata: "account is locked due to a billing issue"
+      => https://github.com/settings/billing adresinden kontrol edin.
+   2) Ucretsiz hesapta repo GIZLI (private) ise github.io sayfasi genelde acilmaz.
+      Repo: Settings -> Danger Zone -> Change visibility -> PUBLIC yapin.
 
-2) GitHub'da: https://github.com/YZOKUMUS/3D-MODELLER
-   Settings (Ayarlar) → sol menuden "Pages"
+B) EN KOLAY CALISAN YOL (Actions gerekmez)
 
-3) "Build and deployment" bolumunde Source: GitHub Actions secili olsun.
-   (Ilk seferde "GitHub Actions" sozlugu gorunursa onu sec.)
+   1) GitHub: https://github.com/YZOKUMUS/3D-MODELLER/settings/pages
+      "Build and deployment" -> Source: "Deploy from a branch"
+      Branch: main   Folder: /docs   Save
 
-4) Ust menuden "Actions" sekmesine git; sari is calissin bitsin (2-10 dk).
+   2) Bilgisayarda (model-market klasorunde):
+      npm run publish:docs
+      (biraz surer, cok sayida resim var)
 
-5) Site adresi (genelde birkac dakika sonra):
-   https://YZOKUMUS.github.io/3D-MODELLER/
+   3) Yukle:
+      git add docs
+      git commit -m "docs: web sitesi"
+      git push origin main
 
-Not: Yerelde denemek icin: npm run export:web  sonra dist klasorunu acabilirsin.
+   4) 2-5 dakika bekleyin, sonra acin:
+      https://YZOKUMUS.github.io/3D-MODELLER/
+
+C) Faturalandirma duzelirse
+   .github/workflows/deploy-pages.yml tekrar otomatik calisir;
+   Pages kaynagi "GitHub Actions" ise branch/docs yerine o da kullanilabilir.
+
+D) Hala istemezseniz
+   Netlify veya Cloudflare Pages: ucretsiz, surukle-birak veya repo bagla (ayri anlatilir).
