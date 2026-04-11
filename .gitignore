@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# optimize-images.cjs bir kerelik yedek olusturur; repoya tekrar girmesin
+assets/covers-original/
