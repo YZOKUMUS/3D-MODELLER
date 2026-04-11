@@ -247,15 +247,15 @@ export default function StoreScreen() {
         )}
       </ScrollView>
 
-      <View style={[styles.fabColumn, { bottom: tabBarHeight + 16 }]} pointerEvents="box-none">
+      <View style={[styles.fabColumn, { bottom: tabBarHeight + 10 }]} pointerEvents="box-none">
         <Animated.View
-          style={[styles.fabSlot, { bottom: 54, opacity: fabUpOpacity }]}
+          style={[styles.fabSlot, { bottom: 44, opacity: fabUpOpacity }]}
           pointerEvents={fabUpHit ? 'box-none' : 'none'}>
           <Pressable
             onPress={scrollToTop}
             style={styles.fab}
             accessibilityLabel="En üste git">
-            <Icon name="chevron-up" size={20} color="#fff" />
+            <Icon name="chevron-up" size={18} color="#d4d4d8" />
           </Pressable>
         </Animated.View>
         <Animated.View
@@ -265,7 +265,7 @@ export default function StoreScreen() {
             onPress={scrollToBottom}
             style={styles.fab}
             accessibilityLabel="En alta git">
-            <Icon name="chevron-down" size={20} color="#fff" />
+            <Icon name="chevron-down" size={18} color="#d4d4d8" />
           </Pressable>
         </Animated.View>
       </View>
@@ -379,9 +379,9 @@ const styles = StyleSheet.create({
   },
   fabColumn: {
     position: 'absolute',
-    right: 16,
-    width: 44,
-    height: 98,
+    left: 10,
+    width: 36,
+    height: 80,
     alignItems: 'center',
   },
   fabSlot: {
@@ -391,16 +391,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fab: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#00c853',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(30, 30, 36, 0.88)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
