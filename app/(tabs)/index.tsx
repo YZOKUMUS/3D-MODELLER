@@ -1,7 +1,7 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   NativeScrollEvent,
@@ -18,14 +18,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridModelCard } from '@/components/GridModelCard';
-import { CATALOG, CATEGORIES, type ModelCategory } from '@/data/catalog';
+import { CATALOG, CATALOG_TAB_CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
 
 const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' }[] = [
   { id: 'all', label: 'Senin İçin', category: 'Tümü' },
   { id: 'trending', label: 'Trend', category: 'Tümü' },
-  ...CATEGORIES.map((c) => ({ id: c, label: c, category: c as ModelCategory })),
+  ...CATALOG_TAB_CATEGORIES.map((c) => ({ id: c, label: c, category: c })),
 ];
 
 export default function StoreScreen() {
@@ -38,6 +38,14 @@ export default function StoreScreen() {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [visibleCount, setVisibleCount] = useState(20);
+
+  const validTabIds = useMemo(() => new Set(ALL_TABS.map((t) => t.id)), []);
+
+  useEffect(() => {
+    if (!validTabIds.has(activeTab)) {
+      setActiveTab('all');
+    }
+  }, [activeTab, validTabIds]);
 
   const scrollRef = useRef<ScrollView>(null);
   const fabOpacity = useRef(new Animated.Value(0)).current;

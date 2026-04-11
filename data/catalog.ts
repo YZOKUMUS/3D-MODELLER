@@ -16,6 +16,7 @@ export type CatalogModel = {
   rating: number;
 };
 
+/** Sekme sırası; yeni `ModelCategory` eklerken buraya da ekleyin (ürünü olanlar sekmede görünür). */
 export const CATEGORIES: ModelCategory[] = [
   'Araç',
   'Motorsiklet',
@@ -3500,13 +3501,13 @@ export const CATALOG: CatalogModel[] = [
   },
   {
     id: '249',
-    title: 'IMG 9515',
-    tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
+    title: 'GEMİ',
+    tagline: 'GEMİ',
     price: 849,
     formats: ['GLB', 'OBJ', 'FBX'],
     category: 'Aksesuar',
     description:
-      'Bu kayıt klasördeki IMG_9515.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
+      'GEMİ',
     coverImage: require('../assets/covers/cover-249.jpg'),
     accent: '#5B8DEF',
     polyCount: '—',
@@ -3702,7 +3703,7 @@ export const CATALOG: CatalogModel[] = [
   {
     id: '264',
     title: 'HARRY POTTER TRAIN',
-    tagline: 'HARRY POTTER TRAIN · GLB, OBJ, FBX, STL',
+    tagline: 'HARRY POTTER TRAIN',
     price: 1000,
     formats: ['GLB', 'OBJ', 'FBX', 'STL'],
     category: 'Araç',
@@ -3714,18 +3715,27 @@ export const CATALOG: CatalogModel[] = [
   },
   {
     id: '265',
-    title: 'TAŞ FIRLATMA ARACI',
-    tagline: 'TAŞ FIRLATMA ARACI · GLB, OBJ, FBX, STL',
+    title: 'MANCINIK',
+    tagline: 'MANCINIK',
     price: 1999,
     formats: ['GLB', 'OBJ', 'FBX', 'STL'],
     category: 'Silah',
-    description: 'TAŞ FIRLATMA ARACI modeli',
+    description: 'TAŞ FIRLATMA ARACI',
     coverImage: require('../assets/covers/cover-265.jpg'),
     accent: '#5B8DEF',
     polyCount: '—',
     rating: 4.4,
   },
 ];
+
+/** Katalogda en az bir ürünü olan kategoriler; sekme sırası `CATEGORIES` ile aynı. */
+const _categoriesInCatalog = new Set<ModelCategory>();
+for (const m of CATALOG) {
+  _categoriesInCatalog.add(m.category);
+}
+export const CATALOG_TAB_CATEGORIES: ModelCategory[] = CATEGORIES.filter((c) =>
+  _categoriesInCatalog.has(c)
+);
 
 export function getModelById(id: string): CatalogModel | undefined {
   return CATALOG.find((m) => m.id === id);

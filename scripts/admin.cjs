@@ -12,6 +12,29 @@ const CATALOG = path.join(ROOT, 'data', 'catalog.ts');
 
 fs.mkdirSync(COVERS, { recursive: true });
 
+/** `data/catalog.ts` icindeki `CATEGORIES` — tek kaynak; yeni kategori buraya eklenir. */
+function parseCategoriesFromCatalog() {
+  try {
+    const src = fs.readFileSync(CATALOG, 'utf8');
+    const m = src.match(/export const CATEGORIES:\s*ModelCategory\[\]\s*=\s*\[([\s\S]*?)\]\s*;/);
+    if (!m) return [];
+    const out = [];
+    for (const line of m[1].split('\n')) {
+      const x = line.match(/^\s*'((?:\\'|[^'])*)'\s*,?\s*$/);
+      if (x) out.push(x[1].replace(/\\'/g, "'"));
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+function getAllowedCategorySet() {
+  const list = parseCategoriesFromCatalog();
+  if (list.length) return new Set(list);
+  return new Set(['Araç', 'Motorsiklet', 'Silah', 'Tank', 'Figür', 'Aksesuar']);
+}
+
 function nextCoverIndex() {
   const files = fs.readdirSync(COVERS).filter(f => /^cover-\d+\.jpg$/i.test(f));
   let max = 0;
@@ -58,17 +81,37 @@ function appendToCatalog(entry) {
 function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
 function listModels() {
-  const src = fs.readFileSync(CATALOG, 'utf8');
-  const re = /\{\s*id:\s*'(\d+)',\s*title:\s*'([^']*)',[\s\S]*?price:\s*(\d+),[\s\S]*?description:\s*(?:'([^']*)'|[\s\S]*?'([^']*)'),[\s\S]*?coverImage:\s*require\('\.\.\/(assets\/covers\/[^']+)'\)/g;
+  const lines = fs.readFileSync(CATALOG, 'utf8').split('\n');
   const models = [];
-  let m;
-  while ((m = re.exec(src)) !== null) {
+  for (let i = 0; i < lines.length; i++) {
+    const idM = lines[i].match(/^\s*id:\s*'(\d+)'\s*,?\s*$/);
+    if (!idM) continue;
+    const id = idM[1];
+    let start = i;
+    while (start > 0 && !/^\s*\{\s*$/.test(lines[start])) start--;
+    let end = i;
+    while (end < lines.length && !/^\s*\},?\s*$/.test(lines[end])) end++;
+    const block = lines.slice(start, end + 1).join('\n');
+    const titleM = block.match(/title:\s*'((?:\\'|[^'])*)'/);
+    const priceM = block.match(/price:\s*(\d+)/);
+    const catM = block.match(/category:\s*'([^']+)'/);
+    const coverM = block.match(/coverImage:\s*require\('\.\.\/(assets\/covers\/[^']+)'\)/);
+    let description = '';
+    const desc1 = block.match(/description:\s*'((?:\\'|[^'])*)'/);
+    if (desc1) {
+      description = desc1[1].replace(/\\'/g, "'");
+    } else {
+      const desc2 = block.match(/description:\s*\r?\n\s*'((?:\\'|[^'])*)'/);
+      if (desc2) description = desc2[1].replace(/\\'/g, "'");
+    }
+    if (!titleM || !priceM || !catM || !coverM) continue;
     models.push({
-      id: m[1],
-      title: m[2].replace(/\\'/g, "'"),
-      price: parseInt(m[3], 10),
-      description: (m[4] || m[5] || '').replace(/\\'/g, "'"),
-      cover: m[6],
+      id,
+      title: titleM[1].replace(/\\'/g, "'"),
+      price: parseInt(priceM[1], 10),
+      category: catM[1],
+      description,
+      cover: coverM[1],
     });
   }
   return models.reverse();
@@ -101,6 +144,9 @@ function updateModel(id, fields) {
           lines[i + 1] = lines[i + 1].replace(/^\s*'[^']*'/, `      '${esc(fields.description)}'`);
         }
       }
+    }
+    if (fields.category != null) {
+      lines[i] = lines[i].replace(/^(\s*category:\s*)'[^']*'/, `$1'${esc(fields.category)}'`);
     }
   }
 
@@ -187,14 +233,9 @@ button[type=submit]:disabled{opacity:.5;cursor:wait}
     <input type="number" name="price" required min="1" step="1" placeholder="299">
 
     <label>Kategori</label>
-    <select name="category" required>
-      <option value="">Sec...</option>
-      <option value="Arac">Arac</option>
-      <option value="Motorsiklet">Motorsiklet</option>
-      <option value="Silah">Silah</option>
-      <option value="Tank">Tank</option>
-      <option value="Figur">Figur</option>
-      <option value="Aksesuar">Aksesuar</option>
+    <p style="font-size:12px;color:#64748b;margin:4px 0 8px;line-height:1.4">Liste <code style="background:#f1f5f9;padding:2px 6px;border-radius:6px">data/catalog.ts</code> icindeki <code style="background:#f1f5f9;padding:2px 6px;border-radius:6px">CATEGORIES</code> dizisinden gelir. Yeni kategori icin orada tanimlayip admin sayfasini yenileyin.</p>
+    <select name="category" required id="add-category">
+      <option value="">Yukleniyor...</option>
     </select>
 
     <label>Dosya Formatlari</label>
@@ -251,6 +292,24 @@ async function doSubmit(){
   }catch(ex){m.className='msg err';m.textContent=ex.message;}
   btn.disabled=false;btn.textContent='Modeli Ekle';
 }
+async function initAddCategories(){
+  try{
+    const r=await fetch('/api/categories');
+    const j=await r.json();
+    const sel=document.getElementById('add-category');
+    sel.innerHTML='<option value="">Sec...</option>';
+    const cats=j.categories||[];
+    for(const c of cats){
+      const o=document.createElement('option');
+      o.value=c;o.textContent=c;
+      sel.appendChild(o);
+    }
+    if(!cats.length){sel.innerHTML='<option value="">Kategori listesi okunamadi</option>';}
+  }catch(e){
+    document.getElementById('add-category').innerHTML='<option value="">Hata: kategoriler yuklenemedi</option>';
+  }
+}
+initAddCategories();
 fetch('/api/count').then(r=>r.json()).then(j=>{document.getElementById('cnt').textContent='Mevcut: '+j.total+' model';});
 </script>
 </body>
@@ -294,6 +353,8 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 .modal input,.modal textarea{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit}
 .modal input:focus,.modal textarea:focus{border-color:#0369a1}
 .modal textarea{resize:vertical;min-height:80px}
+.modal select{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;background:#fff}
+.modal select:focus{border-color:#0369a1}
 .modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 .modal-btns button{padding:12px 24px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
 .btn-cancel{background:#f1f5f9;color:#334155}
@@ -334,6 +395,8 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
     <input type="text" id="edit-title">
     <label>Fiyat (TL)</label>
     <input type="number" id="edit-price" min="1">
+    <label>Kategori</label>
+    <select id="edit-category"><option value="">Yukleniyor...</option></select>
     <label>Aciklama</label>
     <textarea id="edit-desc"></textarea>
     <div class="modal-btns">
@@ -347,6 +410,7 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 
 <script>
 let allModels=[];
+let categoryList=[];
 let deleteId=null;
 let editId=null;
 
@@ -357,17 +421,32 @@ function showToast(msg){
 }
 
 async function load(){
-  const r=await fetch('/api/list');
-  const j=await r.json();
+  const [rList,rCat]=await Promise.all([fetch('/api/list'),fetch('/api/categories')]);
+  const j=await rList.json();
+  const jc=await rCat.json();
   allModels=j.models;
+  categoryList=jc.categories||[];
   filterList();
   document.getElementById('total').textContent='Toplam: '+allModels.length+' model';
+}
+
+function populateEditCategorySelect(current){
+  const sel=document.getElementById('edit-category');
+  const cur=current||'';
+  const merged=[...new Set([...categoryList,cur].filter(Boolean))];
+  sel.innerHTML='';
+  for(const c of merged){
+    const o=document.createElement('option');
+    o.value=c;o.textContent=c;
+    sel.appendChild(o);
+  }
+  sel.value=merged.includes(cur)?cur:(categoryList[0]||merged[0]||'');
 }
 
 function filterList(){
   const q=document.getElementById('q').value.toLowerCase().trim();
   const grid=document.getElementById('grid');
-  const filtered=q?allModels.filter(m=>m.title.toLowerCase().includes(q)||m.id.includes(q)):allModels;
+  const filtered=q?allModels.filter(m=>m.title.toLowerCase().includes(q)||m.id.includes(q)||(m.category&&m.category.toLowerCase().includes(q))):allModels;
   if(filtered.length===0){
     grid.innerHTML='<div class="empty">'+(!q?'Henuz model yok.':'Sonuc bulunamadi.')+'</div>';
     return;
@@ -377,7 +456,7 @@ function filterList(){
       <img src="/cover/\${m.cover.split('/').pop()}" alt="\${m.title}" onerror="this.style.background='#e2e8f0'">
       <div class="item-body">
         <div class="item-title">\${m.title}</div>
-        <div class="item-id">ID: \${m.id} · \${m.price} TL</div>
+        <div class="item-id">ID: \${m.id} · \${m.category || '?'} · \${m.price} TL</div>
         <div class="btn-row">
           <button class="edit-btn" onclick="openEdit('\${m.id}')">Duzenle</button>
           <button class="del-btn" onclick="askDelete('\${m.id}','\${m.title.replace(/'/g,"\\\\'")}')">Sil</button>
@@ -394,6 +473,7 @@ function openEdit(id){
   document.getElementById('edit-title').value=m.title;
   document.getElementById('edit-price').value=m.price;
   document.getElementById('edit-desc').value=m.description||'';
+  populateEditCategorySelect(m.category);
   document.getElementById('edit-overlay').style.display='flex';
 }
 
@@ -408,13 +488,14 @@ async function saveEdit(){
   btn.disabled=true;btn.textContent='Kaydediliyor...';
   const title=document.getElementById('edit-title').value.trim();
   const price=parseInt(document.getElementById('edit-price').value,10);
+  const category=document.getElementById('edit-category').value;
   const description=document.getElementById('edit-desc').value.trim();
   try{
-    const r=await fetch('/api/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editId,title,price,description})});
+    const r=await fetch('/api/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editId,title,price,category,description})});
     const j=await r.json();
     if(j.ok){
       const m=allModels.find(x=>x.id===editId);
-      if(m){m.title=title;m.price=price;m.description=description;}
+      if(m){m.title=title;m.price=price;m.category=category;m.description=description;}
       filterList();
       showToast('Kaydedildi!');
     }else{alert('Hata: '+j.error);}
@@ -494,6 +575,7 @@ function parseMultipart(req, cb) {
   });
 }
 
+/** Eski admin kayitlari (ASCII) */
 const CATEGORY_MAP = { Arac: 'Araç', Figur: 'Figür' };
 
 const server = http.createServer((req, res) => {
@@ -515,6 +597,12 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify({ models }));
   }
 
+  if (req.url === '/api/categories' && req.method === 'GET') {
+    const categories = parseCategoriesFromCatalog();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ categories }));
+  }
+
   if (req.url === '/api/update' && req.method === 'POST') {
     const chunks = [];
     req.on('data', c => chunks.push(c));
@@ -524,6 +612,10 @@ const server = http.createServer((req, res) => {
         const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
         const id = String(body.id || '').trim();
         if (!id) return res.end(JSON.stringify({ ok: false, error: 'ID gerekli' }));
+        const allowed = getAllowedCategorySet();
+        if (body.category != null && body.category !== '' && !allowed.has(String(body.category))) {
+          return res.end(JSON.stringify({ ok: false, error: 'Gecersiz kategori (catalog.ts CATEGORIES)' }));
+        }
         const ok = updateModel(id, body);
         if (!ok) return res.end(JSON.stringify({ ok: false, error: 'Model bulunamadi' }));
         console.log('Guncellendi: id=' + id, body.title || '', body.price || '', body.description ? '(aciklama)' : '');
@@ -574,6 +666,9 @@ const server = http.createServer((req, res) => {
 
       if (!title || !price || !category) {
         return res.end(JSON.stringify({ ok: false, error: 'Isim, fiyat ve kategori zorunlu' }));
+      }
+      if (!getAllowedCategorySet().has(category)) {
+        return res.end(JSON.stringify({ ok: false, error: 'Gecersiz kategori (catalog.ts CATEGORIES)' }));
       }
 
       const idx = nextCoverIndex();
