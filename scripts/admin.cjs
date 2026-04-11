@@ -84,6 +84,61 @@ ${galleryLines}    accent: '${entry.accent}',
 
 function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
+/** Model nesnesindeki `galleryImages` icindeki dosya adlari (sadece ekler; kapak degil). */
+function parseGalleryFilenames(block) {
+  const m = block.match(/galleryImages:\s*\[([\s\S]*?)\]\s*,/);
+  if (!m) return [];
+  return [...m[1].matchAll(/require\('\.\.\/assets\/covers\/([^']+)'\)/g)].map((x) => x[1]);
+}
+
+function findModelBlockBounds(lines, id) {
+  const idLine = lines.findIndex((l) => l.match(new RegExp(`^\\s*id:\\s*'${id}'\\s*,?\\s*$`)));
+  if (idLine === -1) return null;
+  let start = idLine;
+  while (start > 0 && !lines[start].match(/^\s*\{/)) start--;
+  let end = idLine;
+  while (end < lines.length - 1 && !lines[end].match(/^\s*\},?/)) end++;
+  return { start, end };
+}
+
+function injectGalleryIntoBlock(block, galleryFilenames) {
+  const hasGallery = galleryFilenames && galleryFilenames.length > 0;
+  if (hasGallery) {
+    const galBlock = `    galleryImages: [\n${galleryFilenames.map((f) => `      require('../assets/covers/${f}'),`).join('\n')}\n    ],`;
+    if (/galleryImages:\s*\[/.test(block)) {
+      return block.replace(/galleryImages:\s*\[[\s\S]*?\]\s*,/, galBlock + ',');
+    }
+    return block.replace(
+      /(coverImage:\s*require\('\.\.\/assets\/covers\/[^']+'\)\s*,)\s*\r?\n(\s*accent:)/,
+      `$1\n${galBlock},\n$2`,
+    );
+  }
+  return block.replace(/\r?\n\s*galleryImages:\s*\[[\s\S]*?\]\s*,\s*/, '\n');
+}
+
+function replaceModelBlockInSrc(src, bounds, newBlockText) {
+  const lines = src.split('\n');
+  const { start, end } = bounds;
+  const newLines = newBlockText.split('\n');
+  return [...lines.slice(0, start), ...newLines, ...lines.slice(end + 1)].join('\n');
+}
+
+function countRefsToFileInCatalog(src, fileBasename) {
+  const escaped = fileBasename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`require\\('\\.\\./assets/covers/${escaped}'\\)`, 'g');
+  return (src.match(re) || []).length;
+}
+
+async function jpegCoverFromUpload(buf) {
+  let out = buf;
+  if (sharp) {
+    try {
+      out = await sharp(buf).resize(400, null, { withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+    } catch (_) {}
+  }
+  return out;
+}
+
 function listModels() {
   const lines = fs.readFileSync(CATALOG, 'utf8').split('\n');
   const models = [];
@@ -109,8 +164,7 @@ function listModels() {
       if (desc2) description = desc2[1].replace(/\\'/g, "'");
     }
     if (!titleM || !priceM || !catM || !coverM) continue;
-    const coverRequires = block.match(/require\('\.\.\/assets\/covers\/[^']+'\)/g) || [];
-    const galleryCount = Math.max(0, coverRequires.length - 1);
+    const galleryFiles = parseGalleryFilenames(block);
     models.push({
       id,
       title: titleM[1].replace(/\\'/g, "'"),
@@ -118,7 +172,8 @@ function listModels() {
       category: catM[1],
       description,
       cover: coverM[1],
-      galleryCount,
+      gallery: galleryFiles,
+      galleryCount: galleryFiles.length,
     });
   }
   return models.reverse();
@@ -368,7 +423,7 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 .empty{text-align:center;padding:48px 20px;color:#94a3b8;font-size:16px}
 .total{max-width:800px;margin:16px auto 0;font-size:13px;color:#94a3b8}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:99;display:none}
-.modal{background:#fff;border-radius:20px;padding:28px;max-width:420px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.modal{background:#fff;border-radius:20px;padding:28px;max-width:480px;width:92%;box-shadow:0 16px 48px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto}
 .modal h2{font-size:18px;font-weight:800;margin-bottom:16px}
 .modal label{display:block;font-weight:700;font-size:13px;color:#334155;margin-bottom:6px;margin-top:14px}
 .modal input,.modal textarea{width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit}
@@ -385,6 +440,19 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 .btn-confirm{background:#dc2626;color:#fff}
 .btn-confirm:hover{background:#b91c1c}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#065f46;color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;display:none;z-index:100}
+.gal-list{max-height:200px;overflow-y:auto;margin-top:8px;padding:8px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0}
+.gal-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.gal-row:last-child{margin-bottom:0}
+.gal-row img{width:52px;height:52px;object-fit:cover;border-radius:8px;background:#e2e8f0}
+.gal-row span{flex:1;font-size:12px;color:#64748b;word-break:break-all}
+.gal-remove{padding:8px 12px;border:none;border-radius:8px;background:#fee2e2;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer}
+.gal-remove:hover{background:#fecaca}
+.gal-remove:disabled{opacity:.5;cursor:wait}
+.gal-add-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.gal-add-row input[type=file]{font-size:13px;max-width:100%}
+.gal-add-btn{padding:10px 16px;border:none;border-radius:10px;background:#0d9488;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.gal-add-btn:hover{background:#0f766e}
+.gal-add-btn:disabled{opacity:.5;cursor:wait}
 </style>
 </head>
 <body>
@@ -420,6 +488,15 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
     <select id="edit-category"><option value="">Yukleniyor...</option></select>
     <label>Aciklama</label>
     <textarea id="edit-desc"></textarea>
+
+    <label>Detay fotograflari (kaydirmali galeri)</label>
+    <p style="font-size:12px;color:#64748b;margin:4px 0 0;line-height:1.4">Kapak listedeki resim; buradakiler urun detayinda soldan saga kaydirilir. Tek tek silebilir veya yeni resim yukleyebilirsiniz.</p>
+    <div class="gal-list" id="edit-gallery-list"></div>
+    <div class="gal-add-row">
+      <input type="file" id="edit-gal-in" accept="image/jpeg,image/png,image/webp" multiple>
+      <button type="button" class="gal-add-btn" id="edit-gal-btn" onclick="uploadGalleryAdds()">Fotograf ekle</button>
+    </div>
+
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeEdit()">Vazgec</button>
       <button class="btn-save" id="edit-save-btn" onclick="saveEdit()">Kaydet</button>
@@ -434,6 +511,7 @@ let allModels=[];
 let categoryList=[];
 let deleteId=null;
 let editId=null;
+let editGalleryFiles=[];
 
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -487,20 +565,82 @@ function filterList(){
   \`).join('');
 }
 
+function renderEditGallery(){
+  const el=document.getElementById('edit-gallery-list');
+  if(!editGalleryFiles.length){
+    el.innerHTML='<p style="font-size:13px;color:#94a3b8;margin:0">Ek fotograf yok. Asagidan ekleyebilirsiniz.</p>';
+    return;
+  }
+  el.innerHTML=editGalleryFiles.map((fn,i)=>\`<div class="gal-row">
+    <img src="/cover/\${fn}" alt="" onerror="this.style.opacity=0.3">
+    <span>\${fn}</span>
+    <button type="button" class="gal-remove" data-idx="\${i}" onclick="removeGalleryAt(\${i})">Sil</button>
+  </div>\`).join('');
+}
+
 function openEdit(id){
   const m=allModels.find(x=>x.id===id);
   if(!m)return;
   editId=id;
+  editGalleryFiles=Array.isArray(m.gallery)?m.gallery.slice():[];
   document.getElementById('edit-title').value=m.title;
   document.getElementById('edit-price').value=m.price;
   document.getElementById('edit-desc').value=m.description||'';
+  document.getElementById('edit-gal-in').value='';
   populateEditCategorySelect(m.category);
+  renderEditGallery();
   document.getElementById('edit-overlay').style.display='flex';
 }
 
 function closeEdit(){
   editId=null;
+  editGalleryFiles=[];
   document.getElementById('edit-overlay').style.display='none';
+}
+
+async function removeGalleryAt(i){
+  if(editId===null||i===undefined)return;
+  if(!confirm('Bu fotografi galeriden kaldir? Dosya baska yerde kullanilmiyorsa silinir.'))return;
+  const btn=document.querySelector('.gal-remove[data-idx="'+i+'"]');
+  if(btn)btn.disabled=true;
+  try{
+    const r=await fetch('/api/remove-gallery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editId,index:i})});
+    const j=await r.json();
+    if(j.ok){
+      editGalleryFiles=Array.isArray(j.gallery)?j.gallery:[];
+      renderEditGallery();
+      const m=allModels.find(x=>x.id===editId);
+      if(m){m.gallery=editGalleryFiles.slice();m.galleryCount=editGalleryFiles.length;}
+      filterList();
+      showToast('Fotograf kaldirildi');
+    }else{alert('Hata: '+j.error);}
+  }catch(e){alert(e.message);}
+  finally{if(btn)btn.disabled=false;}
+}
+
+async function uploadGalleryAdds(){
+  if(!editId)return;
+  const inp=document.getElementById('edit-gal-in');
+  if(!inp.files||!inp.files.length){alert('Once bir veya birden fazla resim secin.');return;}
+  const fd=new FormData();
+  fd.set('id',editId);
+  for(let k=0;k<inp.files.length;k++)fd.append('gallery',inp.files[k]);
+  const btn=document.getElementById('edit-gal-btn');
+  btn.disabled=true;
+  try{
+    const r=await fetch('/api/add-gallery',{method:'POST',body:fd});
+    const j=await r.json();
+    if(j.ok){
+      editGalleryFiles=Array.isArray(j.gallery)?j.gallery:[];
+      inp.value='';
+      renderEditGallery();
+      const m=allModels.find(x=>x.id===editId);
+      if(m){m.gallery=editGalleryFiles.slice();m.galleryCount=editGalleryFiles.length;}
+      filterList();
+      showToast(j.added?('+'+j.added+' fotograf eklendi'):'Eklendi');
+    }else{alert('Hata: '+j.error);}
+  }catch(e){alert(e.message);}
+  finally{btn.disabled=false;}
 }
 
 async function saveEdit(){
@@ -647,6 +787,80 @@ const server = http.createServer((req, res) => {
     });
   }
 
+  if (req.url === '/api/add-gallery' && req.method === 'POST') {
+    return parseMultipart(req, async (err, fields, files) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      const id = String(fields.id || '').trim();
+      const parts = files.filter((f) => f.fieldName === 'gallery' && f.data && f.data.length);
+      if (err || !id) return res.end(JSON.stringify({ ok: false, error: 'Model ID gerekli' }));
+      if (!parts.length) return res.end(JSON.stringify({ ok: false, error: 'En az bir resim secin' }));
+
+      let src = fs.readFileSync(CATALOG, 'utf8');
+      const lines = src.split('\n');
+      const bounds = findModelBlockBounds(lines, id);
+      if (!bounds) return res.end(JSON.stringify({ ok: false, error: 'Model bulunamadi' }));
+
+      const oldBlock = lines.slice(bounds.start, bounds.end + 1).join('\n');
+      let currentGallery = parseGalleryFilenames(oldBlock);
+
+      let idx = nextCoverIndex();
+      const newNames = [];
+      for (const g of parts) {
+        const name = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
+        idx += 1;
+        const buf = await jpegCoverFromUpload(g.data);
+        fs.writeFileSync(path.join(COVERS, name), buf);
+        newNames.push(name);
+      }
+      currentGallery = currentGallery.concat(newNames);
+      const newBlock = injectGalleryIntoBlock(oldBlock, currentGallery);
+      fs.writeFileSync(CATALOG, replaceModelBlockInSrc(src, bounds, newBlock), 'utf8');
+
+      console.log('Galeri ekle id=' + id, '+' + newNames.length);
+      res.end(JSON.stringify({ ok: true, gallery: currentGallery, added: newNames.length }));
+    });
+  }
+
+  if (req.url === '/api/remove-gallery' && req.method === 'POST') {
+    const chunks = [];
+    req.on('data', (c) => chunks.push(c));
+    return req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      try {
+        const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+        const id = String(body.id || '').trim();
+        const index = parseInt(body.index, 10);
+        if (!id || !Number.isFinite(index) || index < 0) {
+          return res.end(JSON.stringify({ ok: false, error: 'ID ve gecerli sira numarasi gerekli' }));
+        }
+        let src = fs.readFileSync(CATALOG, 'utf8');
+        const lines = src.split('\n');
+        const bounds = findModelBlockBounds(lines, id);
+        if (!bounds) return res.end(JSON.stringify({ ok: false, error: 'Model bulunamadi' }));
+
+        const oldBlock = lines.slice(bounds.start, bounds.end + 1).join('\n');
+        const currentGallery = parseGalleryFilenames(oldBlock);
+        if (index >= currentGallery.length) {
+          return res.end(JSON.stringify({ ok: false, error: 'Bu sirada fotograf yok' }));
+        }
+        const removed = currentGallery[index];
+        currentGallery.splice(index, 1);
+        const newBlock = injectGalleryIntoBlock(oldBlock, currentGallery);
+        src = replaceModelBlockInSrc(src, bounds, newBlock);
+        fs.writeFileSync(CATALOG, src, 'utf8');
+
+        if (countRefsToFileInCatalog(src, removed) === 0) {
+          const fp = path.join(COVERS, removed);
+          if (fs.existsSync(fp)) fs.unlinkSync(fp);
+        }
+        console.log('Galeri sil id=' + id, removed);
+        res.end(JSON.stringify({ ok: true, gallery: currentGallery }));
+      } catch (e) {
+        res.end(JSON.stringify({ ok: false, error: e.message }));
+      }
+    });
+  }
+
   if (req.url === '/api/delete' && req.method === 'POST') {
     const chunks = [];
     req.on('data', c => chunks.push(c));
@@ -695,20 +909,10 @@ const server = http.createServer((req, res) => {
         return res.end(JSON.stringify({ ok: false, error: 'Gecersiz kategori (catalog.ts CATEGORIES)' }));
       }
 
-      async function processImageBuffer(buf) {
-        let out = buf;
-        if (sharp) {
-          try {
-            out = await sharp(buf).resize(400, null, { withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
-          } catch (_) {}
-        }
-        return out;
-      }
-
       let idx = nextCoverIndex();
       const coverFile = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
       idx += 1;
-      const mainBuf = await processImageBuffer(main.data);
+      const mainBuf = await jpegCoverFromUpload(main.data);
       fs.writeFileSync(path.join(COVERS, coverFile), mainBuf);
 
       const galleryParts = files.filter((f) => f.fieldName === 'gallery' && f.data && f.data.length);
@@ -716,7 +920,7 @@ const server = http.createServer((req, res) => {
       for (const g of galleryParts) {
         const name = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
         idx += 1;
-        const gb = await processImageBuffer(g.data);
+        const gb = await jpegCoverFromUpload(g.data);
         fs.writeFileSync(path.join(COVERS, name), gb);
         galleryFiles.push(name);
       }
