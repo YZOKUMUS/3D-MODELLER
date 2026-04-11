@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-title Model Market - Admin Panel
+title YZOKUMUS - Admin Panel
 
 echo.
-echo  Model Market Admin Paneli
+echo  YZOKUMUS Admin Paneli
 echo  Proje: %CD%
 echo.
 

@@ -187,7 +187,7 @@ const HTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Model Market — Yeni Model Ekle</title>
+<title>YZOKUMUS — Yeni Model Ekle</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0fdf4;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -216,7 +216,7 @@ button[type=submit]:disabled{opacity:.5;cursor:wait}
 </head>
 <body>
 <div class="card">
-  <h1>Yeni Model Ekle</h1>
+  <h1>YZOKUMUS — Yeni Model Ekle</h1>
   <p class="sub">Resim sec, bilgileri gir, Ekle'ye bas. Gerisi otomatik.</p>
   <form id="f" enctype="multipart/form-data">
     <div class="file-area" id="drop">
@@ -320,7 +320,7 @@ const MANAGE_HTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Model Market — Modelleri Yonet</title>
+<title>YZOKUMUS — Modelleri Yonet</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fef2f2;min-height:100vh;padding:24px}
@@ -368,7 +368,7 @@ h1{font-size:22px;font-weight:800;color:#7f1d1d}
 </head>
 <body>
 <div class="header">
-  <h1>Modelleri Yonet</h1>
+  <h1>YZOKUMUS — Modelleri Yonet</h1>
   <a href="/" class="back">+ Yeni Model Ekle</a>
 </div>
 <div class="search-row">
@@ -720,7 +720,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  Model Market — Admin Panel');
+  console.log('  YZOKUMUS — Admin Panel');
   console.log('  http://localhost:' + PORT);
   console.log('');
   console.log('  Resim sec, bilgileri gir, Ekle\'ye bas.');

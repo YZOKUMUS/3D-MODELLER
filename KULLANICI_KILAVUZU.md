@@ -1,6 +1,6 @@
-# Model Market — Kullanıcı Kılavuzu
+# YZOKUMUS — Kullanıcı Kılavuzu
 
-Bu belge **3B model vitrin uygulaması** (Expo / React Native) ve **yerel admin paneli** için hazırlanmıştır.
+Bu belge **YZOKUMUS** 3B model vitrin uygulaması (Expo / React Native) ve **yerel admin paneli** için hazırlanmıştır.
 
 ---
 

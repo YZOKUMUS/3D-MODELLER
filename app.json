@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Model Market",
+    "name": "YZOKUMUS",
     "slug": "model-market",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,13 +28,13 @@
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png",
-      "name": "Model Market",
-      "shortName": "Model Market",
+      "name": "YZOKUMUS",
+      "shortName": "YZOKUMUS",
       "lang": "tr",
       "themeColor": "#0d9488",
       "backgroundColor": "#064e3b",
       "display": "standalone",
-      "description": "3D model magazasi"
+      "description": "YZOKUMUS — 3D baskı vitrin"
     },
     "plugins": [
       "expo-router"

@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-title Model Market - Expo
+title YZOKUMUS - Expo
 
 echo.
-echo  Model Market baslatiliyor...
+echo  YZOKUMUS baslatiliyor...
 echo  Proje: %CD%
 echo.
 

@@ -24,7 +24,7 @@ export default function ModalScreen() {
       <View style={[styles.iconWrap, { backgroundColor: colors.tint }]}>
         <Icon name="info-circle" size={28} color="#fff" />
       </View>
-      <Text style={[styles.title, { color: colors.text }]}>Model Market</Text>
+      <Text style={[styles.title, { color: colors.text }]}>YZOKUMUS</Text>
       <Text style={[styles.lead, { color: isDark ? '#94a3b8' : '#64748b' }]}>
         Bu sürüm, 3D model mağazanızın mobil deneyimini hızlıca denemeniz içindir. Tüm akışlar çevrimdışı
         demo verisiyle çalışır.

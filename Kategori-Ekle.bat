@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
-title Model Market - Yeni kategori
+title YZOKUMUS - Yeni kategori
 cd /d "%~dp0"
 
 echo.
-echo  Model Market - Yeni kategori ekleme
+echo  YZOKUMUS - Yeni kategori ekleme
 echo  (catalog.ts dosyasi guncellenir)
 echo.
 
