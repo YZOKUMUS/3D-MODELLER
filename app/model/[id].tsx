@@ -1,22 +1,50 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  FlatList,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+  type ViewToken,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
 import { useCart } from '@/context/CartContext';
-import { CATALOG, getModelById } from '@/data/catalog';
+import { CATALOG, getDetailSlides, getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
 
 export default function ModelDetailScreen() {
+  const { width: windowWidth } = useWindowDimensions();
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   const router = useRouter();
   const model = id ? getModelById(id) : undefined;
   const insets = useSafeAreaInsets();
   const { add } = useCart();
+
+  const slides = useMemo(() => (model ? getDetailSlides(model) : []), [model]);
+  const slideWidth = windowWidth;
+  const [slideIndex, setSlideIndex] = useState(0);
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 55 }).current;
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      const first = viewableItems[0];
+      if (first?.index != null) setSlideIndex(first.index);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    setSlideIndex(0);
+  }, [model?.id]);
 
   const goBackOne = () => {
     lightImpact();
@@ -66,20 +94,44 @@ export default function ModelDetailScreen() {
       <View style={styles.screen}>
         <ScrollView
           style={styles.scroll}
+          nestedScrollEnabled={Platform.OS === 'android'}
           contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}>
 
           <View style={styles.imageWrap}>
-            <ModelCoverImage
-              source={model.coverImage}
-              accent={model.accent}
-              fallbackLetter={model.title.slice(0, 1)}
-              fallbackFontSize={72}
-              style={styles.heroImage}
-              contain
+            <FlatList
+              data={slides}
+              horizontal
+              pagingEnabled
+              nestedScrollEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(_, i) => `${model.id}-slide-${i}`}
+              renderItem={({ item }) => (
+                <View style={{ width: slideWidth, height: 380 }}>
+                  <ModelCoverImage
+                    source={item}
+                    accent={model.accent}
+                    fallbackLetter={model.title.slice(0, 1)}
+                    fallbackFontSize={72}
+                    style={[styles.heroImage, { width: slideWidth }]}
+                    contain
+                  />
+                </View>
+              )}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              getItemLayout={(_, index) => ({
+                length: slideWidth,
+                offset: slideWidth * index,
+                index,
+              })}
             />
-            <View style={styles.imageCounter}>
-              <Text style={styles.imageCounterText}>1/1</Text>
-            </View>
+            {slides.length > 1 && (
+              <View style={styles.imageCounter} pointerEvents="none">
+                <Text style={styles.imageCounterText}>
+                  {slideIndex + 1}/{slides.length}
+                </Text>
+              </View>
+            )}
           </View>
 
           <ModelLikeButton modelId={model.id} variant="detail" />

@@ -11,10 +11,18 @@ export type CatalogModel = {
   category: ModelCategory;
   description: string;
   coverImage: ImageSourcePropType;
+  /** Detay sayfasinda kapaktan sonra gosterilecek ek fotograflar (yatay kaydirma). */
+  galleryImages?: ImageSourcePropType[];
   accent: string;
   polyCount: string;
   rating: number;
 };
+
+/** Liste kapagi + varsa galleryImages — detay carousel verisi. */
+export function getDetailSlides(model: CatalogModel): ImageSourcePropType[] {
+  const extra = model.galleryImages ?? [];
+  return [model.coverImage, ...extra];
+}
 
 /** Sekme sırası; yeni `ModelCategory` eklerken buraya da ekleyin (ürünü olanlar sekmede görünür). */
 export const CATEGORIES: ModelCategory[] = [
@@ -38,6 +46,10 @@ export const CATALOG: CatalogModel[] = [
     description:
       'Bu kayıt klasördeki 20221227_220524.jpg dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-001.jpg'),
+    galleryImages: [
+      require('../assets/covers/cover-002.jpg'),
+      require('../assets/covers/cover-003.jpg'),
+    ],
     accent: '#5B8DEF',
     polyCount: '—',
     rating: 4.1,

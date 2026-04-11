@@ -60,6 +60,10 @@ function appendToCatalog(entry) {
     console.error('catalog.ts icinde ]; bulunamadi');
     return false;
   }
+  const galleryLines =
+    entry.galleryFiles && entry.galleryFiles.length
+      ? `    galleryImages: [\n${entry.galleryFiles.map((f) => `      require('../assets/covers/${f}'),`).join('\n')}\n    ],\n`
+      : '';
   const block = `  {
     id: '${entry.id}',
     title: '${esc(entry.title)}',
@@ -69,7 +73,7 @@ function appendToCatalog(entry) {
     category: '${entry.category}',
     description: '${esc(entry.description)}',
     coverImage: require('../assets/covers/${entry.coverFile}'),
-    accent: '${entry.accent}',
+${galleryLines}    accent: '${entry.accent}',
     polyCount: '${entry.polyCount}',
     rating: ${entry.rating},
   },\n`;
@@ -105,6 +109,8 @@ function listModels() {
       if (desc2) description = desc2[1].replace(/\\'/g, "'");
     }
     if (!titleM || !priceM || !catM || !coverM) continue;
+    const coverRequires = block.match(/require\('\.\.\/assets\/covers\/[^']+'\)/g) || [];
+    const galleryCount = Math.max(0, coverRequires.length - 1);
     models.push({
       id,
       title: titleM[1].replace(/\\'/g, "'"),
@@ -112,6 +118,7 @@ function listModels() {
       category: catM[1],
       description,
       cover: coverM[1],
+      galleryCount,
     });
   }
   return models.reverse();
@@ -168,18 +175,18 @@ function removeFromCatalog(id) {
   while (end < lines.length - 1 && !lines[end].match(/^\s*\},?/)) end++;
 
   const block = lines.slice(start, end + 1).join('\n');
-  const coverMatch = block.match(/require\('\.\.\/assets\/covers\/([^']+)'\)/);
-  const coverFile = coverMatch ? coverMatch[1] : null;
+  const coverFiles = [...block.matchAll(/require\('\.\.\/assets\/covers\/([^']+)'\)/g)].map((m) => m[1]);
+  const uniqueCovers = [...new Set(coverFiles)];
 
   lines.splice(start, end - start + 1);
   fs.writeFileSync(CATALOG, lines.join('\n'), 'utf8');
 
-  if (coverFile) {
+  for (const coverFile of uniqueCovers) {
     const coverPath = path.join(COVERS, coverFile);
     if (fs.existsSync(coverPath)) fs.unlinkSync(coverPath);
   }
 
-  return { ok: true, coverFile };
+  return { ok: true, coverFile: uniqueCovers[0] || null };
 }
 
 const HTML = `<!DOCTYPE html>
@@ -226,6 +233,14 @@ button[type=submit]:disabled{opacity:.5;cursor:wait}
     </div>
     <img class="preview" id="prev">
 
+    <label style="margin-top:20px">Ek fotograflar (istege bagli)</label>
+    <p style="font-size:12px;color:#64748b;margin:4px 0 8px;line-height:1.4">Detay sayfasinda yatay kaydirma ile gosterilir. Kapak yukaridaki alan; buraya 2. 3. resimleri secin (coklu secim).</p>
+    <div class="file-area" id="dropGal" style="margin-top:0;padding:16px">
+      <div class="icon">&#128444;</div>
+      <p id="galHint">Birden fazla JPG/PNG sec (Ctrl veya Surukle)</p>
+      <input type="file" name="gallery" accept="image/jpeg,image/png,image/webp" multiple id="galIn">
+    </div>
+
     <label>Model Ismi</label>
     <input type="text" name="title" required placeholder="Ornek: Uzay Gemisi v2">
 
@@ -258,12 +273,17 @@ button[type=submit]:disabled{opacity:.5;cursor:wait}
 </div>
 <script>
 const fileIn=document.getElementById('fileIn'),prev=document.getElementById('prev'),drop=document.getElementById('drop');
+const galIn=document.getElementById('galIn'),galHint=document.getElementById('galHint');
 fileIn.addEventListener('change',()=>{
   if(fileIn.files[0]){
     prev.src=URL.createObjectURL(fileIn.files[0]);
     prev.style.display='block';
     drop.querySelector('p').textContent=fileIn.files[0].name;
   }
+});
+galIn.addEventListener('change',()=>{
+  const n=galIn.files.length;
+  galHint.textContent=n?('Secildi: '+n+' dosya'):'Birden fazla JPG/PNG sec (Ctrl veya Surukle)';
 });
 document.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='none';});
 document.addEventListener('drop',e=>e.preventDefault());
@@ -285,8 +305,9 @@ async function doSubmit(){
     const r=await fetch('/api/add',{method:'POST',body:fd});
     const j=await r.json();
     const m=document.getElementById('msg');
-    if(j.ok){m.className='msg ok';m.textContent='Eklendi: '+j.title+' ('+j.coverFile+')';
+    if(j.ok){m.className='msg ok';m.textContent='Eklendi: '+j.title+' ('+j.coverFile+(j.galleryCount?(', +'+j.galleryCount+' ek'):'')+')';
       form.reset();prev.style.display='none';drop.querySelector('p').textContent='Tikla ve bilgisayarindan JPG sec';
+      galHint.textContent='Birden fazla JPG/PNG sec (Ctrl veya Surukle)';
       document.getElementById('cnt').textContent='Toplam: '+j.total+' model';
     }else{m.className='msg err';m.textContent='Hata: '+j.error;}
   }catch(ex){m.className='msg err';m.textContent=ex.message;}
@@ -456,7 +477,7 @@ function filterList(){
       <img src="/cover/\${m.cover.split('/').pop()}" alt="\${m.title}" onerror="this.style.background='#e2e8f0'">
       <div class="item-body">
         <div class="item-title">\${m.title}</div>
-        <div class="item-id">ID: \${m.id} · \${m.category || '?'} · \${m.price} TL</div>
+        <div class="item-id">ID: \${m.id} · \${m.category || '?'} · \${m.price} TL\${m.galleryCount?(' · +' + m.galleryCount + ' fotograf'):''}</div>
         <div class="btn-row">
           <button class="edit-btn" onclick="openEdit('\${m.id}')">Duzenle</button>
           <button class="del-btn" onclick="askDelete('\${m.id}','\${m.title.replace(/'/g,"\\\\'")}')">Sil</button>
@@ -556,7 +577,7 @@ function parseMultipart(req, cb) {
       start = next + boundary.length;
     }
     const fields = {};
-    let fileData = null, fileName = null;
+    const files = [];
     for (const part of parts) {
       const headerEnd = part.indexOf('\r\n\r\n');
       if (headerEnd === -1) continue;
@@ -564,14 +585,14 @@ function parseMultipart(req, cb) {
       const body = part.slice(headerEnd + 4, part.length - 2);
       const nameMatch = header.match(/name="([^"]+)"/);
       const fnMatch = header.match(/filename="([^"]+)"/);
-      if (fnMatch) {
-        fileData = body;
-        fileName = fnMatch[1];
+      if (fnMatch && nameMatch) {
+        const fn = fnMatch[1].trim();
+        if (fn) files.push({ fieldName: nameMatch[1], fileName: fn, data: body });
       } else if (nameMatch) {
         fields[nameMatch[1]] = body.toString('utf8').trim();
       }
     }
-    cb(null, fields, fileData, fileName);
+    cb(null, fields, files);
   });
 }
 
@@ -653,9 +674,12 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.url === '/api/add' && req.method === 'POST') {
-    return parseMultipart(req, async (err, fields, fileData, fileName) => {
+    return parseMultipart(req, async (err, fields, files) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      if (err || !fileData) return res.end(JSON.stringify({ ok: false, error: 'Dosya okunamadi' }));
+      const main = files.find((f) => f.fieldName === 'image');
+      if (err || !main || !main.data || !main.data.length) {
+        return res.end(JSON.stringify({ ok: false, error: 'Kapak resmi okunamadi' }));
+      }
 
       const title = (fields.title || '').trim();
       const price = parseInt(fields.price, 10);
@@ -671,14 +695,31 @@ const server = http.createServer((req, res) => {
         return res.end(JSON.stringify({ ok: false, error: 'Gecersiz kategori (catalog.ts CATEGORIES)' }));
       }
 
-      const idx = nextCoverIndex();
-      const coverFile = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
-      if (sharp) {
-        try {
-          fileData = await sharp(fileData).resize(400, null, { withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
-        } catch (_) {}
+      async function processImageBuffer(buf) {
+        let out = buf;
+        if (sharp) {
+          try {
+            out = await sharp(buf).resize(400, null, { withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+          } catch (_) {}
+        }
+        return out;
       }
-      fs.writeFileSync(path.join(COVERS, coverFile), fileData);
+
+      let idx = nextCoverIndex();
+      const coverFile = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
+      idx += 1;
+      const mainBuf = await processImageBuffer(main.data);
+      fs.writeFileSync(path.join(COVERS, coverFile), mainBuf);
+
+      const galleryParts = files.filter((f) => f.fieldName === 'gallery' && f.data && f.data.length);
+      const galleryFiles = [];
+      for (const g of galleryParts) {
+        const name = 'cover-' + String(idx).padStart(3, '0') + '.jpg';
+        idx += 1;
+        const gb = await processImageBuffer(g.data);
+        fs.writeFileSync(path.join(COVERS, name), gb);
+        galleryFiles.push(name);
+      }
 
       const id = nextCatalogId();
       const accent = ACCENTS[(id - 1) % ACCENTS.length];
@@ -691,6 +732,7 @@ const server = http.createServer((req, res) => {
         category,
         description: desc,
         coverFile,
+        galleryFiles,
         accent,
         polyCount: '\u2014',
         rating: (4.0 + Math.random() * 0.9).toFixed(1),
@@ -700,8 +742,8 @@ const server = http.createServer((req, res) => {
 
       const src = fs.readFileSync(CATALOG, 'utf8');
       const total = (src.match(/id:\s*'/g) || []).length;
-      console.log('Eklendi:', title, '->', coverFile, '(toplam', total, ')');
-      res.end(JSON.stringify({ ok: true, title, coverFile, total }));
+      console.log('Eklendi:', title, '->', coverFile, galleryFiles.length ? ('+' + galleryFiles.length + ' ek') : '', '(toplam', total, ')');
+      res.end(JSON.stringify({ ok: true, title, coverFile, galleryCount: galleryFiles.length, total }));
     });
   }
 
