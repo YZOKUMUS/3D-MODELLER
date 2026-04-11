@@ -17,9 +17,17 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridModelCard } from '@/components/GridModelCard';
+import { BAMBU } from '@/constants/bambuTheme';
 import { CATALOG, CATALOG_TAB_CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
+
+const TAB_FONT = Platform.select({
+  web: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  },
+  default: {},
+});
 
 const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' }[] = [
   { id: 'all', label: 'Senin İçin', category: 'Tümü' },
@@ -45,6 +53,7 @@ export default function StoreScreen() {
   }, [activeTab, validTabIds]);
 
   const scrollRef = useRef<ScrollView>(null);
+  const tabsScrollRef = useRef<ScrollView>(null);
   const fabUpOpacity = useRef(new Animated.Value(0)).current;
   const fabDownOpacity = useRef(new Animated.Value(0)).current;
   const showFabUp = useRef(false);
@@ -140,10 +149,10 @@ export default function StoreScreen() {
   const scrollBottomPad = 20 + tabBarHeight;
 
   return (
-    <View style={[styles.root, { backgroundColor: '#111' }]}>
+    <View style={[styles.root, { backgroundColor: BAMBU.handyScreenBg }]}>
       <StatusBar style="light" />
 
-      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+      <View style={[styles.topBar, { paddingTop: insets.top + 8, backgroundColor: BAMBU.handyNavBg }]}>
         <View style={styles.searchRow}>
           <Icon name="search" size={16} color="#71717a" />
           <TextInput
@@ -160,12 +169,12 @@ export default function StoreScreen() {
       </View>
 
       <ScrollView
+        ref={tabsScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         removeClippedSubviews={false}
         contentContainerStyle={styles.tabsScrollContent}
-        style={styles.tabsContainer}>
-        {/* Samsung / One UI: inner row must not be collapsed off native hierarchy */}
+        style={[styles.tabsContainer, { backgroundColor: BAMBU.handyNavBg }]}>
         <View collapsable={false} style={styles.tabsRow}>
           {ALL_TABS.map((t) => {
             const active = activeTab === t.id;
@@ -178,17 +187,40 @@ export default function StoreScreen() {
                   setActiveTab(t.id);
                   setVisibleCount(20);
                 }}
-                style={[styles.tab, active && styles.tabActive]}>
+                style={styles.tab}>
                 <Text
-                  style={[styles.tabText, active && styles.tabTextActive]}
+                  style={[
+                    styles.tabText,
+                    TAB_FONT,
+                    { color: active ? BAMBU.handyTabActive : BAMBU.handyTabInactive },
+                    active && styles.tabTextActive,
+                  ]}
                   {...Platform.select({
                     android: { includeFontPadding: false },
                   })}>
                   {t.label}
                 </Text>
+                <View style={styles.tabIndicatorSlot}>
+                  <View
+                    style={[
+                      styles.tabIndicator,
+                      active && { backgroundColor: BAMBU.handyIndicator },
+                    ]}
+                  />
+                </View>
               </Pressable>
             );
           })}
+          <Pressable
+            accessibilityLabel="Daha fazla kategori"
+            hitSlop={12}
+            onPress={() => {
+              lightImpact();
+              tabsScrollRef.current?.scrollToEnd({ animated: true });
+            }}
+            style={styles.tabChevron}>
+            <Icon name="chevron-down" size={18} color={BAMBU.handyTabInactive} />
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -280,12 +312,11 @@ const styles = StyleSheet.create({
   topBar: {
     paddingHorizontal: 12,
     paddingBottom: 8,
-    backgroundColor: '#111',
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1e1e24',
+    backgroundColor: BAMBU.handySearchBg,
     borderRadius: 22,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -298,58 +329,74 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   tabsContainer: {
-    backgroundColor: '#111',
     flexGrow: 0,
     flexShrink: 0,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
     ...Platform.select({
-      // rn-web: horizontal ScrollView height can collapse; minHeight avoids clipping tab row
-      web: { minHeight: 48 },
-      default: {},
+      web: { minHeight: 52 },
+      default: { minHeight: 48 },
     }),
   },
   tabsScrollContent: {
     flexGrow: 0,
-    // 'center' on cross-axis + wrong viewport height clips tab tops on web
-    alignItems: 'flex-start',
-    paddingBottom: 10,
+    alignItems: 'flex-end',
+    paddingBottom: 0,
+    paddingRight: 8,
+    paddingLeft: 6,
     ...Platform.select({
-      web: { paddingTop: 6 },
-      default: {},
+      web: { paddingTop: 4 },
+      default: { paddingTop: 2 },
     }),
   },
   tabsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
+    alignItems: 'flex-end',
+    gap: 2,
+    paddingHorizontal: 4,
   },
   mainScroll: {
     flex: 1,
   },
   tab: {
     flexShrink: 0,
-    minHeight: 36,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#1e1e24',
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 0,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
     ...Platform.select({
       web: { overflow: 'visible' },
       default: {},
     }),
   },
-  tabActive: {
-    backgroundColor: '#00c853',
-  },
   tabText: {
-    color: '#a1a1aa',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
+    letterSpacing: 0.15,
   },
   tabTextActive: {
-    color: '#fff',
-    fontWeight: '800',
+    fontWeight: '700',
+  },
+  tabIndicatorSlot: {
+    marginTop: 8,
+    height: 3,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabIndicator: {
+    width: 28,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: 'transparent',
+  },
+  tabChevron: {
+    paddingLeft: 6,
+    paddingRight: 4,
+    paddingBottom: 10,
+    justifyContent: 'flex-end',
+    alignSelf: 'flex-end',
   },
   masonry: {
     flexDirection: 'row',
