@@ -164,6 +164,7 @@ export default function StoreScreen() {
 
       <ScrollView
         ref={scrollRef}
+        style={styles.mainScroll}
         onScroll={onScroll}
         scrollEventThrottle={100}
         showsVerticalScrollIndicator={false}
@@ -238,17 +239,31 @@ const styles = StyleSheet.create({
   tabsContainer: {
     backgroundColor: '#111',
     flexGrow: 0,
+    flexShrink: 0,
+    ...Platform.select({
+      // rn-web: horizontal ScrollView height can collapse; minHeight avoids clipping tab row
+      web: { minHeight: 48 },
+      default: {},
+    }),
   },
   tabsScrollContent: {
     flexGrow: 0,
-    alignItems: 'center',
+    // 'center' on cross-axis + wrong viewport height clips tab tops on web
+    alignItems: 'flex-start',
     paddingBottom: 10,
+    ...Platform.select({
+      web: { paddingTop: 6 },
+      default: {},
+    }),
   },
   tabsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 10,
+  },
+  mainScroll: {
+    flex: 1,
   },
   tab: {
     flexShrink: 0,
@@ -258,6 +273,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: '#1e1e24',
+    ...Platform.select({
+      web: { overflow: 'visible' },
+      default: {},
+    }),
   },
   tabActive: {
     backgroundColor: '#00c853',
