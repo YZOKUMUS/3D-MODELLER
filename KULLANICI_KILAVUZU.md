@@ -63,7 +63,9 @@ npm run ios
 
 ### Model detayı
 
-- Büyük kapak, açıklama, fiyat, sepete ekle, sepete git.
+- **Görseller (kaydırmalı galeri):** Üstteki büyük alanda birden fazla fotoğraf tanımlıysa parmakla veya fareyle **sağa/sola kaydırarak** diğer açılara geçebilirsiniz (Bambu Handy’deki gibi). Sağ altta **1/3** biçiminde **hangi slaytta olduğunuz** yazar; yalnızca **tek** fotoğraf varsa bu sayaç gösterilmez.
+- İlk slayt her zaman **kapak** görselidir; ek fotoğraflar ondan sonra gelir.
+- Açıklama, fiyat, sepete ekle, sepete git.
 - **Benzer modeller:** Aynı kategoriden örnekler.
 - Üstte geri ve ana listeye dönüş kısayolları.
 
@@ -102,7 +104,8 @@ Bu ekranda vitrine **yeni bir ürün kaydı** oluşturursunuz. Kayıt sonunda:
 
 | Alan | Zorunlu | Açıklama |
 |------|---------|----------|
-| **Resim** | Evet | Tıklayıp veya sürükleyip seçin. JPG, PNG veya WebP kabul edilir; sunucu mümkünse **400px genişliğe** indirgeyip **JPEG** olarak kaydeder (`sharp` kuruluysa). Bu görsel hem uygulamada kartta hem detayda kullanılır. |
+| **Resim (kapak)** | Evet | Tıklayıp veya sürükleyip seçin. JPG, PNG veya WebP kabul edilir; sunucu mümkünse **400px genişliğe** indirgeyip **JPEG** olarak kaydeder (`sharp` kuruluysa). Bu görsel **liste kartında** ve detayda **ilk slayt** olarak kullanılır. |
+| **Ek fotoğraflar** | Hayır | İsterseniz alttaki ikinci kutudan **birden fazla** dosya seçin (Ctrl ile çoklu seçim veya sürükle-bırak). Bunlar detay sayfasında kapaktan **sonra** yatay kaydırmayla gösterilir. Her biri `assets/covers/` altında yeni bir `cover-XXX.jpg` dosyası olur; `catalog.ts` içinde `galleryImages` dizisi olarak eklenir. |
 | **Model ismi** | Evet | Uygulamada görünen başlık. Kaydedildikten sonra katalogda **tagline** satırı da otomatik olarak “isim · seçilen formatlar” biçiminde güncellenir. |
 | **Fiyat (TL)** | Evet | Tam sayı (lira). Sepette ve listede bu değer gösterilir. |
 | **Kategori** | Evet | Açılır liste, `catalog.ts` içindeki **`CATEGORIES`** dizisinden dolar. Listede yoksa önce dosyada yeni kategori tanımlayıp sayfayı yenileyin (aşağıdaki 4.4). |
@@ -113,7 +116,7 @@ Bu ekranda vitrine **yeni bir ürün kaydı** oluşturursunuz. Kayıt sonunda:
 
 1. Form doğrulanır (resim, isim, fiyat, kategori eksikse hata mesajı çıkar).
 2. Kategori, sunucuda izinli listede değilse kayıt reddedilir (liste `CATEGORIES` ile uyumlu olmalı).
-3. Başarılı olursa yeşil onay mesajında dosya adı ve toplam model sayısı gösterilir; form sıfırlanır.
+3. Başarılı olursa yeşil onay mesajında kapak dosya adı, varsa **+N ek** ve toplam model sayısı gösterilir; form sıfırlanır.
 
 **Not:** Aynı anda iki kişi admin kullanıyorsa dosya çakışması riski vardır; tek kullanıcı veya dikkatli kullanım önerilir.
 
@@ -121,7 +124,7 @@ Bu ekranda vitrine **yeni bir ürün kaydı** oluşturursunuz. Kayıt sonunda:
 
 ### 4.2 Model düzenleme (`/manage` → Düzenle)
 
-**Modelleri Yönet** sayfasında her kartta **Düzenle** düğmesi vardır. Tıklayınca bir **pencere (modal)** açılır.
+**Modelleri Yönet** sayfasında her kartta **Düzenle** düğmesi vardır. Tıklayınca bir **pencere (modal)** açılır. Kart üzerinde **+N fotoğraf** yazıyorsa o modelde detay galerisinde **N adet ek görsel** (kapak hariç) vardır.
 
 **Değiştirebileceğiniz alanlar**
 
@@ -131,8 +134,11 @@ Bu ekranda vitrine **yeni bir ürün kaydı** oluşturursunuz. Kayıt sonunda:
 | **Fiyat (TL)** | `price` alanı; tam sayı olmalı. |
 | **Kategori** | `category` alanı. Liste yine `CATEGORIES`’ten gelir. Modelde katalogda olup listede henüz olmayan nadir bir değer varsa, düzenle penceresinde o değer de seçenek olarak eklenir (kaydetmeden önce doğru kategoriyi seçebilirsiniz). |
 | **Açıklama** | `description` alanı; çok satırlı yazabilirsiniz. |
+| **Detay fotoğrafları** | Kapak **bu listede yoktur**; kapak yalnızca “yeni model ekle” sırasında veya `catalog.ts` içinde `coverImage` ile değiştirilir. Burada gördükleriniz `galleryImages` dizisindeki ek slaytlardır. **Sil:** Onaydan sonra o satır katalogdan çıkar; görsel dosyası **başka hiçbir modelde aynı dosya adıyla kullanılmıyorsa** diskten de silinir (aynı `cover-XXX.jpg` başka kayıtta da varsa dosya korunur). **Fotoğraf ekle:** Dosya seçip düğmeye basın; yeni `cover-XXX.jpg` üretilir ve galeri sonuna eklenir. |
 
-**Kaydet** ile değişiklikler `data/catalog.ts` içindeki ilgili model bloğuna yazılır. **Vazgeç** ile pencere kapanır; diske yazılmaz.
+**Kaydet** ile yalnızca **isim, fiyat, kategori, açıklama** diske yazılır. Galeri ekleme/silme **anında** ayrı isteklerle `catalog.ts` ve `assets/covers/` güncellenir; **Kaydet**’e basmanız gerekmez.
+
+**Vazgeç** ile pencere kapanır; yazılmamış metin alanı değişiklikleri kaybolur (galeri zaten yaptıysanız o işlemler kalıcıdır).
 
 Üstteki **arama kutusu** ile listeyi isim, ID veya **kategori adına** göre süzebilirsiniz.
 
@@ -144,7 +150,7 @@ Bu ekranda vitrine **yeni bir ürün kaydı** oluşturursunuz. Kayıt sonunda:
 
 - **Evet, Sil** derseniz:
   - `data/catalog.ts` içinden **o modelin tüm bloğu** kaldırılır.
-  - İlgili **kapak dosyası** (`assets/covers/cover-XXX.jpg`) diskten **silinir** (geri getirme yok).
+  - O blokta geçen **tüm kapak ve galeri** görselleri (`coverImage` ve `galleryImages` içindeki `cover-XXX.jpg` dosyaları) diskten **silinir** (geri getirme yok).
 - **Vazgeç** ile işlem iptal edilir.
 
 **Dikkat:** Silme **geri alınamaz**. Yanlışlıkla silindiyse yedekten veya Git geçmişinden `catalog.ts` ve görseli geri yüklemeniz gerekir.
@@ -179,7 +185,26 @@ Sohbette “`catalog.ts` içine şu adlı kategoriyi ekle” derseniz, düzenlem
 
 > Uygulamada üst sekmeler yalnızca **ürünü olan** kategorileri gösterir; ürün eklenince ilgili sekme belirir.
 
-### 4.5 PowerShell ve Git ipucu
+### 4.5 Elle `catalog.ts` ile galeri (isteğe bağlı)
+
+Admin kullanmadan veya toplu düzenleme için `data/catalog.ts` içinde ilgili modele şunu ekleyebilirsiniz:
+
+- **`galleryImages`:** `coverImage` satırından sonra, isteğe bağlı dizi. Her öğe `require('../assets/covers/dosya.jpg')` şeklinde olmalı; dosyalar `assets/covers/` klasöründe gerçekten bulunmalıdır.
+
+Uygulama detay ekranı slaytları **`getDetailSlides`** ile oluşturur: önce kapak, sonra `galleryImages` sırasıyla.
+
+### 4.6 Geliştirici notu (admin HTTP API)
+
+Otomasyon veya özel araçlar için `scripts/admin.cjs` şu uçları sunar (localhost, admin çalışırken):
+
+| Yöntem ve yol | Gövde | Açıklama |
+|---------------|--------|----------|
+| `POST /api/add` | `multipart/form-data`: `image` (zorunlu kapak), `gallery` (isteğe bağlı, çoklu), `title`, `price`, `category`, `formats`, `desc` | Yeni model + dosyalar |
+| `POST /api/add-gallery` | `multipart/form-data`: `id` (model id), `gallery` (bir veya çoklu dosya) | Mevcut modele ek slayt |
+| `POST /api/remove-gallery` | JSON: `{ "id": "12", "index": 0 }` | `index` = ek galerideki sıra (0 = ilk ek foto; kapak sayılmaz) |
+| `GET /api/list` | — | Modeller; her birinde `gallery` (dosya adları dizisi) ve `galleryCount` |
+
+### 4.7 PowerShell ve Git ipucu
 
 Dosya yolu parantez içeriyorsa tırnak kullanın:
 
@@ -197,7 +222,7 @@ Statik web derlemesi ve `docs` klasörüne kopyalama için:
 npm run publish:docs
 ```
 
-`app.json` içindeki `experiments.baseUrl` (ör. `/3D-MODELLER/`) GitHub Pages alt yolu ile uyumlu olmalıdır. Ayrıntılar için `.github/workflows/deploy-pages.yml` dosyasına bakın.
+`app.json` içindeki `experiments.baseUrl` (ör. `/3D-MODELLER/`) GitHub Pages alt yolu ile uyumlu olmalıdır. **Adım adım kopyala-yapıştır komutları** proje kökündeki **`KOLAY-GITHUB-PAGES.txt`** dosyasındadır. İş akışı ayrıntıları için `.github/workflows/deploy-pages.yml` dosyasına da bakabilirsiniz.
 
 ---
 

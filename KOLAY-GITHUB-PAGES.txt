@@ -1,5 +1,8 @@
 GITHUB PAGES — YZOKUMUS
 
+  Genel kullanim, admin paneli, coklu fotograf (galeri), kategori: bakiniz
+  model-market\KULLANICI_KILAVUZU.md
+
 ================================================================================
 KOPYALA-YAPISTIR: Siteyi guncellemek (kod degistirdikten sonra)
 ================================================================================
