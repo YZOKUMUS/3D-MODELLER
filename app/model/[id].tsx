@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
+import { ModelLikeButton } from '@/components/ModelLikeButton';
 import { useCart } from '@/context/CartContext';
 import { CATALOG, getModelById } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
@@ -80,6 +81,8 @@ export default function ModelDetailScreen() {
               <Text style={styles.imageCounterText}>1/1</Text>
             </View>
           </View>
+
+          <ModelLikeButton modelId={model.id} variant="detail" />
 
           <View style={styles.content}>
             <Text style={styles.title}>{model.title}</Text>

@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
+import { ModelLikeButton } from '@/components/ModelLikeButton';
 import { CATALOG, type CatalogModel } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
@@ -17,39 +18,41 @@ export function GridModelCard({ model, width, isDark }: Props) {
   const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
   const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
 
+  const openDetail = () => {
+    lightImpact();
+    router.push(`/model/${model.id}`);
+  };
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={() => {
-        lightImpact();
-        router.push(`/model/${model.id}`);
-      }}
-      style={({ pressed }) => [
-        styles.root,
-        { width, opacity: pressed ? 0.85 : 1 },
-      ]}>
-      <View>
-        <ModelCoverImage
-          source={model.coverImage}
-          accent={model.accent}
-          fallbackLetter={model.title.slice(0, 1)}
-          fallbackFontSize={28}
-          style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
-        />
-        {isNew && (
-          <View style={styles.newBadge}>
-            <Text style={styles.newBadgeText}>YENİ</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.info}>
+    <View style={[styles.root, { width }]}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={openDetail}
+        style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}>
+        <View>
+          <ModelCoverImage
+            source={model.coverImage}
+            accent={model.accent}
+            fallbackLetter={model.title.slice(0, 1)}
+            fallbackFontSize={28}
+            style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+          />
+          {isNew && (
+            <View style={styles.newBadge}>
+              <Text style={styles.newBadgeText}>YENİ</Text>
+            </View>
+          )}
+        </View>
+      </Pressable>
+      <ModelLikeButton modelId={model.id} variant="compact" />
+      <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
         <View style={styles.row}>
           <Text style={styles.category}>{model.category}</Text>
           <Text style={styles.price}>{formatTry(model.price)}</Text>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 

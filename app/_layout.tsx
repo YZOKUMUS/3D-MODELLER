@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { CartProvider } from '@/context/CartContext';
+import { LikesProvider } from '@/context/LikesContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,13 +54,15 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider>
       <CartProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="model/[id]" options={{ headerBackTitle: 'Geri' }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Bilgi' }} />
-          </Stack>
-        </ThemeProvider>
+        <LikesProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="model/[id]" options={{ headerBackTitle: 'Geri' }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Bilgi' }} />
+            </Stack>
+          </ThemeProvider>
+        </LikesProvider>
       </CartProvider>
     </SafeAreaProvider>
   );

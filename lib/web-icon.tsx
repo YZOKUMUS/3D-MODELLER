@@ -29,6 +29,8 @@ const MI: Record<string, string> = {
   'chevron-right': 'chevron_right',
   info: 'info',
   home: 'home',
+  heart: 'favorite',
+  'heart-o': 'favorite_border',
 };
 
 type Props = {
