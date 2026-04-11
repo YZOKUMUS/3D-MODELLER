@@ -3517,10 +3517,10 @@ export const CATALOG: CatalogModel[] = [
   {
     id: '250',
     title: 'IMG 9669',
-    tagline: 'Klasör görseli · Açıklamayı catalog.ts içinden düzenleyin',
+    tagline: 'IMG 9669',
     price: 914,
     formats: ['GLB', 'OBJ', 'FBX'],
-    category: 'Aksesuar',
+    category: 'Diğer',
     description:
       'Bu kayıt klasördeki IMG_9669.JPG dosyasından üretildi. Gerçek ürün adı, format ve fiyatı burada güncelleyebilirsiniz.',
     coverImage: require('../assets/covers/cover-250.jpg'),
@@ -3720,7 +3720,7 @@ export const CATALOG: CatalogModel[] = [
     tagline: 'MANCINIK',
     price: 1999,
     formats: ['GLB', 'OBJ', 'FBX', 'STL'],
-    category: 'Silah',
+    category: 'Diğer',
     description: 'TAŞ FIRLATMA ARACI',
     coverImage: require('../assets/covers/cover-265.jpg'),
     accent: '#5B8DEF',
