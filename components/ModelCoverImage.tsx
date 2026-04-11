@@ -1,4 +1,4 @@
-import { Image } from 'expo-image';
+import { Image as ExpoImage } from 'expo-image';
 import { useState } from 'react';
 import {
   Image as RNImage,
@@ -89,16 +89,32 @@ export function ModelCoverImage({
     }
   }
 
+  // Metro `require()` ids: React Native's Image decodes bundled assets reliably on iOS/Android.
+  // expo-image + numeric module id has been reported to miss onLoad / fail on cold start (Fabric).
+  if (typeof source === 'number') {
+    return (
+      <View style={[styles.clip, style, { backgroundColor: accent }]}>
+        {!loaded && placeholder}
+        <RNImage
+          source={source}
+          style={styles.fillCover}
+          resizeMode={contain ? 'contain' : 'cover'}
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.clip, style, { backgroundColor: accent }]}>
       {!loaded && placeholder}
-      <Image
+      <ExpoImage
         source={source}
         style={styles.fillCover}
         contentFit={contain ? 'contain' : 'cover'}
         transition={300}
         cachePolicy="memory-disk"
-        recyclingKey={typeof source === 'number' ? String(source) : undefined}
         onLoad={() => setLoaded(true)}
         onError={() => setFailed(true)}
       />

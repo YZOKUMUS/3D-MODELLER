@@ -132,25 +132,34 @@ export default function StoreScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tabsRow}
+        removeClippedSubviews={false}
+        contentContainerStyle={styles.tabsScrollContent}
         style={styles.tabsContainer}>
-        {ALL_TABS.map((t) => {
-          const active = activeTab === t.id;
-          return (
-            <Pressable
-              key={t.id}
-              onPress={() => {
-                lightImpact();
-                setActiveTab(t.id);
-                setVisibleCount(20);
-              }}
-              style={[styles.tab, active && styles.tabActive]}>
-              <Text style={[styles.tabText, active && styles.tabTextActive]}>
-                {t.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {/* Samsung / One UI: inner row must not be collapsed off native hierarchy */}
+        <View collapsable={false} style={styles.tabsRow}>
+          {ALL_TABS.map((t) => {
+            const active = activeTab === t.id;
+            return (
+              <Pressable
+                key={t.id}
+                collapsable={false}
+                onPress={() => {
+                  lightImpact();
+                  setActiveTab(t.id);
+                  setVisibleCount(20);
+                }}
+                style={[styles.tab, active && styles.tabActive]}>
+                <Text
+                  style={[styles.tabText, active && styles.tabTextActive]}
+                  {...Platform.select({
+                    android: { includeFontPadding: false },
+                  })}>
+                  {t.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </ScrollView>
 
       <ScrollView
@@ -230,13 +239,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#111',
     flexGrow: 0,
   },
-  tabsRow: {
-    flexDirection: 'row',
-    gap: 4,
-    paddingHorizontal: 10,
+  tabsScrollContent: {
+    flexGrow: 0,
+    alignItems: 'center',
     paddingBottom: 10,
   },
+  tabsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+  },
   tab: {
+    flexShrink: 0,
+    minHeight: 36,
+    justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
