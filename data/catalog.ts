@@ -1,6 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
 
-export type ModelCategory = 'Araç' | 'Motorsiklet' | 'Silah' | 'Tank' | 'Figür' | 'Aksesuar';
+export type ModelCategory = 'Araç' | 'Motorsiklet' | 'Silah' | 'Tank' | 'Figür' | 'Aksesuar' | 'Diğer';
 
 export type CatalogModel = {
   id: string;
@@ -24,6 +24,7 @@ export const CATEGORIES: ModelCategory[] = [
   'Tank',
   'Figür',
   'Aksesuar',
+  'Diğer',
 ];
 
 export const CATALOG: CatalogModel[] = [
