@@ -1,6 +1,5 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
@@ -29,8 +28,6 @@ const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' 
 ];
 
 export default function StoreScreen() {
-  const router = useRouter();
-  const isDark = true;
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { width: windowWidth } = useWindowDimensions();
@@ -72,12 +69,6 @@ export default function StoreScreen() {
   const scrollToTop = useCallback(() => {
     lightImpact();
     scrollRef.current?.scrollTo({ y: 0, animated: true });
-  }, []);
-
-  const scrollToBottom = useCallback(() => {
-    lightImpact();
-    const maxY = contentHeight.current - layoutHeight.current;
-    if (maxY > 0) scrollRef.current?.scrollTo({ y: maxY, animated: true });
   }, []);
 
   const currentTab = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
@@ -186,12 +177,12 @@ export default function StoreScreen() {
           <View style={[styles.masonry, { gap }]}>
             <View style={[styles.masonryCol, { gap }]}>
               {leftCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} isDark={isDark} />
+                <GridModelCard key={model.id} model={model} width={colWidth} />
               ))}
             </View>
             <View style={[styles.masonryCol, { gap }]}>
               {rightCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} isDark={isDark} />
+                <GridModelCard key={model.id} model={model} width={colWidth} />
               ))}
             </View>
           </View>

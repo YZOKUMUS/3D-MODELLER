@@ -10,10 +10,9 @@ import { lightImpact } from '@/lib/haptics';
 type Props = {
   model: CatalogModel;
   width: number;
-  isDark: boolean;
 };
 
-export function GridModelCard({ model, width, isDark }: Props) {
+export function GridModelCard({ model, width }: Props) {
   const router = useRouter();
   const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
   const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
