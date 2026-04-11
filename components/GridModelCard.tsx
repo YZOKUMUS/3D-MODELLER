@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
@@ -47,8 +47,18 @@ export function GridModelCard({ model, width }: Props) {
       <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
         <View style={styles.row}>
-          <Text style={styles.category}>{model.category}</Text>
-          <Text style={styles.price}>{formatTry(model.price)}</Text>
+          <View style={styles.categoryWrap}>
+            <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
+              {model.category}
+            </Text>
+          </View>
+          <Text
+            style={styles.price}
+            {...Platform.select({
+              android: { includeFontPadding: false },
+            })}>
+            {formatTry(model.price)}
+          </Text>
         </View>
       </Pressable>
     </View>
@@ -62,7 +72,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   info: {
-    paddingHorizontal: 8,
+    paddingLeft: 8,
+    paddingRight: 6,
     paddingTop: 8,
     paddingBottom: 10,
   },
@@ -75,8 +86,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginTop: 5,
+    gap: 4,
+  },
+  /** Kategori daralsin; fiyat (TRY) son rakamlari kesilmesin */
+  categoryWrap: {
+    flex: 1,
+    minWidth: 0,
   },
   category: {
     color: '#71717a',
@@ -84,6 +100,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   price: {
+    flexShrink: 0,
     color: '#00c853',
     fontSize: 13,
     fontWeight: '800',
