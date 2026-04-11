@@ -46,20 +46,16 @@ export function GridModelCard({ model, width }: Props) {
       <ModelLikeButton modelId={model.id} variant="compact" />
       <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
-        <View style={styles.row}>
-          <View style={styles.categoryWrap}>
-            <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
-              {model.category}
-            </Text>
-          </View>
-          <Text
-            style={styles.price}
-            {...Platform.select({
-              android: { includeFontPadding: false },
-            })}>
-            {formatTry(model.price)}
-          </Text>
-        </View>
+        <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
+          {model.category}
+        </Text>
+        <Text
+          style={styles.price}
+          {...Platform.select({
+            android: { includeFontPadding: false },
+          })}>
+          {formatTry(model.price)}
+        </Text>
       </Pressable>
     </View>
   );
@@ -72,8 +68,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   info: {
-    paddingLeft: 8,
-    paddingRight: 6,
+    paddingLeft: 10,
+    paddingRight: 12,
     paddingTop: 8,
     paddingBottom: 10,
   },
@@ -83,27 +79,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 17,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-    gap: 4,
-  },
-  /** Kategori daralsin; fiyat (TRY) son rakamlari kesilmesin */
-  categoryWrap: {
-    flex: 1,
-    minWidth: 0,
-  },
   category: {
     color: '#71717a',
     fontSize: 11,
     fontWeight: '500',
+    marginTop: 5,
   },
+  /** Ayri satir + sag hizali: dar sutunda TRY son rakamlari kesilmesin */
   price: {
-    flexShrink: 0,
+    alignSelf: 'flex-end',
+    marginTop: 4,
     color: '#00c853',
     fontSize: 13,
     fontWeight: '800',
+    textAlign: 'right',
+    width: '100%',
   },
   newBadge: {
     position: 'absolute',

@@ -137,7 +137,8 @@ export default function StoreScreen() {
   const hasMore = filtered.length > visibleCount;
 
   const gap = 6;
-  const sidePad = 6;
+  /** Dar mobilde sag sutun kenara yapisip fiyat kesilmesin diye biraz ic boşluk */
+  const sidePad = 10;
   // SSG / GitHub Pages: useWindowDimensions() sifir olabilir; negatif kolon genisligi tum grid'i bozar.
   const layoutWidth = Math.max(windowWidth, 360);
   const colWidth = Math.floor((layoutWidth - sidePad * 2 - gap) / 2);
