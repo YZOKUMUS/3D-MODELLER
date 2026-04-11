@@ -141,7 +141,8 @@ export default function StoreScreen() {
   const sidePad = 10;
   // SSG / GitHub Pages: useWindowDimensions() sifir olabilir; negatif kolon genisligi tum grid'i bozar.
   const layoutWidth = Math.max(windowWidth, 360);
-  const colWidth = Math.floor((layoutWidth - sidePad * 2 - gap) / 2);
+  /** 1px kucult: flex sutun ile tam eslesme yuvarlamasinda tasip kesilmesin (ozellikle sol sutun) */
+  const colWidth = Math.max(120, Math.floor((layoutWidth - sidePad * 2 - gap) / 2) - 1);
 
   const leftCol: typeof visibleModels = [];
   const rightCol: typeof visibleModels = [];
@@ -256,14 +257,14 @@ export default function StoreScreen() {
           <Text style={styles.empty}>Sonuç bulunamadı.</Text>
         ) : (
           <View style={[styles.masonry, { gap }]}>
-            <View style={[styles.masonryCol, { gap }]}>
+            <View style={[styles.masonryCol, styles.masonryColLeft, { gap }]}>
               {leftCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} />
+                <GridModelCard key={model.id} model={model} width={colWidth} column="left" />
               ))}
             </View>
-            <View style={[styles.masonryCol, { gap }]}>
+            <View style={[styles.masonryCol, styles.masonryColRight, { gap }]}>
               {rightCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} />
+                <GridModelCard key={model.id} model={model} width={colWidth} column="right" />
               ))}
             </View>
           </View>
@@ -405,6 +406,13 @@ const styles = StyleSheet.create({
   },
   masonryCol: {
     flex: 1,
+  },
+  /** Sol: kart sutunun soluna yapisir, orta boslukta kesilme azalir. Sag: kart sag kenara yakisir. */
+  masonryColLeft: {
+    alignItems: 'flex-start',
+  },
+  masonryColRight: {
+    alignItems: 'flex-end',
   },
   empty: {
     color: '#71717a',

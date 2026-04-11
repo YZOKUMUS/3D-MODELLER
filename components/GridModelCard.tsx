@@ -10,9 +10,11 @@ import { lightImpact } from '@/lib/haptics';
 type Props = {
   model: CatalogModel;
   width: number;
+  /** Iki sutunlu grid: sol kartlarda metni hafif sola, sagda mevcut bosluk */
+  column?: 'left' | 'right';
 };
 
-export function GridModelCard({ model, width }: Props) {
+export function GridModelCard({ model, width, column = 'right' }: Props) {
   const router = useRouter();
   const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
   const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
@@ -44,7 +46,10 @@ export function GridModelCard({ model, width }: Props) {
         </View>
       </Pressable>
       <ModelLikeButton modelId={model.id} variant="compact" />
-      <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={openDetail}
+        style={[styles.info, column === 'left' ? styles.infoLeftCol : styles.infoRightCol]}>
         <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
         <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
           {model.category}
@@ -68,10 +73,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   info: {
-    paddingLeft: 10,
-    paddingRight: 12,
     paddingTop: 8,
     paddingBottom: 10,
+  },
+  infoLeftCol: {
+    paddingLeft: 6,
+    paddingRight: 14,
+  },
+  infoRightCol: {
+    paddingLeft: 10,
+    paddingRight: 12,
   },
   title: {
     color: '#e4e4e7',
