@@ -18,8 +18,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridModelCard } from '@/components/GridModelCard';
-import { useColorScheme } from '@/components/useColorScheme';
-import { BAMBU } from '@/constants/bambuTheme';
 import { CATALOG, CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
@@ -32,7 +30,6 @@ const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' 
 
 export default function StoreScreen() {
   const router = useRouter();
-  const scheme = useColorScheme() ?? 'dark';
   const isDark = true;
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
