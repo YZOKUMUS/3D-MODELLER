@@ -1,4 +1,29 @@
-GITHUB PAGES — 404 cozumu (acele)
+GITHUB PAGES — Model Market
+
+================================================================================
+KOPYALA-YAPISTIR: Siteyi guncellemek (kod degistirdikten sonra)
+================================================================================
+
+Editorde YESIL / tarali gordugun satirlar = asagidaki blok. Fareyle ilk # satirindan
+son # satirina kadar sec, Ctrl+C, PowerShell / Cursor terminaline Ctrl+V.
+
+# >>> BURADAN ITIBAREN SEC (dahil) — tek yapistirmada calisir (# satirlari yorumdur)
+cd "C:\Users\ziyao\Desktop\3D MODELLERİM\model-market"
+npm run publish:docs
+git add -A
+git status
+git commit -m "docs: web guncelleme"
+git push
+# <<< BURAYA KADAR SEC (dahil)
+
+Ilk kez commit hatasi alirsan (once bir kez, blok disinda calistir):
+  git config --global user.name "Adiniz"
+  git config --global user.email "email@ornek.com"
+
+Canli site: https://yzokumus.github.io/3D-MODELLER/
+Yerel Metro: Model-Market-Baslat.cmd  |  http://localhost:8082/
+
+================================================================================
 
 A) NEDEN 404?
    1) GitHub Actions hesabinizda "billing" kilidi varsa OTOMATIK workflow CALISMAZ.

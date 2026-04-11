@@ -45,30 +45,62 @@ export default function StoreScreen() {
   }, [activeTab, validTabIds]);
 
   const scrollRef = useRef<ScrollView>(null);
-  const fabOpacity = useRef(new Animated.Value(0)).current;
-  const showFab = useRef(false);
+  const fabUpOpacity = useRef(new Animated.Value(0)).current;
+  const fabDownOpacity = useRef(new Animated.Value(0)).current;
+  const showFabUp = useRef(false);
+  const showFabDown = useRef(false);
   const contentHeight = useRef(0);
   const layoutHeight = useRef(0);
+  const scrollY = useRef(0);
+  const [fabUpHit, setFabUpHit] = useState(false);
+  const [fabDownHit, setFabDownHit] = useState(false);
 
-  const onScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const y = e.nativeEvent.contentOffset.y;
-      const shouldShow = y > 300;
-      if (shouldShow !== showFab.current) {
-        showFab.current = shouldShow;
-        Animated.timing(fabOpacity, {
-          toValue: shouldShow ? 1 : 0,
+  const updateFabVisibility = useCallback(
+    (y: number) => {
+      const maxY = Math.max(0, contentHeight.current - layoutHeight.current);
+      const canScroll = maxY > 80;
+      const shouldShowUp = y > 280;
+      const shouldShowDown = canScroll && y < maxY - 72;
+
+      if (shouldShowUp !== showFabUp.current) {
+        showFabUp.current = shouldShowUp;
+        setFabUpHit(shouldShowUp);
+        Animated.timing(fabUpOpacity, {
+          toValue: shouldShowUp ? 1 : 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+      if (shouldShowDown !== showFabDown.current) {
+        showFabDown.current = shouldShowDown;
+        setFabDownHit(shouldShowDown);
+        Animated.timing(fabDownOpacity, {
+          toValue: shouldShowDown ? 1 : 0,
           duration: 200,
           useNativeDriver: true,
         }).start();
       }
     },
-    [fabOpacity],
+    [fabUpOpacity, fabDownOpacity],
+  );
+
+  const onScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      scrollY.current = y;
+      updateFabVisibility(y);
+    },
+    [updateFabVisibility],
   );
 
   const scrollToTop = useCallback(() => {
     lightImpact();
     scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    lightImpact();
+    scrollRef.current?.scrollToEnd({ animated: true });
   }, []);
 
   const currentTab = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
@@ -169,8 +201,22 @@ export default function StoreScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         nestedScrollEnabled={Platform.OS === 'android'}
-        onContentSizeChange={(_w, h) => { contentHeight.current = h; }}
-        onLayout={(e) => { layoutHeight.current = e.nativeEvent.layout.height; }}
+        onContentSizeChange={(_w, h) => {
+          contentHeight.current = h;
+          const run =
+            typeof requestAnimationFrame !== 'undefined'
+              ? requestAnimationFrame
+              : (cb: () => void) => setTimeout(cb, 0);
+          run(() => updateFabVisibility(scrollY.current));
+        }}
+        onLayout={(e) => {
+          layoutHeight.current = e.nativeEvent.layout.height;
+          const run =
+            typeof requestAnimationFrame !== 'undefined'
+              ? requestAnimationFrame
+              : (cb: () => void) => setTimeout(cb, 0);
+          run(() => updateFabVisibility(scrollY.current));
+        }}
         contentContainerStyle={{ paddingBottom: scrollBottomPad + insets.bottom, paddingHorizontal: sidePad }}>
 
         {filtered.length === 0 ? (
@@ -201,11 +247,28 @@ export default function StoreScreen() {
         )}
       </ScrollView>
 
-      <Animated.View style={[styles.fabWrap, { bottom: tabBarHeight + 16, opacity: fabOpacity }]}>
-        <Pressable onPress={scrollToTop} style={styles.fab}>
-          <Icon name="chevron-up" size={20} color="#fff" />
-        </Pressable>
-      </Animated.View>
+      <View style={[styles.fabColumn, { bottom: tabBarHeight + 16 }]} pointerEvents="box-none">
+        <Animated.View
+          style={[styles.fabSlot, { bottom: 54, opacity: fabUpOpacity }]}
+          pointerEvents={fabUpHit ? 'box-none' : 'none'}>
+          <Pressable
+            onPress={scrollToTop}
+            style={styles.fab}
+            accessibilityLabel="En üste git">
+            <Icon name="chevron-up" size={20} color="#fff" />
+          </Pressable>
+        </Animated.View>
+        <Animated.View
+          style={[styles.fabSlot, { bottom: 0, opacity: fabDownOpacity }]}
+          pointerEvents={fabDownHit ? 'box-none' : 'none'}>
+          <Pressable
+            onPress={scrollToBottom}
+            style={styles.fab}
+            accessibilityLabel="En alta git">
+            <Icon name="chevron-down" size={20} color="#fff" />
+          </Pressable>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -314,9 +377,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  fabWrap: {
+  fabColumn: {
     position: 'absolute',
     right: 16,
+    width: 44,
+    height: 98,
+    alignItems: 'center',
+  },
+  fabSlot: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     alignItems: 'center',
   },
   fab: {
