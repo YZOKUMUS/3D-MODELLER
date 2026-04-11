@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   fabColumn: {
     position: 'absolute',
-    left: 10,
+    right: 10,
     width: 36,
     height: 80,
     alignItems: 'center',
