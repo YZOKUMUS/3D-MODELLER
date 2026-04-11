@@ -1,5 +1,6 @@
 import { Image as ExpoImage } from 'expo-image';
-import { useState } from 'react';
+import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import {
   Image as RNImage,
   Platform,
@@ -37,6 +38,74 @@ function resolveWebUri(source: ImageSourcePropType): string | null {
   return null;
 }
 
+/** GitHub Pages / mobil: onbellek veya preload sonrasi `load` olayi gelmeyebilir; `complete` ile yakalariz. */
+function WebCoverImg({
+  uri,
+  lazy,
+  contain,
+  accent,
+  fallbackLetter,
+  fallbackFontSize,
+  style,
+  placeholder,
+}: {
+  uri: string;
+  lazy: boolean;
+  contain: boolean;
+  accent: string;
+  fallbackLetter: string;
+  fallbackFontSize: number;
+  style: StyleProp<ViewStyle>;
+  placeholder: ReactNode;
+}) {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    setLoaded(false);
+    const el = imgRef.current;
+    if (!el) return;
+    const markLoaded = () => setLoaded(true);
+    if (el.complete && el.naturalWidth > 0) {
+      markLoaded();
+      return;
+    }
+    el.addEventListener('load', markLoaded, { once: true });
+    return () => el.removeEventListener('load', markLoaded);
+  }, [uri]);
+
+  if (failed) {
+    return (
+      <View style={[styles.clip, style, styles.fallback, { backgroundColor: accent }]}>
+        <Text style={[styles.fallbackLetter, { fontSize: fallbackFontSize }]}>{fallbackLetter}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.clip, style, { backgroundColor: accent }]}>
+      {!loaded && placeholder}
+      <img
+        ref={imgRef}
+        src={uri}
+        alt=""
+        loading={lazy ? 'lazy' : 'eager'}
+        decoding="async"
+        onError={() => setFailed(true)}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: contain ? 'contain' : 'cover',
+          display: 'block',
+          opacity: loaded ? 1 : 0,
+          transition: 'opacity 0.3s',
+        }}
+      />
+    </View>
+  );
+}
+
 export function ModelCoverImage({
   source,
   accent,
@@ -67,24 +136,16 @@ export function ModelCoverImage({
     const uri = resolveWebUri(source);
     if (uri) {
       return (
-        <View style={[styles.clip, style, { backgroundColor: accent }]}>
-          {!loaded && placeholder}
-          <img
-            src={uri}
-            loading={lazy ? 'lazy' : 'eager'}
-            decoding="async"
-            onLoad={() => setLoaded(true)}
-            onError={() => setFailed(true)}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: contain ? 'contain' : 'cover',
-              display: 'block',
-              opacity: loaded ? 1 : 0,
-              transition: 'opacity 0.3s',
-            }}
-          />
-        </View>
+        <WebCoverImg
+          uri={uri}
+          lazy={lazy}
+          contain={contain}
+          accent={accent}
+          fallbackLetter={fallbackLetter}
+          fallbackFontSize={fallbackFontSize}
+          style={style}
+          placeholder={placeholder}
+        />
       );
     }
   }

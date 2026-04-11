@@ -97,7 +97,9 @@ export default function StoreScreen() {
 
   const gap = 6;
   const sidePad = 6;
-  const colWidth = Math.floor((windowWidth - sidePad * 2 - gap) / 2);
+  // SSG / GitHub Pages: useWindowDimensions() sifir olabilir; negatif kolon genisligi tum grid'i bozar.
+  const layoutWidth = Math.max(windowWidth, 360);
+  const colWidth = Math.floor((layoutWidth - sidePad * 2 - gap) / 2);
 
   const leftCol: typeof visibleModels = [];
   const rightCol: typeof visibleModels = [];
