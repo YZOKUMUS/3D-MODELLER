@@ -11,7 +11,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,8 +37,6 @@ const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' 
 export default function StoreScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  const { width: windowWidth } = useWindowDimensions();
-
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [visibleCount, setVisibleCount] = useState(20);
@@ -139,11 +136,6 @@ export default function StoreScreen() {
   const gap = 6;
   /** Dar mobilde sag sutun kenara yapisip fiyat kesilmesin diye biraz ic boşluk */
   const sidePad = 10;
-  // SSG / GitHub Pages: useWindowDimensions() sifir olabilir; negatif kolon genisligi tum grid'i bozar.
-  const layoutWidth = Math.max(windowWidth, 360);
-  /** 1px kucult: flex sutun ile tam eslesme yuvarlamasinda tasip kesilmesin (ozellikle sol sutun) */
-  const colWidth = Math.max(120, Math.floor((layoutWidth - sidePad * 2 - gap) / 2) - 1);
-
   const leftCol: typeof visibleModels = [];
   const rightCol: typeof visibleModels = [];
   visibleModels.forEach((m, i) => (i % 2 === 0 ? leftCol : rightCol).push(m));
@@ -257,14 +249,14 @@ export default function StoreScreen() {
           <Text style={styles.empty}>Sonuç bulunamadı.</Text>
         ) : (
           <View style={[styles.masonry, { gap }]}>
-            <View style={[styles.masonryCol, styles.masonryColLeft, { gap }]}>
+            <View style={[styles.masonryCol, { gap }]}>
               {leftCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} column="left" />
+                <GridModelCard key={model.id} model={model} />
               ))}
             </View>
-            <View style={[styles.masonryCol, styles.masonryColRight, { gap }]}>
+            <View style={[styles.masonryCol, { gap }]}>
               {rightCol.map((model) => (
-                <GridModelCard key={model.id} model={model} width={colWidth} column="right" />
+                <GridModelCard key={model.id} model={model} />
               ))}
             </View>
           </View>
@@ -406,13 +398,7 @@ const styles = StyleSheet.create({
   },
   masonryCol: {
     flex: 1,
-  },
-  /** Sol: kart sutunun soluna yapisir, orta boslukta kesilme azalir. Sag: kart sag kenara yakisir. */
-  masonryColLeft: {
-    alignItems: 'flex-start',
-  },
-  masonryColRight: {
-    alignItems: 'flex-end',
+    minWidth: 0,
   },
   empty: {
     color: '#71717a',

@@ -1,5 +1,13 @@
 import { useRouter } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import {
+  LayoutChangeEvent,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
@@ -9,14 +17,20 @@ import { lightImpact } from '@/lib/haptics';
 
 type Props = {
   model: CatalogModel;
-  width: number;
-  /** Iki sutunlu grid: sol kartlarda metni hafif sola, sagda mevcut bosluk */
-  column?: 'left' | 'right';
 };
 
-export function GridModelCard({ model, width, column = 'right' }: Props) {
+export function GridModelCard({ model }: Props) {
   const router = useRouter();
-  const imgHeight = Math.round(width * (0.85 + (parseInt(model.id, 10) % 4) * 0.12));
+  const [imgSlotW, setImgSlotW] = useState(0);
+  const aspect = 0.85 + (parseInt(model.id, 10) % 4) * 0.12;
+  const imgHeight =
+    imgSlotW > 0 ? Math.round(imgSlotW * aspect) : Math.round(168 * aspect);
+
+  const onImageSlotLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = Math.round(e.nativeEvent.layout.width);
+    setImgSlotW((prev) => (prev !== w ? w : prev));
+  }, []);
+
   const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
 
   const openDetail = () => {
@@ -25,18 +39,18 @@ export function GridModelCard({ model, width, column = 'right' }: Props) {
   };
 
   return (
-    <View style={[styles.root, { width }]}>
+    <View style={styles.root}>
       <Pressable
         accessibilityRole="button"
         onPress={openDetail}
         style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}>
-        <View>
+        <View style={styles.imageClip} onLayout={onImageSlotLayout}>
           <ModelCoverImage
             source={model.coverImage}
             accent={model.accent}
             fallbackLetter={model.title.slice(0, 1)}
             fallbackFontSize={28}
-            style={{ width, height: imgHeight, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+            style={[styles.coverImg, { height: imgHeight }]}
           />
           {isNew && (
             <View style={styles.newBadge}>
@@ -46,11 +60,10 @@ export function GridModelCard({ model, width, column = 'right' }: Props) {
         </View>
       </Pressable>
       <ModelLikeButton modelId={model.id} variant="compact" />
-      <Pressable
-        accessibilityRole="button"
-        onPress={openDetail}
-        style={[styles.info, column === 'left' ? styles.infoLeftCol : styles.infoRightCol]}>
-        <Text style={styles.title} numberOfLines={2}>{model.title}</Text>
+      <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>
+          {model.title}
+        </Text>
         <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
           {model.category}
         </Text>
@@ -67,22 +80,29 @@ export function GridModelCard({ model, width, column = 'right' }: Props) {
 }
 
 const styles = StyleSheet.create({
+  /** Genislik %100 = flex sutunla ayni; tasip yok. overflow ile alt koseler duzgun. */
   root: {
+    width: '100%',
     borderRadius: 12,
     backgroundColor: '#1a1a1e',
     overflow: 'hidden',
   },
+  imageClip: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  coverImg: {
+    width: '100%',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    alignSelf: 'stretch',
+  },
   info: {
+    paddingHorizontal: 10,
     paddingTop: 8,
     paddingBottom: 10,
-  },
-  infoLeftCol: {
-    paddingLeft: 6,
-    paddingRight: 14,
-  },
-  infoRightCol: {
-    paddingLeft: 10,
-    paddingRight: 12,
   },
   title: {
     color: '#e4e4e7',
@@ -96,15 +116,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 5,
   },
-  /** Ayri satir + sag hizali: dar sutunda TRY son rakamlari kesilmesin */
+  /** Sola yasali, dogal genislik: sagda kesilme / overflow hatasi olmaz */
   price: {
-    alignSelf: 'flex-end',
     marginTop: 4,
     color: '#00c853',
     fontSize: 13,
     fontWeight: '800',
-    textAlign: 'right',
-    width: '100%',
+    alignSelf: 'flex-start',
   },
   newBadge: {
     position: 'absolute',
