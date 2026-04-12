@@ -1,12 +1,27 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useMemo, type ComponentProps } from 'react';
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useMemo, useState, type ComponentProps } from 'react';
+import {
+  FlatList,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
-import { CATALOG } from '@/data/catalog';
+import { CATALOG, getModelById } from '@/data/catalog';
 import { Icon } from '@/lib/web-icon';
+
+const PROFILE_HERO_COVER_STORAGE_KEY = 'profile:heroCoverModelId';
 
 function ProfileFact({
   icon,
@@ -42,11 +57,56 @@ export default function ProfileScreen() {
   const scheme = useColorScheme() ?? 'light';
   const colors = Colors[scheme];
   const isDark = scheme === 'dark';
-  const { height: windowHeight } = useWindowDimensions();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
 
+  const defaultHeroId = CATALOG[0]?.id ?? '';
+  const [heroModelId, setHeroModelId] = useState(defaultHeroId);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(PROFILE_HERO_COVER_STORAGE_KEY);
+        if (cancelled || raw == null) return;
+        if (getModelById(raw)) setHeroModelId(raw);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const heroModel = useMemo(() => getModelById(heroModelId) ?? CATALOG[0], [heroModelId]);
+
+  const pickerSheetWidth = Math.min(windowWidth - 24, 520);
+  const pickerSheetHeight = Math.min(Math.round(windowHeight * 0.76), 600);
+  const pickerPad = 16;
+  const pickerColGap = 10;
+  const pickerThumbWidth = (pickerSheetWidth - pickerPad * 2 - pickerColGap) / 2;
+
   const categoryCount = useMemo(() => new Set(CATALOG.map((m) => m.category)).size, []);
+
+  const onPickHeroModel = async (id: string) => {
+    setHeroModelId(id);
+    setPickerOpen(false);
+    try {
+      await AsyncStorage.setItem(PROFILE_HERO_COVER_STORAGE_KEY, id);
+    } catch {
+      /* ignore */
+    }
+    if (Platform.OS !== 'web') {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch {
+        /* ignore */
+      }
+    }
+  };
 
   const minScrollInner = useMemo(() => {
     const usable = windowHeight - tabBarHeight - Math.max(insets.top, 8) - 24;
@@ -71,9 +131,26 @@ export default function ProfileScreen() {
       showsVerticalScrollIndicator={false}>
       <View style={[styles.heroCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
         <View style={[styles.heroAccent, { backgroundColor: colors.tint }]} />
-        <View style={[styles.avatar, { backgroundColor: colors.tint }]}>
-          <Icon name="user" size={40} color="#fff" />
-        </View>
+        <Pressable
+          onPress={() => setPickerOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Profil kapak görseli: vitrinden model seç"
+          style={({ pressed }) => [
+            styles.heroImageTouch,
+            { borderColor: cardBorder, opacity: pressed ? 0.92 : 1 },
+          ]}>
+          <ModelCoverImage
+            source={heroModel.coverImage}
+            accent={heroModel.accent}
+            fallbackLetter={heroModel.title.slice(0, 1).toUpperCase()}
+            fallbackFontSize={40}
+            style={styles.heroImage}
+            lazy={false}
+          />
+        </Pressable>
+        <Text style={[styles.heroImageHint, { color: isDark ? '#64748b' : '#94a3b8' }]}>
+          Kapak: {heroModel.title} · değiştirmek için görsele dokun
+        </Text>
         <Text style={[styles.name, { color: colors.text }]}>YZOKUMUS</Text>
         <Text style={[styles.tagline, { color: colors.tint }]}>Hobi ile üretiyorum</Text>
         <Text style={[styles.lead, { color: isDark ? '#cbd5e1' : '#475569' }]}>
@@ -163,6 +240,76 @@ export default function ProfileScreen() {
       </View>
 
       <Text style={[styles.footerLine, { color: isDark ? '#52525b' : '#94a3b8' }]}>YZOKUMUS · 3B vitrin</Text>
+
+      <Modal
+        visible={pickerOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setPickerOpen(false)}>
+        <View style={styles.modalRoot}>
+          <Pressable style={styles.modalBackdrop} onPress={() => setPickerOpen(false)} />
+          <View
+            style={[
+              styles.modalSheet,
+              {
+                width: pickerSheetWidth,
+                height: pickerSheetHeight,
+                backgroundColor: cardBg,
+                borderColor: cardBorder,
+                paddingBottom: 12 + insets.bottom,
+              },
+            ]}
+            onStartShouldSetResponder={() => true}>
+          <View style={[styles.modalGrab, { backgroundColor: isDark ? '#3f3f46' : '#cbd5e1' }]} />
+          <Text style={[styles.modalTitle, { color: colors.text }]}>Profil kapağı için model</Text>
+          <Text style={[styles.modalSubtitle, { color: isDark ? '#94a3b8' : '#64748b' }]}>
+            Vitrindeki herhangi bir kaydın fotoğrafı üstte görünür; seçimin cihazda saklanır.
+          </Text>
+          <FlatList
+            style={styles.modalList}
+            data={CATALOG}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            keyboardShouldPersistTaps="handled"
+            columnWrapperStyle={{ gap: pickerColGap, marginBottom: pickerColGap }}
+            contentContainerStyle={{ paddingHorizontal: pickerPad, paddingBottom: 8 }}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
+              const selected = item.id === heroModelId;
+              return (
+                <Pressable
+                  onPress={() => onPickHeroModel(item.id)}
+                  style={[
+                    styles.pickerCell,
+                    {
+                      width: pickerThumbWidth,
+                      borderColor: selected ? colors.tint : cardBorder,
+                      borderWidth: selected ? 2 : 1,
+                    },
+                  ]}>
+                  <ModelCoverImage
+                    source={item.coverImage}
+                    accent={item.accent}
+                    fallbackLetter={item.title.slice(0, 1).toUpperCase()}
+                    fallbackFontSize={28}
+                    style={styles.pickerThumb}
+                    lazy
+                  />
+                  <Text style={[styles.pickerTitle, { color: colors.text }]} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                </Pressable>
+              );
+            }}
+          />
+          <Pressable
+            onPress={() => setPickerOpen(false)}
+            style={[styles.modalCloseBtn, { borderColor: cardBorder }]}>
+            <Text style={[styles.modalCloseBtnText, { color: colors.tint }]}>Kapat</Text>
+          </Pressable>
+        </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -193,18 +340,29 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
   },
-  avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  heroImageTouch: {
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
+    marginTop: 12,
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 1,
+  },
+  heroImage: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+  },
+  heroImageHint: {
     marginTop: 8,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.22)',
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+    paddingHorizontal: 8,
+    lineHeight: 16,
   },
   name: {
-    marginTop: 18,
+    marginTop: 14,
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: 0.8,
@@ -327,5 +485,79 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
     letterSpacing: 1.2,
+  },
+  modalRoot: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  modalSheet: {
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 520,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    paddingTop: 10,
+    overflow: 'hidden',
+    flexDirection: 'column',
+  },
+  modalList: {
+    flex: 1,
+    minHeight: 0,
+  },
+  modalGrab: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 14,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    paddingHorizontal: 16,
+    marginBottom: 6,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    lineHeight: 19,
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  pickerCell: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    paddingBottom: 8,
+    backgroundColor: 'transparent',
+  },
+  pickerThumb: {
+    width: '100%',
+    aspectRatio: 1,
+    borderTopLeftRadius: 11,
+    borderTopRightRadius: 11,
+  },
+  pickerTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    marginTop: 8,
+    paddingHorizontal: 8,
+    lineHeight: 15,
+  },
+  modalCloseBtn: {
+    marginHorizontal: 16,
+    marginTop: 4,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  modalCloseBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
   },
 });
