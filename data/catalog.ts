@@ -3739,6 +3739,24 @@ export const CATALOG: CatalogModel[] = [
     polyCount: '—',
     rating: 4.4,
   },
+  {
+    id: '266',
+    title: 'SAAT',
+    tagline: 'SAAT · STL',
+    price: 2900,
+    formats: ['STL'],
+    category: 'Aksesuar',
+    description: 'SAAT',
+    coverImage: require('../assets/covers/cover-266.jpg'),
+    galleryImages: [
+      require('../assets/covers/cover-267.jpg'),
+      require('../assets/covers/cover-268.jpg'),
+      require('../assets/covers/cover-269.jpg'),
+    ],
+    accent: '#C084FC',
+    polyCount: '—',
+    rating: 4.8,
+  },
 ];
 
 /** Katalogda en az bir ürünü olan kategoriler; sekme sırası `CATEGORIES` ile aynı. */
