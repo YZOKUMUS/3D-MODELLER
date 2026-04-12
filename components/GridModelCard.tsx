@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#1a1a1e',
     overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   imageClip: {
     borderTopLeftRadius: 12,
