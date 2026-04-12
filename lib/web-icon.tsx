@@ -27,6 +27,7 @@ const MI: Record<string, string> = {
   'check-circle': 'check_circle',
   'question-circle': 'help',
   'chevron-right': 'chevron_right',
+  'chevron-left': 'chevron_left',
   info: 'info',
   home: 'home',
   heart: 'favorite',

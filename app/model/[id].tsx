@@ -33,6 +33,7 @@ export default function ModelDetailScreen() {
   const slides = useMemo(() => (model ? getDetailSlides(model) : []), [model]);
   const slideWidth = windowWidth;
   const [slideIndex, setSlideIndex] = useState(0);
+  const galleryRef = useRef<FlatList | null>(null);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 55 }).current;
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -45,6 +46,20 @@ export default function ModelDetailScreen() {
   useEffect(() => {
     setSlideIndex(0);
   }, [model?.id]);
+
+  const goGalleryPrev = useCallback(() => {
+    if (slides.length < 2) return;
+    const next = Math.max(0, slideIndex - 1);
+    lightImpact();
+    galleryRef.current?.scrollToIndex({ index: next, animated: true });
+  }, [slideIndex, slides.length]);
+
+  const goGalleryNext = useCallback(() => {
+    if (slides.length < 2) return;
+    const next = Math.min(slides.length - 1, slideIndex + 1);
+    lightImpact();
+    galleryRef.current?.scrollToIndex({ index: next, animated: true });
+  }, [slideIndex, slides.length]);
 
   const goBackOne = () => {
     lightImpact();
@@ -99,6 +114,7 @@ export default function ModelDetailScreen() {
 
           <View style={styles.imageWrap}>
             <FlatList
+              ref={galleryRef}
               data={slides}
               horizontal
               pagingEnabled
@@ -124,13 +140,58 @@ export default function ModelDetailScreen() {
                 offset: slideWidth * index,
                 index,
               })}
+              onScrollToIndexFailed={({ index }) => {
+                galleryRef.current?.scrollToOffset({
+                  offset: index * slideWidth,
+                  animated: true,
+                });
+              }}
             />
             {slides.length > 1 && (
-              <View style={styles.imageCounter} pointerEvents="none">
-                <Text style={styles.imageCounterText}>
-                  {slideIndex + 1}/{slides.length}
-                </Text>
-              </View>
+              <>
+                <Pressable
+                  accessibilityLabel="Önceki fotoğraf"
+                  onPress={goGalleryPrev}
+                  disabled={slideIndex === 0}
+                  hitSlop={8}
+                  style={[styles.galleryArrow, styles.galleryArrowLeft, slideIndex === 0 && styles.galleryArrowDisabled]}>
+                  <View style={styles.galleryArrowInner}>
+                    <Icon name="chevron-left" size={22} color="#fff" />
+                  </View>
+                </Pressable>
+                <Pressable
+                  accessibilityLabel="Sonraki fotoğraf"
+                  onPress={goGalleryNext}
+                  disabled={slideIndex >= slides.length - 1}
+                  hitSlop={8}
+                  style={[
+                    styles.galleryArrow,
+                    styles.galleryArrowRight,
+                    slideIndex >= slides.length - 1 && styles.galleryArrowDisabled,
+                  ]}>
+                  <View style={styles.galleryArrowInner}>
+                    <Icon name="chevron-right" size={22} color="#fff" />
+                  </View>
+                </Pressable>
+                <View style={styles.galleryDots} pointerEvents="none">
+                  {slides.map((_, i) => (
+                    <View
+                      key={`dot-${model.id}-${i}`}
+                      style={[styles.galleryDot, i === slideIndex && styles.galleryDotActive]}
+                    />
+                  ))}
+                </View>
+                <View style={styles.galleryFooter} pointerEvents="box-none">
+                  <Text style={styles.galleryHint} numberOfLines={2}>
+                    Kaydırın veya yan oklara dokunun.
+                  </Text>
+                  <View style={styles.imageCounter}>
+                    <Text style={styles.imageCounterText}>
+                      {slideIndex + 1}/{slides.length}
+                    </Text>
+                  </View>
+                </View>
+              </>
             )}
           </View>
 
@@ -255,14 +316,77 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 380,
   },
-  imageCounter: {
+  galleryArrow: {
     position: 'absolute',
-    bottom: 12,
-    right: 12,
+    top: 0,
+    bottom: 0,
+    width: 48,
+    justifyContent: 'center',
+    zIndex: 9,
+  },
+  galleryArrowLeft: {
+    left: 2,
+  },
+  galleryArrowRight: {
+    right: 2,
+  },
+  galleryArrowInner: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  galleryArrowDisabled: {
+    opacity: 0.32,
+  },
+  galleryDots: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 48,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 7,
+    zIndex: 7,
+  },
+  galleryDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  galleryDotActive: {
+    backgroundColor: '#00c853',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  galleryFooter: {
+    position: 'absolute',
+    left: 10,
+    right: 10,
+    bottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    zIndex: 8,
+  },
+  galleryHint: {
+    flex: 1,
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 11,
+    fontWeight: '600',
+    lineHeight: 14,
+  },
+  imageCounter: {
     backgroundColor: 'rgba(0,0,0,0.6)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
+    flexShrink: 0,
   },
   imageCounterText: {
     color: '#fff',
