@@ -139,12 +139,6 @@ export default function ModelDetailScreen() {
           <View style={styles.content}>
             <Text style={styles.title}>{model.title}</Text>
 
-            <View style={styles.badgeRow}>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{model.category}</Text>
-              </View>
-            </View>
-
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <Icon name="star" size={14} color="#fbbf24" />
@@ -283,24 +277,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     lineHeight: 26,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 10,
-  },
-  badge: {
-    backgroundColor: '#1e1e24',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#2a2a32',
-  },
-  badgeText: {
-    color: '#a1a1aa',
-    fontSize: 13,
-    fontWeight: '600',
   },
   statsRow: {
     flexDirection: 'row',
