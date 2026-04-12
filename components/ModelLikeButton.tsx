@@ -6,14 +6,37 @@ import { Icon } from '@/lib/web-icon';
 
 type Props = {
   modelId: string;
-  /** Tek satır, küçük — ızgara kartı foto altı */
-  variant?: 'compact' | 'detail';
+  /** compact: foto alti satir | detail: urun detay | iconOnly: sadece kucuk kalp (kartta fiyat karsisi) */
+  variant?: 'compact' | 'detail' | 'iconOnly';
 };
+
+const ICON_ONLY_SIZE = 15;
 
 export function ModelLikeButton({ modelId, variant = 'compact' }: Props) {
   const { isLiked, toggleLike } = useLikes();
   const liked = isLiked(modelId);
   const isDetail = variant === 'detail';
+  const isIconOnly = variant === 'iconOnly';
+
+  if (isIconOnly) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={liked ? 'Beğeniyi kaldır' : 'Beğen'}
+        hitSlop={12}
+        onPress={() => {
+          lightImpact();
+          toggleLike(modelId);
+        }}
+        style={({ pressed }) => [styles.iconOnlyPress, { opacity: pressed ? 0.75 : 1 }]}>
+        <Icon
+          name={liked ? 'heart' : 'heart-o'}
+          size={ICON_ONLY_SIZE}
+          color={liked ? '#ff4d6d' : '#a1a1aa'}
+        />
+      </Pressable>
+    );
+  }
 
   return (
     <View style={[styles.wrap, isDetail && styles.wrapDetail]}>
@@ -40,6 +63,12 @@ export function ModelLikeButton({ modelId, variant = 'compact' }: Props) {
 }
 
 const styles = StyleSheet.create({
+  iconOnlyPress: {
+    flexShrink: 0,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   wrap: {
     backgroundColor: '#151518',
     borderBottomWidth: StyleSheet.hairlineWidth,

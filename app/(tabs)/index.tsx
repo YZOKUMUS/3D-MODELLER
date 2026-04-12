@@ -133,7 +133,7 @@ export default function StoreScreen() {
   const visibleModels = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
   const hasMore = filtered.length > visibleCount;
 
-  const gap = 6;
+  const gap = 10;
   /** Dar mobilde sag sutun kenara yapisip fiyat kesilmesin diye biraz ic boşluk */
   const sidePad = 10;
   const leftCol: typeof visibleModels = [];

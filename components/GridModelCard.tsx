@@ -39,55 +39,91 @@ export function GridModelCard({ model }: Props) {
   };
 
   return (
-    <View style={styles.root}>
-      <Pressable
-        accessibilityRole="button"
-        onPress={openDetail}
-        style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}>
-        <View style={styles.imageClip} onLayout={onImageSlotLayout}>
-          <ModelCoverImage
-            source={model.coverImage}
-            accent={model.accent}
-            fallbackLetter={model.title.slice(0, 1)}
-            fallbackFontSize={28}
-            style={[styles.coverImg, { height: imgHeight }]}
-          />
-          {isNew && (
-            <View style={styles.newBadge}>
-              <Text style={styles.newBadgeText}>YENİ</Text>
-            </View>
-          )}
+    <View style={styles.shadowHost}>
+      <View style={styles.root}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={openDetail}
+          style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}>
+          <View style={styles.imageClip} onLayout={onImageSlotLayout}>
+            <ModelCoverImage
+              source={model.coverImage}
+              accent={model.accent}
+              fallbackLetter={model.title.slice(0, 1)}
+              fallbackFontSize={28}
+              style={[styles.coverImg, { height: imgHeight }]}
+            />
+            {isNew && (
+              <View style={styles.newBadge}>
+                <Text style={styles.newBadgeText}>YENİ</Text>
+              </View>
+            )}
+          </View>
+        </Pressable>
+        <View style={styles.info}>
+          <Pressable accessibilityRole="button" onPress={openDetail}>
+            <Text style={styles.title} numberOfLines={2}>
+              {model.title}
+            </Text>
+            <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
+              {model.category}
+            </Text>
+          </Pressable>
+          <View style={styles.priceRow}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Model detayı"
+              onPress={openDetail}
+              style={styles.priceHit}>
+              <Text
+                style={styles.price}
+                numberOfLines={1}
+                {...Platform.select({
+                  android: { includeFontPadding: false },
+                })}>
+                {formatTry(model.price)}
+              </Text>
+            </Pressable>
+            <ModelLikeButton modelId={model.id} variant="iconOnly" />
+          </View>
         </View>
-      </Pressable>
-      <ModelLikeButton modelId={model.id} variant="compact" />
-      <Pressable accessibilityRole="button" onPress={openDetail} style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>
-          {model.title}
-        </Text>
-        <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
-          {model.category}
-        </Text>
-        <Text
-          style={styles.price}
-          {...Platform.select({
-            android: { includeFontPadding: false },
-          })}>
-          {formatTry(model.price)}
-        </Text>
-      </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  /** Genislik %100 = flex sutunla ayni; tasip yok. overflow ile alt koseler duzgun. */
+  /** Dis kabuk: golge/elevation (overflow yok — golge kesilmesin) */
+  shadowHost: {
+    width: '100%',
+    borderRadius: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.45,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 5,
+      },
+      default: {
+        // web: RN genelde shadow* alanlarini map eder
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.35,
+        shadowRadius: 5,
+      },
+    }),
+  },
+  /** Zeminden hafif daha acik + belirgin cerceve: kartlar ayri “kutu” gibi */
   root: {
     width: '100%',
     borderRadius: 12,
-    backgroundColor: '#1a1a1e',
+    backgroundColor: '#1e1e24',
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
   },
   imageClip: {
     borderTopLeftRadius: 12,
@@ -118,13 +154,24 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 5,
   },
-  /** Sola yasali, dogal genislik: sagda kesilme / overflow hatasi olmaz */
-  price: {
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: 4,
+    gap: 4,
+    minWidth: 0,
+  },
+  priceHit: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: 2,
+  },
+  /** Sol: fiyat; sag: kalp */
+  price: {
     color: '#00c853',
     fontSize: 13,
     fontWeight: '800',
-    alignSelf: 'flex-start',
   },
   newBadge: {
     position: 'absolute',
