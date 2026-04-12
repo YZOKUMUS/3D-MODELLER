@@ -130,6 +130,20 @@ export default function StoreScreen() {
     return list;
   }, [query, activeTab, currentTab.category]);
 
+  /** Arama yokken sekme+Trend listesi — boş durumda “arama mı sekme mi” ayırımı için */
+  const listWithoutSearch = useMemo(() => {
+    let list = [...CATALOG].reverse();
+    if (currentTab.category !== 'Tümü') {
+      list = list.filter((m) => m.category === currentTab.category);
+    }
+    if (activeTab === 'trending') {
+      list = [...list].sort((a, b) => b.rating - a.rating);
+    }
+    return list;
+  }, [activeTab, currentTab.category]);
+
+  const hasSearchQuery = query.trim().length > 0;
+
   const visibleModels = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
   const hasMore = filtered.length > visibleCount;
 
@@ -246,7 +260,45 @@ export default function StoreScreen() {
         contentContainerStyle={{ paddingBottom: scrollBottomPad + insets.bottom, paddingHorizontal: sidePad }}>
 
         {filtered.length === 0 ? (
-          <Text style={styles.empty}>Sonuç bulunamadı.</Text>
+          <View style={styles.emptyWrap}>
+            <Icon name="search" size={40} color="#52525b" />
+            <Text style={styles.emptyTitle}>
+              {hasSearchQuery
+                ? 'Bu aramada sonuç yok'
+                : listWithoutSearch.length === 0
+                  ? 'Bu sekmede henüz model yok'
+                  : 'Sonuç yok'}
+            </Text>
+            <Text style={styles.emptyHint}>
+              {hasSearchQuery && listWithoutSearch.length > 0
+                ? 'Aramayı temizleyin veya başka bir sekme seçin.'
+                : hasSearchQuery
+                  ? 'Başka kelimeler deneyin veya aramayı sıfırlayın.'
+                  : 'Üstten başka bir kategori veya “Senin İçin”e geçebilirsiniz.'}
+            </Text>
+            {hasSearchQuery && (
+              <Pressable
+                style={styles.emptyBtn}
+                onPress={() => {
+                  lightImpact();
+                  setQuery('');
+                }}>
+                <Text style={styles.emptyBtnText}>Aramayı temizle</Text>
+              </Pressable>
+            )}
+            {activeTab !== 'all' && (
+              <Pressable
+                style={[styles.emptyBtn, styles.emptyBtnSecondary]}
+                onPress={() => {
+                  lightImpact();
+                  setActiveTab('all');
+                  setQuery('');
+                  setVisibleCount(20);
+                }}>
+                <Text style={[styles.emptyBtnText, styles.emptyBtnTextSecondary]}>Senin İçin — tüm modeller</Text>
+              </Pressable>
+            )}
+          </View>
         ) : (
           <View style={[styles.masonry, { gap }]}>
             <View style={[styles.masonryCol, { gap }]}>
@@ -400,11 +452,44 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  empty: {
-    color: '#71717a',
+  emptyWrap: {
+    alignItems: 'center',
+    paddingVertical: 36,
+    paddingHorizontal: 16,
+    gap: 10,
+  },
+  emptyTitle: {
+    color: '#e4e4e7',
+    fontSize: 17,
+    fontWeight: '800',
     textAlign: 'center',
-    paddingVertical: 40,
+  },
+  emptyHint: {
+    color: '#71717a',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 300,
+  },
+  emptyBtn: {
+    marginTop: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    backgroundColor: '#00c853',
+  },
+  emptyBtnSecondary: {
+    backgroundColor: '#1e1e24',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  emptyBtnText: {
+    color: '#fff',
     fontSize: 15,
+    fontWeight: '800',
+  },
+  emptyBtnTextSecondary: {
+    color: '#00c853',
   },
   loadMore: {
     marginTop: 8,

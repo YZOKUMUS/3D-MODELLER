@@ -1,3 +1,5 @@
+import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -5,6 +7,7 @@ import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useCart } from '@/context/CartContext';
 import Colors from '@/constants/Colors';
+import { CATALOG } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
@@ -14,7 +17,13 @@ export default function CartScreen() {
   const colors = Colors[scheme];
   const isDark = scheme === 'dark';
   const insets = useSafeAreaInsets();
-  const { lines, ready, remove, setQuantity, clear, subtotal } = useCart();
+  const router = useRouter();
+  const { lines, ready, remove, setQuantity, clear, subtotal, add } = useCart();
+
+  const suggestions = useMemo(
+    () => [...CATALOG].sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10)).slice(0, 3),
+    [],
+  );
 
   const checkout = () => {
     if (lines.length === 0) return;
@@ -56,8 +65,66 @@ export default function CartScreen() {
             <Icon name="shopping-cart" size={48} color={isDark ? '#3f3f46' : '#cbd5e1'} />
             <Text style={[styles.emptyTitle, { color: colors.text }]}>Sepet boş</Text>
             <Text style={[styles.emptySub, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-              Mağazadan modeller ekleyerek başlayın.
+              Mağazadan modeller ekleyerek başlayın veya aşağıdan hızlıca deneyin.
             </Text>
+            <View style={styles.suggestBlock}>
+            <Text style={[styles.suggestTitle, { color: colors.text }]}>Örnek ürünler</Text>
+            {suggestions.map((m) => (
+              <View
+                key={m.id}
+                style={[
+                  styles.suggestRow,
+                  {
+                    backgroundColor: isDark ? '#1a1a1e' : '#f8fafc',
+                    borderColor: isDark ? '#2d2d35' : '#e2e8f0',
+                  },
+                ]}>
+                <Pressable
+                  onPress={() => {
+                    lightImpact();
+                    router.push(`/model/${m.id}` as const);
+                  }}
+                  style={styles.suggestMain}>
+                  <ModelCoverImage
+                    source={m.coverImage}
+                    accent={m.accent}
+                    fallbackLetter={m.title.slice(0, 1)}
+                    fallbackFontSize={18}
+                    style={styles.suggestThumb}
+                  />
+                  <View style={styles.suggestBody}>
+                    <Text style={[styles.suggestName, { color: colors.text }]} numberOfLines={2}>
+                      {m.title}
+                    </Text>
+                    <Text style={[styles.suggestPrice, { color: colors.tint }]}>{formatTry(m.price)}</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    lightImpact();
+                    add(m);
+                    successNotification();
+                  }}
+                  style={({ pressed }) => [
+                    styles.suggestAdd,
+                    { backgroundColor: colors.tint, opacity: pressed ? 0.88 : 1 },
+                  ]}>
+                  <Text style={styles.suggestAddText}>Ekle</Text>
+                </Pressable>
+              </View>
+            ))}
+            <Pressable
+              onPress={() => {
+                lightImpact();
+                router.push('/(tabs)' as const);
+              }}
+              style={({ pressed }) => [
+                styles.goStoreBtn,
+                { borderColor: colors.tint, opacity: pressed ? 0.85 : 1 },
+              ]}>
+              <Text style={[styles.goStoreText, { color: colors.tint }]}>Mağazaya git</Text>
+            </Pressable>
+            </View>
           </View>
         ) : (
           lines.map((line) => (
@@ -162,8 +229,16 @@ const styles = StyleSheet.create({
   },
   emptyWrap: {
     alignItems: 'center',
-    paddingTop: 48,
-    gap: 12,
+    paddingTop: 32,
+    gap: 8,
+    width: '100%',
+  },
+  suggestBlock: {
+    width: '100%',
+    maxWidth: 420,
+    alignSelf: 'center',
+    marginTop: 12,
+    gap: 6,
   },
   emptyTitle: {
     fontSize: 20,
@@ -173,8 +248,72 @@ const styles = StyleSheet.create({
   emptySub: {
     fontSize: 15,
     textAlign: 'center',
-    maxWidth: 280,
+    maxWidth: 320,
     lineHeight: 22,
+    alignSelf: 'center',
+  },
+  suggestTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  suggestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
+    marginBottom: 8,
+    gap: 8,
+  },
+  suggestMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    minWidth: 0,
+  },
+  suggestThumb: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  suggestBody: {
+    flex: 1,
+    marginLeft: 10,
+    minWidth: 0,
+  },
+  suggestName: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  suggestPrice: {
+    fontSize: 13,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  suggestAdd: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+  },
+  suggestAddText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  goStoreBtn: {
+    marginTop: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignItems: 'center',
+  },
+  goStoreText: {
+    fontSize: 16,
+    fontWeight: '800',
   },
   line: {
     flexDirection: 'row',

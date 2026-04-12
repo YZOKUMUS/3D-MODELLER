@@ -19,6 +19,15 @@ type Props = {
   model: CatalogModel;
 };
 
+/** Kart köşesi: GLB veya GLB·OBJ veya GLB +2 */
+function formatChipLabel(formats: string[]): string {
+  const f = formats.filter(Boolean);
+  if (f.length === 0) return '';
+  if (f.length === 1) return f[0];
+  if (f.length === 2) return `${f[0]}·${f[1]}`;
+  return `${f[0]} +${f.length - 1}`;
+}
+
 export function GridModelCard({ model }: Props) {
   const router = useRouter();
   const [imgSlotW, setImgSlotW] = useState(0);
@@ -32,6 +41,7 @@ export function GridModelCard({ model }: Props) {
   }, []);
 
   const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
+  const formatLabel = formatChipLabel(model.formats);
 
   const openDetail = () => {
     lightImpact();
@@ -56,6 +66,13 @@ export function GridModelCard({ model }: Props) {
             {isNew && (
               <View style={styles.newBadge}>
                 <Text style={styles.newBadgeText}>YENİ</Text>
+              </View>
+            )}
+            {formatLabel.length > 0 && (
+              <View style={styles.formatBadge}>
+                <Text style={styles.formatBadgeText} numberOfLines={1}>
+                  {formatLabel}
+                </Text>
               </View>
             )}
           </View>
@@ -177,5 +194,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 10,
     fontWeight: '800',
+  },
+  formatBadge: {
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    maxWidth: '72%',
+    backgroundColor: 'rgba(0,0,0,0.62)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  formatBadgeText: {
+    color: '#e4e4e7',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
 });
