@@ -65,9 +65,6 @@ export function GridModelCard({ model }: Props) {
             <Text style={styles.title} numberOfLines={2}>
               {model.title}
             </Text>
-            <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
-              {model.category}
-            </Text>
           </Pressable>
           <View style={styles.priceRow}>
             <Pressable
@@ -148,17 +145,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 17,
   },
-  category: {
-    color: '#71717a',
-    fontSize: 11,
-    fontWeight: '500',
-    marginTop: 5,
-  },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
+    marginTop: 6,
     gap: 4,
     minWidth: 0,
   },
