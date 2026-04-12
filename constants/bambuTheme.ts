@@ -18,4 +18,7 @@ export const BAMBU = {
   handyTabInactive: '#E0E0E0',
   handyIndicator: '#00C853',
   handySearchBg: '#252525',
+  /** Kart altı başlık / ikincil metin (Bambu Handy beslemesi). */
+  handyFeedTitle: '#ffffff',
+  handyFeedMeta: '#999999',
 } as const;

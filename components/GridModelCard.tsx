@@ -11,6 +11,7 @@ import {
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
+import { BAMBU } from '@/constants/bambuTheme';
 import { CATALOG, type CatalogModel } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
@@ -18,6 +19,14 @@ import { lightImpact } from '@/lib/haptics';
 type Props = {
   model: CatalogModel;
 };
+
+/** Bambu Handy beslemesi: Inter/Roboto benzeri sistem sans-serif. */
+const FEED_SANS = Platform.select({
+  web: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  },
+  default: {},
+});
 
 export function GridModelCard({ model }: Props) {
   const router = useRouter();
@@ -62,7 +71,12 @@ export function GridModelCard({ model }: Props) {
         </Pressable>
         <View style={styles.info}>
           <Pressable accessibilityRole="button" onPress={openDetail}>
-            <Text style={styles.title} numberOfLines={2}>
+            <Text
+              style={styles.title}
+              numberOfLines={2}
+              {...Platform.select({
+                android: { includeFontPadding: false },
+              })}>
               {model.title}
             </Text>
           </Pressable>
@@ -77,6 +91,7 @@ export function GridModelCard({ model }: Props) {
                 numberOfLines={1}
                 {...Platform.select({
                   android: { includeFontPadding: false },
+                  default: {},
                 })}>
                 {formatTry(model.price)}
               </Text>
@@ -135,21 +150,23 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   info: {
-    paddingHorizontal: 10,
-    paddingTop: 8,
+    paddingHorizontal: 12,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   title: {
-    color: '#e4e4e7',
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 17,
+    color: BAMBU.handyFeedTitle,
+    fontSize: 17,
+    fontWeight: '600',
+    lineHeight: 22,
+    textAlign: 'left',
+    ...FEED_SANS,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 6,
+    marginTop: 8,
     gap: 4,
     minWidth: 0,
   },
@@ -158,11 +175,12 @@ const styles = StyleSheet.create({
     minWidth: 0,
     paddingVertical: 2,
   },
-  /** Sol: fiyat; sag: kalp */
+  /** Sol: fiyat (beslemede ikincil satır gibi); sag: kalp */
   price: {
-    color: '#00c853',
-    fontSize: 13,
-    fontWeight: '800',
+    color: BAMBU.handyFeedMeta,
+    fontSize: 14,
+    fontWeight: '500',
+    ...FEED_SANS,
   },
   newBadge: {
     position: 'absolute',
