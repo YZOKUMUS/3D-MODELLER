@@ -287,18 +287,9 @@ export default function ResimEkleTabScreen() {
             <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Modeller sekmesini sıfırla</Text>
             <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
               Telefonda çekip kaydetmediklerin (uygulama paketindeki örnek vitrin) Modeller listesinde gizlenir; kişisel
-              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür.
+              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür. Paket vitrinini geri
+              açmak için ekranın en altındaki düğmeyi kullanın.
             </Text>
-            {hideBundledCatalog ? (
-              <Pressable
-                onPress={() => {
-                  lightImpact();
-                  void setHideBundledCatalog(false);
-                }}
-                style={[styles.btnWide, { borderColor: colors.tint, marginBottom: 10 }]}>
-                <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
-              </Pressable>
-            ) : null}
             <Pressable
               onPress={onFullFreshStart}
               style={[styles.btnWide, { borderColor: '#b45309', backgroundColor: isDark ? '#2a1f0a' : '#fffbeb' }]}>
@@ -508,8 +499,8 @@ export default function ResimEkleTabScreen() {
           <Text style={{ color: isDark ? '#64748b' : '#94a3b8', paddingHorizontal: 4 }}>
             Bu telefonda henüz kişisel model yok; yukarıdaki formdan ekleyin.
             {hideBundledCatalog
-              ? ' Paket vitrini şu an kapalı; Modeller sekmesinde yalnızca buradan eklediklerin listelenir.'
-              : ' Modeller sekmesinde gördüklerin uygulama paketinden gelir; tam sıfırlamak için yukarıdaki turuncu düğmeyi kullanın.'}
+              ? ' Paket vitrini şu an kapalı; Modeller sekmesinde yalnızca buradan eklediklerin listelenir. Açmak için en alttaki «Paket vitrinini tekrar göster»e basın.'
+              : ' Modeller sekmesinde gördüklerin uygulama paketinden gelir; tam sıfırlamak için üstteki turuncu düğmeyi kullanın.'}
           </Text>
         </View>
       }
@@ -527,6 +518,23 @@ export default function ResimEkleTabScreen() {
           <Text style={[styles.hint, { color: isDark ? '#64748b' : '#94a3b8', marginTop: 8, textAlign: 'center' }]}>
             Sadece bu telefonda eklediklerin silinir; projedeki sabit katalog aynı kalır.
           </Text>
+          {hideBundledCatalog ? (
+            <Pressable
+              onPress={() => {
+                lightImpact();
+                void setHideBundledCatalog(false);
+              }}
+              style={[
+                styles.btnWide,
+                {
+                  borderColor: colors.tint,
+                  backgroundColor: isDark ? '#16231c' : '#ecfdf5',
+                  marginTop: 20,
+                },
+              ]}>
+              <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
+            </Pressable>
+          ) : null}
         </View>
       }
     />
