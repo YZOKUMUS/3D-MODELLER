@@ -275,6 +275,38 @@ export default function ResimEkleTabScreen() {
       ListHeaderComponent={
         <View style={{ gap: 14, paddingBottom: 8 }}>
           <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Bu sekmedeki liste</Text>
+            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 0 }]}>
+              Sadece bu telefonda &quot;Modeli vitrine ekle&quot; ile kaydettiğin modeller burada görünür. Modeller
+              sekmesindeki hazır vitrin burada listelenmez. Kayıtların varsa aşağı kaydır; her satırda &quot;Sil&quot;
+              vardır.
+            </Text>
+          </View>
+
+          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Modeller sekmesini sıfırla</Text>
+            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
+              Telefonda çekip kaydetmediklerin (uygulama paketindeki örnek vitrin) Modeller listesinde gizlenir; kişisel
+              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür.
+            </Text>
+            {hideBundledCatalog ? (
+              <Pressable
+                onPress={() => {
+                  lightImpact();
+                  void setHideBundledCatalog(false);
+                }}
+                style={[styles.btnWide, { borderColor: colors.tint, marginBottom: 10 }]}>
+                <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              onPress={onFullFreshStart}
+              style={[styles.btnWide, { borderColor: '#b45309', backgroundColor: isDark ? '#2a1f0a' : '#fffbeb' }]}>
+              <Text style={[styles.btnText, { color: '#b45309' }]}>Tam yeni başlangıç (sadece kendi vitrinin)</Text>
+            </Pressable>
+          </View>
+
+          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
             <Text style={[styles.blockTitle, { color: colors.text }]}>Yeni model</Text>
             <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
               Birden fazla fotoğrafı tek vitrin kaydında tutmak için aşağıdan galeride hepsini seç: ilki kapak,
@@ -439,38 +471,6 @@ export default function ResimEkleTabScreen() {
             style={[styles.btnWide, { borderColor: cardBorder, marginBottom: 4 }]}>
             <Text style={[styles.btnText, { color: colors.tint }]}>Modeller listesine git</Text>
           </Pressable>
-
-          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder, marginTop: 6 }]}>
-            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Bu sekmedeki liste</Text>
-            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 0 }]}>
-              Sadece bu telefonda &quot;Modeli vitrine ekle&quot; ile kaydettiğin modeller burada görünür. Modeller
-              sekmesindeki hazır vitrin burada listelenmez. Kayıtların varsa ekranı aşağı kaydır; her satırda
-              &quot;Sil&quot; düğmesi vardır.
-            </Text>
-          </View>
-
-          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder, marginTop: 6 }]}>
-            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Modeller sekmesini sıfırla</Text>
-            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-              Telefonda çekip kaydetmediklerin (uygulama paketindeki örnek vitrin) Modeller listesinde gizlenir; kişisel
-              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür.
-            </Text>
-            {hideBundledCatalog ? (
-              <Pressable
-                onPress={() => {
-                  lightImpact();
-                  void setHideBundledCatalog(false);
-                }}
-                style={[styles.btnWide, { borderColor: colors.tint, marginBottom: 10 }]}>
-                <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
-              </Pressable>
-            ) : null}
-            <Pressable
-              onPress={onFullFreshStart}
-              style={[styles.btnWide, { borderColor: '#b45309', backgroundColor: isDark ? '#2a1f0a' : '#fffbeb' }]}>
-              <Text style={[styles.btnText, { color: '#b45309' }]}>Tam yeni başlangıç (sadece kendi vitrinin)</Text>
-            </Pressable>
-          </View>
         </View>
       }
       contentContainerStyle={{
