@@ -96,11 +96,21 @@ export default function PersonalStudioScreen() {
       mediaTypes: ['images'],
       allowsMultipleSelection: true,
       quality: 0.85,
-      selectionLimit: 8,
+      selectionLimit: 12,
     });
     if (!res.canceled) {
-      const uris = res.assets.map((a) => a.uri).filter(Boolean);
-      setGalleryUris(uris);
+      const picked = res.assets.map((a) => a.uri).filter(Boolean);
+      setGalleryUris((prev) => {
+        const seen = new Set(prev);
+        const merged = [...prev];
+        for (const u of picked) {
+          if (!seen.has(u)) {
+            seen.add(u);
+            merged.push(u);
+          }
+        }
+        return merged.slice(0, 12);
+      });
     }
   }, []);
 
@@ -252,6 +262,11 @@ export default function PersonalStudioScreen() {
               ) : null}
 
               <Text style={[styles.label, { color: colors.text, marginTop: 12 }]}>Ek fotoğraflar (isteğe bağlı)</Text>
+              <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b' }]}>
+                Galeride birden fazla foto seç: genelde birine dokunup sonra diğerlerine işaret koyarak çoklu seçim
+                yapılır (Samsung Galeri’de üstte “Seç” veya benzeri). İstersen aynı düğmeye tekrar basıp yeni seçimler
+                ekle (öncekilerle birleşir, en fazla 12).
+              </Text>
               <Pressable
                 onPress={pickGalleryExtras}
                 style={[styles.btnWide, { borderColor: cardBorder, backgroundColor: isDark ? '#26262c' : '#fff' }]}>
@@ -259,6 +274,16 @@ export default function PersonalStudioScreen() {
                   Galeriden seç ({galleryUris.length} dosya)
                 </Text>
               </Pressable>
+              {galleryUris.length > 0 ? (
+                <Pressable
+                  onPress={() => {
+                    lightImpact();
+                    setGalleryUris([]);
+                  }}
+                  style={[styles.btnWide, { borderColor: '#b91c1c', marginTop: 8 }]}>
+                  <Text style={[styles.btnText, { color: '#f87171', fontSize: 13 }]}>Ek fotoğrafları temizle</Text>
+                </Pressable>
+              ) : null}
 
               <Text style={[styles.label, { color: colors.text }]}>Model adı</Text>
               <TextInput
@@ -431,6 +456,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 6,
+  },
+  hint: {
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 8,
   },
   row: {
     flexDirection: 'row',
