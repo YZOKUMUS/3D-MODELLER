@@ -1,0 +1,131 @@
+================================================================================
+YZOKUMUS MODEL VİTRİNİ — ÖZET KULLANICI KILAVUZU (baştan sona)
+================================================================================
+Proje klasörü:  ...\3D MODELLERİM\model-market   (içinde package.json olmalı)
+
+--------------------------------------------------------------------------------
+1) BİLGİSAYARDA TEMEL KOMUTLAR
+--------------------------------------------------------------------------------
+  • Klasöre gir (PowerShell’de yol boşlukluysa tırnak kullan):
+      cd "C:\Users\ziyao\Desktop\3D MODELLERİM\model-market"
+
+  • Bağımlılıklar (ilk sefer veya package değişince):
+      npm install
+
+  • Expo geliştirme sunucusu (telefonda Expo Go ile QR):
+      npm start
+    Tuhaf davranış / eski sekmeler görünürse:
+      npx expo start --clear
+
+  • Tür denetimi:
+      npm run typecheck
+
+--------------------------------------------------------------------------------
+2) TELEFONDA EXPO GO İLE ÇALIŞTIRMA
+--------------------------------------------------------------------------------
+  • Telefon ve PC aynı Wi‑Fi’de olsun.
+  • PC’de model-market içinde: npm start
+  • Expo Go → QR tara (veya exp:// adresini elle gir).
+  • Kod değişikliği: çoğu zaman kaydedince otomatik yenilenir; olmazsa salla →
+    Reload veya terminalde r.
+  • GitHub push: Expo’da denemek için GEREKMEZ. Sadece GitHub Pages sitesini
+    güncellemek istediğinde push + publish akışı gerekir.
+
+--------------------------------------------------------------------------------
+3) ALT MENÜ (SEKMELER) — UYGULAMA İÇİ
+--------------------------------------------------------------------------------
+  • İki sekme vardır:
+      - Modeller     → vitrin listesi, arama, üst kategori şeridi
+      - Resim ekle   → telefonda model + foto ekleme / silme
+  • Sepet ve “Ben” (profil) kaldırılmıştır.
+
+--------------------------------------------------------------------------------
+4) ÜST ŞERİT: “SENİN İÇİN”, “TREND”, KATEGORİLER
+--------------------------------------------------------------------------------
+  • “Senin İçin” ve “Trend” metinleri sabittir; değiştirmek için:
+      app\(tabs)\index.tsx  içinde ilgili label satırları.
+  • Kategori isimleri ve sırası:
+      data\catalog.ts  →  CATEGORIES  dizisi (+ ModelCategory tipi).
+  • Üstte bir kategori sekmesi ancak vitrinde (statik + telefondan eklenen
+    birleşik liste) o kategoride EN AZ BİR MODEL varken görünür.
+  • Yeni kategori adı telefonda seçilebilsin diye önce katalogda tanımlı
+    olmalıdır (aşağıdaki bölüm 9).
+
+--------------------------------------------------------------------------------
+5) RESİM EKLE SEKMESİ (TELEFON — ANDROID / iOS)
+--------------------------------------------------------------------------------
+  • Veri telefonda kalır: AsyncStorage + uygulama belge klasörü; GitHub’daki
+    catalog.ts dosyasına otomatik yazılmaz.
+  • “Tek model — galeriden tüm fotoğrafları seç”: seçtiğin sırayla ilki KAPAK,
+    kalanlar aynı modelin DETAY galerisinde (sağa/sola kaydırma).
+  • Ayrı kapak / ek fotoğraf düğmeleri isteğe bağlı; ek fotoğraflar birleştirilebilir.
+  • Modeli vitrine ekledikten sonra Modeller listesinde görünür; detayda
+    galeri: yatay kaydırma; altta noktalar ve 1/N sayacı (yan ok yok).
+  • Web tarayıcıda bu ekran sadece bilgi metni gösterir (kamera/dosya yok).
+
+--------------------------------------------------------------------------------
+6) MODEL DETAY — FOTOĞRAFLAR
+--------------------------------------------------------------------------------
+  • Çok foto: kapak + ekler detayda yatay kaydırmalıdır.
+  • Galeri, dikey kaydırma ile çakışmasın diye üst blok ScrollView dışındadır.
+  • Yerel dosya görselleri için kapak bileşeni RN Image kullanır (açılınca
+    hemen görünür).
+
+--------------------------------------------------------------------------------
+7) GITHUB PAGES (SİTE) İLE FARK
+--------------------------------------------------------------------------------
+  • Siteden “Ana ekrana ekle” = PWA / web; telefondan kamera ile model ekleme
+    bu yolla çalışmaz.
+  • Tam özellik: Expo Go veya derlenmiş Android uygulaması (aşağı bölüm 11).
+
+--------------------------------------------------------------------------------
+8) STATİK KATALOG VE SİTEYİ GÜNCELLEMEK
+--------------------------------------------------------------------------------
+  • Ana liste + GitHub sitesi: data\catalog.ts + assets\covers + export.
+  • Yerel admin (PC):  npm run admin  →  http://localhost:3333
+  • Site klasörüne aktarım (özet):
+      npm run publish:docs
+      git add …  git commit …  git push
+    Ayrıntı: KOLAY-GITHUB-PAGES.txt
+
+--------------------------------------------------------------------------------
+9) YENİ KATEGORİ EKLEMEK (PC)
+--------------------------------------------------------------------------------
+  • model-market klasöründe çift tık:
+      Kategori-Ekle.bat
+    Kategori adını yaz → catalog.ts içinde ModelCategory ve CATEGORIES güncellenir.
+  • Alternatif terminal:
+      npm run add-category -- "Kategori Adı"
+  • Kural: adında tek tırnak, ters eğik çizgi veya | kullanma.
+  • Sonra Expo’da Reload; telefonda Resim ekle’de yeni kategori çıkar; o
+    kategoride model varken üst sekmede de görünür.
+
+--------------------------------------------------------------------------------
+10) POWERSHELL — YOL HATASI
+--------------------------------------------------------------------------------
+  • Yanlış:  C:\...\model-market   (cd yok, boşlukta bölünür)
+  • Doğru:   cd "C:\...\3D MODELLERİM\model-market"
+
+--------------------------------------------------------------------------------
+11) TELEFONA AYRI UYGULAMA İKONU (APK — İSTEĞE BAĞLI)
+--------------------------------------------------------------------------------
+  • Android Studio PC’ye kurulur; telefonda USB hata ayıklama açılır.
+  • Ayrıntılı adımlar: TELEFON-LOGO-KURULUM.txt
+  • Hızlı release yükleme (Metro açmadan):
+      Telefon-Android-Release-Yukle.cmd
+    veya: npx expo run:android --variant release --no-bundler
+  • Release APK: kod değişince yeniden derleme gerekir. Expo Go + Metro’da
+    çoğu değişiklik için rebuild gerekmez.
+
+--------------------------------------------------------------------------------
+12) SIK KONTROL LİSTESİ
+--------------------------------------------------------------------------------
+  [ ] npm komutlarını model-market içinde çalıştırıyorum
+  [ ] Expo’da eski arayüz → npx expo start --clear + Expo Go’yu kapat aç
+  [ ] Yeni kategori → önce Kategori-Ekle.bat veya add-category
+  [ ] Telefonda yeni model → Resim ekle sekmesi
+  [ ] Siteyi dünya ile paylaşmak → publish:docs + git push
+
+================================================================================
+Dosya sonu — soruların çoğu bu metindeki madde numaralarıyla cevaplanır.
+================================================================================
