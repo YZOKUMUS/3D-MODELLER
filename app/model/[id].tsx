@@ -114,94 +114,93 @@ export default function ModelDetailScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.screen}>
+        {/* Horizontal gallery must sit outside vertical ScrollView so Android swipes work. */}
+        <View style={styles.imageWrap}>
+          <FlatList
+            ref={galleryRef}
+            data={slides}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, i) => `${model.id}-slide-${i}`}
+            renderItem={({ item }) => (
+              <View style={{ width: slideWidth, height: 380 }}>
+                <ModelCoverImage
+                  source={item}
+                  accent={model.accent}
+                  fallbackLetter={model.title.slice(0, 1)}
+                  fallbackFontSize={72}
+                  style={[styles.heroImage, { width: slideWidth }]}
+                  contain
+                />
+              </View>
+            )}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            getItemLayout={(_, index) => ({
+              length: slideWidth,
+              offset: slideWidth * index,
+              index,
+            })}
+            onScrollToIndexFailed={({ index }) => {
+              galleryRef.current?.scrollToOffset({
+                offset: index * slideWidth,
+                animated: true,
+              });
+            }}
+          />
+          {slides.length > 1 && (
+            <>
+              <Pressable
+                accessibilityLabel="Önceki fotoğraf"
+                onPress={goGalleryPrev}
+                disabled={slideIndex === 0}
+                hitSlop={8}
+                style={[styles.galleryArrow, styles.galleryArrowLeft, slideIndex === 0 && styles.galleryArrowDisabled]}>
+                <View style={styles.galleryArrowInner}>
+                  <Icon name="chevron-left" size={22} color="#fff" />
+                </View>
+              </Pressable>
+              <Pressable
+                accessibilityLabel="Sonraki fotoğraf"
+                onPress={goGalleryNext}
+                disabled={slideIndex >= slides.length - 1}
+                hitSlop={8}
+                style={[
+                  styles.galleryArrow,
+                  styles.galleryArrowRight,
+                  slideIndex >= slides.length - 1 && styles.galleryArrowDisabled,
+                ]}>
+                <View style={styles.galleryArrowInner}>
+                  <Icon name="chevron-right" size={22} color="#fff" />
+                </View>
+              </Pressable>
+              <View style={styles.galleryDots} pointerEvents="none">
+                {slides.map((_, i) => (
+                  <View
+                    key={`dot-${model.id}-${i}`}
+                    style={[styles.galleryDot, i === slideIndex && styles.galleryDotActive]}
+                  />
+                ))}
+              </View>
+              <View style={styles.galleryFooter} pointerEvents="box-none">
+                <Text style={styles.galleryHint} numberOfLines={2}>
+                  Sağa/sola kaydırın veya yan oklara dokunun.
+                </Text>
+                <View style={styles.imageCounter}>
+                  <Text style={styles.imageCounterText}>
+                    {slideIndex + 1}/{slides.length}
+                  </Text>
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+
         <ScrollView
-          style={styles.scroll}
+          style={styles.bodyScroll}
           nestedScrollEnabled={Platform.OS === 'android'}
           contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}>
-
-          <View style={styles.imageWrap}>
-            <FlatList
-              ref={galleryRef}
-              data={slides}
-              horizontal
-              pagingEnabled
-              nestedScrollEnabled
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(_, i) => `${model.id}-slide-${i}`}
-              renderItem={({ item }) => (
-                <View style={{ width: slideWidth, height: 380 }}>
-                  <ModelCoverImage
-                    source={item}
-                    accent={model.accent}
-                    fallbackLetter={model.title.slice(0, 1)}
-                    fallbackFontSize={72}
-                    style={[styles.heroImage, { width: slideWidth }]}
-                    contain
-                  />
-                </View>
-              )}
-              onViewableItemsChanged={onViewableItemsChanged}
-              viewabilityConfig={viewabilityConfig}
-              getItemLayout={(_, index) => ({
-                length: slideWidth,
-                offset: slideWidth * index,
-                index,
-              })}
-              onScrollToIndexFailed={({ index }) => {
-                galleryRef.current?.scrollToOffset({
-                  offset: index * slideWidth,
-                  animated: true,
-                });
-              }}
-            />
-            {slides.length > 1 && (
-              <>
-                <Pressable
-                  accessibilityLabel="Önceki fotoğraf"
-                  onPress={goGalleryPrev}
-                  disabled={slideIndex === 0}
-                  hitSlop={8}
-                  style={[styles.galleryArrow, styles.galleryArrowLeft, slideIndex === 0 && styles.galleryArrowDisabled]}>
-                  <View style={styles.galleryArrowInner}>
-                    <Icon name="chevron-left" size={22} color="#fff" />
-                  </View>
-                </Pressable>
-                <Pressable
-                  accessibilityLabel="Sonraki fotoğraf"
-                  onPress={goGalleryNext}
-                  disabled={slideIndex >= slides.length - 1}
-                  hitSlop={8}
-                  style={[
-                    styles.galleryArrow,
-                    styles.galleryArrowRight,
-                    slideIndex >= slides.length - 1 && styles.galleryArrowDisabled,
-                  ]}>
-                  <View style={styles.galleryArrowInner}>
-                    <Icon name="chevron-right" size={22} color="#fff" />
-                  </View>
-                </Pressable>
-                <View style={styles.galleryDots} pointerEvents="none">
-                  {slides.map((_, i) => (
-                    <View
-                      key={`dot-${model.id}-${i}`}
-                      style={[styles.galleryDot, i === slideIndex && styles.galleryDotActive]}
-                    />
-                  ))}
-                </View>
-                <View style={styles.galleryFooter} pointerEvents="box-none">
-                  <Text style={styles.galleryHint} numberOfLines={2}>
-                    Kaydırın veya yan oklara dokunun.
-                  </Text>
-                  <View style={styles.imageCounter}>
-                    <Text style={styles.imageCounterText}>
-                      {slideIndex + 1}/{slides.length}
-                    </Text>
-                  </View>
-                </View>
-              </>
-            )}
-          </View>
-
           <ModelLikeButton modelId={model.id} variant="detail" />
 
           <View style={styles.content}>
@@ -294,7 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#111',
   },
-  scroll: {
+  bodyScroll: {
     flex: 1,
   },
   floatingBackWrap: {

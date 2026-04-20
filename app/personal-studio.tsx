@@ -114,6 +114,26 @@ export default function PersonalStudioScreen() {
     }
   }, []);
 
+  /** Tek kayıt: seçilen sırayla ilk = kapak, kalanlar = detayda sağa/sola kaydırmalı galeri. */
+  const pickAllPhotosForOneModel = useCallback(async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('İzin', 'Galeri izni verilmedi.');
+      return;
+    }
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      quality: 0.85,
+      selectionLimit: 15,
+    });
+    if (res.canceled) return;
+    const uris = res.assets.map((a) => a.uri).filter(Boolean);
+    if (uris.length === 0) return;
+    setCoverUri(uris[0]);
+    setGalleryUris(uris.length > 1 ? uris.slice(1) : []);
+  }, []);
+
   const onSave = useCallback(async () => {
     if (!supportsPersonal) return;
     const t = title.trim();
@@ -236,10 +256,21 @@ export default function PersonalStudioScreen() {
             <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
               <Text style={[styles.blockTitle, { color: colors.text }]}>Yeni model</Text>
               <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-                Kapak ve isteğe bağlı ek fotoğraflar bu telefonda saklanır; ana vitrin listesine anında düşer.
+                Birden fazla fotoğrafı tek vitrin kaydında tutmak için aşağıdan galeride hepsini seç: ilki kapak,
+                diğerleri model detayında sağa/sola kaydırarak görünür. Ayrı ayrı model oluşturmaz.
               </Text>
 
-              <Text style={[styles.label, { color: colors.text }]}>Kapak fotoğrafı</Text>
+              <Pressable
+                onPress={() => void pickAllPhotosForOneModel()}
+                style={[styles.saveBtn, { backgroundColor: colors.tint, marginBottom: 4 }]}>
+                <Text style={styles.saveBtnText}>Tek model — galeriden tüm fotoğrafları seç</Text>
+              </Pressable>
+              <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 12 }]}>
+                Seçim sırası önemli: ilk foto liste kapaklarında, sonrakiler detay galerisinde 2., 3., … sırayla
+                çıkar. Tek foto seçersen sadece kapak olur.
+              </Text>
+
+              <Text style={[styles.label, { color: colors.text }]}>Kapak fotoğrafı (ayrı ayrı)</Text>
               <View style={styles.row}>
                 <Pressable
                   onPress={pickCoverCamera}
