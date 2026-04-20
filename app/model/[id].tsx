@@ -47,20 +47,6 @@ export default function ModelDetailScreen() {
     setSlideIndex(0);
   }, [model?.id]);
 
-  const goGalleryPrev = useCallback(() => {
-    if (slides.length < 2) return;
-    const next = Math.max(0, slideIndex - 1);
-    lightImpact();
-    galleryRef.current?.scrollToIndex({ index: next, animated: true });
-  }, [slideIndex, slides.length]);
-
-  const goGalleryNext = useCallback(() => {
-    if (slides.length < 2) return;
-    const next = Math.min(slides.length - 1, slideIndex + 1);
-    lightImpact();
-    galleryRef.current?.scrollToIndex({ index: next, animated: true });
-  }, [slideIndex, slides.length]);
-
   const goBackOne = () => {
     lightImpact();
     if (router.canGoBack()) {
@@ -143,30 +129,6 @@ export default function ModelDetailScreen() {
           />
           {slides.length > 1 && (
             <>
-              <Pressable
-                accessibilityLabel="Önceki fotoğraf"
-                onPress={goGalleryPrev}
-                disabled={slideIndex === 0}
-                hitSlop={8}
-                style={[styles.galleryArrow, styles.galleryArrowLeft, slideIndex === 0 && styles.galleryArrowDisabled]}>
-                <View style={styles.galleryArrowInner}>
-                  <Icon name="chevron-left" size={17} color="rgba(255,255,255,0.82)" />
-                </View>
-              </Pressable>
-              <Pressable
-                accessibilityLabel="Sonraki fotoğraf"
-                onPress={goGalleryNext}
-                disabled={slideIndex >= slides.length - 1}
-                hitSlop={8}
-                style={[
-                  styles.galleryArrow,
-                  styles.galleryArrowRight,
-                  slideIndex >= slides.length - 1 && styles.galleryArrowDisabled,
-                ]}>
-                <View style={styles.galleryArrowInner}>
-                  <Icon name="chevron-right" size={17} color="rgba(255,255,255,0.82)" />
-                </View>
-              </Pressable>
               <View style={styles.galleryDots} pointerEvents="none">
                 {slides.map((_, i) => (
                   <View
@@ -177,7 +139,7 @@ export default function ModelDetailScreen() {
               </View>
               <View style={styles.galleryFooter} pointerEvents="box-none">
                 <Text style={styles.galleryHint} numberOfLines={2}>
-                  Sağa/sola kaydırın veya yan oklara dokunun.
+                  Fotoğraflar arasında sağa/sola kaydırın.
                 </Text>
                 <View style={styles.imageCounter}>
                   <Text style={styles.imageCounterText}>
@@ -305,33 +267,6 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: 380,
-  },
-  galleryArrow: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 44,
-    justifyContent: 'center',
-    zIndex: 9,
-  },
-  galleryArrowLeft: {
-    left: 4,
-  },
-  galleryArrowRight: {
-    right: 4,
-  },
-  galleryArrowInner: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(0,0,0,0.28)',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  galleryArrowDisabled: {
-    opacity: 0.22,
   },
   galleryDots: {
     position: 'absolute',
