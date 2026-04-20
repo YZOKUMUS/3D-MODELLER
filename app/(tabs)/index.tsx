@@ -55,11 +55,6 @@ export default function StoreScreen() {
   }, [activeTab, validTabIds]);
 
   const scrollRef = useRef<ScrollView>(null);
-  const tabsScrollRef = useRef<ScrollView>(null);
-  const tabsScrollX = useRef(0);
-  const [tabsViewportW, setTabsViewportW] = useState(0);
-  const [tabsContentW, setTabsContentW] = useState(0);
-  const tabsNeedMoreChevron = tabsViewportW > 0 && tabsContentW > tabsViewportW + 12;
   const fabUpOpacity = useRef(new Animated.Value(0)).current;
   const fabDownOpacity = useRef(new Animated.Value(0)).current;
   const showFabUp = useRef(false);
@@ -117,17 +112,6 @@ export default function StoreScreen() {
     lightImpact();
     scrollRef.current?.scrollToEnd({ animated: true });
   }, []);
-
-  const scrollTabsRight = useCallback(() => {
-    lightImpact();
-    const vw = tabsViewportW;
-    const cw = tabsContentW;
-    if (vw <= 0 || cw <= vw) return;
-    const maxX = Math.max(0, cw - vw);
-    const step = Math.max(80, Math.floor(vw * 0.75));
-    const next = Math.min(maxX, tabsScrollX.current + step);
-    tabsScrollRef.current?.scrollTo({ x: next, y: 0, animated: true });
-  }, [tabsViewportW, tabsContentW]);
 
   const currentTab = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
 
@@ -196,68 +180,50 @@ export default function StoreScreen() {
         </View>
       </View>
 
-      <View style={[styles.tabsBarRow, { backgroundColor: BAMBU.handyNavBg }]}>
-        <ScrollView
-          ref={tabsScrollRef}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          removeClippedSubviews={false}
-          contentContainerStyle={styles.tabsScrollContent}
-          style={styles.tabsScrollInner}
-          onLayout={(e) => setTabsViewportW(e.nativeEvent.layout.width)}
-          onContentSizeChange={(w) => setTabsContentW(w)}
-          onScroll={(e) => {
-            tabsScrollX.current = e.nativeEvent.contentOffset.x;
-          }}
-          scrollEventThrottle={32}>
-          <View collapsable={false} style={styles.tabsRow}>
-            {ALL_TABS.map((t) => {
-              const active = activeTab === t.id;
-              return (
-                <Pressable
-                  key={t.id}
-                  collapsable={false}
-                  onPress={() => {
-                    lightImpact();
-                    setActiveTab(t.id);
-                    setVisibleCount(20);
-                  }}
-                  style={styles.tab}>
-                  <Text
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        removeClippedSubviews={false}
+        contentContainerStyle={styles.tabsScrollContent}
+        style={[styles.tabsContainer, { backgroundColor: BAMBU.handyNavBg }]}>
+        <View collapsable={false} style={styles.tabsRow}>
+          {ALL_TABS.map((t) => {
+            const active = activeTab === t.id;
+            return (
+              <Pressable
+                key={t.id}
+                collapsable={false}
+                onPress={() => {
+                  lightImpact();
+                  setActiveTab(t.id);
+                  setVisibleCount(20);
+                }}
+                style={styles.tab}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    TAB_FONT,
+                    { color: active ? BAMBU.handyTabActive : BAMBU.handyTabInactive },
+                    active && styles.tabTextActive,
+                  ]}
+                  {...Platform.select({
+                    android: { includeFontPadding: false },
+                  })}>
+                  {t.label}
+                </Text>
+                <View style={styles.tabIndicatorSlot}>
+                  <View
                     style={[
-                      styles.tabText,
-                      TAB_FONT,
-                      { color: active ? BAMBU.handyTabActive : BAMBU.handyTabInactive },
-                      active && styles.tabTextActive,
+                      styles.tabIndicator,
+                      active && { backgroundColor: BAMBU.handyIndicator },
                     ]}
-                    {...Platform.select({
-                      android: { includeFontPadding: false },
-                    })}>
-                    {t.label}
-                  </Text>
-                  <View style={styles.tabIndicatorSlot}>
-                    <View
-                      style={[
-                        styles.tabIndicator,
-                        active && { backgroundColor: BAMBU.handyIndicator },
-                      ]}
-                    />
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        </ScrollView>
-        {tabsNeedMoreChevron ? (
-          <Pressable
-            accessibilityLabel="Kategori sekmelerini sağa kaydır"
-            hitSlop={12}
-            onPress={scrollTabsRight}
-            style={[styles.tabsMoreChevron, { borderLeftColor: 'rgba(255,255,255,0.12)' }]}>
-            <Icon name="chevron-right" size={20} color={BAMBU.handyTabInactive} />
-          </Pressable>
-        ) : null}
-      </View>
+                  />
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
 
       <ScrollView
         ref={scrollRef}
@@ -401,9 +367,7 @@ const styles = StyleSheet.create({
     color: '#fafafa',
     paddingVertical: 2,
   },
-  tabsBarRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+  tabsContainer: {
     flexGrow: 0,
     flexShrink: 0,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -411,15 +375,6 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: { minHeight: 52 },
       default: { minHeight: 48 },
-    }),
-  },
-  tabsScrollInner: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 48,
-    ...Platform.select({
-      web: { minHeight: 52 },
-      default: {},
     }),
   },
   tabsScrollContent: {
@@ -474,14 +429,6 @@ const styles = StyleSheet.create({
     height: 3,
     borderRadius: 2,
     backgroundColor: 'transparent',
-  },
-  tabsMoreChevron: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    borderLeftWidth: StyleSheet.hairlineWidth,
   },
   masonry: {
     flexDirection: 'row',
