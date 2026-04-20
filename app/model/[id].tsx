@@ -150,7 +150,7 @@ export default function ModelDetailScreen() {
                 hitSlop={8}
                 style={[styles.galleryArrow, styles.galleryArrowLeft, slideIndex === 0 && styles.galleryArrowDisabled]}>
                 <View style={styles.galleryArrowInner}>
-                  <Icon name="chevron-left" size={22} color="#fff" />
+                  <Icon name="chevron-left" size={17} color="rgba(255,255,255,0.82)" />
                 </View>
               </Pressable>
               <Pressable
@@ -164,7 +164,7 @@ export default function ModelDetailScreen() {
                   slideIndex >= slides.length - 1 && styles.galleryArrowDisabled,
                 ]}>
                 <View style={styles.galleryArrowInner}>
-                  <Icon name="chevron-right" size={22} color="#fff" />
+                  <Icon name="chevron-right" size={17} color="rgba(255,255,255,0.82)" />
                 </View>
               </Pressable>
               <View style={styles.galleryDots} pointerEvents="none">
@@ -310,26 +310,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: 48,
+    width: 44,
     justifyContent: 'center',
     zIndex: 9,
   },
   galleryArrowLeft: {
-    left: 2,
+    left: 4,
   },
   galleryArrowRight: {
-    right: 2,
+    right: 4,
   },
   galleryArrowInner: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(0,0,0,0.28)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   galleryArrowDisabled: {
-    opacity: 0.32,
+    opacity: 0.22,
   },
   galleryDots: {
     position: 'absolute',
