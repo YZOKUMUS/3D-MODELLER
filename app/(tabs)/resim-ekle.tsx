@@ -5,7 +5,10 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   FlatList,
+  KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -21,7 +24,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import { useLikes } from '@/context/LikesContext';
 import { usePersonalModels } from '@/context/PersonalModelsContext';
-import { CATEGORIES, type ModelCategory } from '@/data/catalog';
+import { CATEGORIES, type CatalogModel, type ModelCategory } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
 
@@ -40,6 +43,8 @@ export default function ResimEkleTabScreen() {
     addFromPicker,
     deletePersonal,
     clearAllPersonal,
+    updatePersonal,
+    removePersonalImage,
     hideBundledCatalog,
     setHideBundledCatalog,
   } = usePersonalModels();
@@ -54,6 +59,20 @@ export default function ResimEkleTabScreen() {
   const [galleryUris, setGalleryUris] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState<ModelCategory>(CATEGORIES[0]);
+  const [editFormats, setEditFormats] = useState<string[]>(['GLB']);
+  const [editSaving, setEditSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+
+  const editingModel = useMemo(
+    () => (editingId ? personalOnlyAsModels.find((m) => m.id === editingId) ?? null : null),
+    [editingId, personalOnlyAsModels],
+  );
+
   const cardBg = isDark ? '#1a1a1e' : '#f8fafc';
   const cardBorder = isDark ? '#2d2d35' : '#e2e8f0';
   const listPadBottom = tabBarHeight + insets.bottom + 20;
@@ -67,6 +86,120 @@ export default function ResimEkleTabScreen() {
       return [...prev, f];
     });
   };
+
+  const toggleEditFormat = (f: string) => {
+    lightImpact();
+    setEditFormats((prev) => {
+      const has = prev.includes(f);
+      if (has && prev.length === 1) return prev;
+      if (has) return prev.filter((x) => x !== f);
+      return [...prev, f];
+    });
+  };
+
+  const openEdit = useCallback((item: CatalogModel) => {
+    lightImpact();
+    setEditingId(item.id);
+    setEditTitle(item.title);
+    setEditPrice(String(item.price));
+    setEditDescription(item.description ?? '');
+    setEditCategory(item.category);
+    setEditFormats(item.formats.length > 0 ? [...item.formats] : ['GLB']);
+  }, []);
+
+  const closeEdit = useCallback(() => {
+    if (editSaving || photoBusy) return;
+    setEditingId(null);
+  }, [editSaving, photoBusy]);
+
+  const runRemoveCover = useCallback(async () => {
+    if (!editingId) return;
+    setPhotoBusy(true);
+    try {
+      const r = await removePersonalImage(editingId, { kind: 'cover' });
+      if (!r.ok) Alert.alert('Hata', r.message);
+      else lightImpact();
+    } finally {
+      setPhotoBusy(false);
+    }
+  }, [editingId, removePersonalImage]);
+
+  const requestRemoveCover = useCallback(() => {
+    const gal = editingModel?.galleryImages ?? [];
+    if (gal.length === 0) {
+      Alert.alert(
+        'Kapak kaldırılamaz',
+        'Yalnızca tek fotoğraf kaldı. Tüm modeli silmek için listede Sil kullan.',
+      );
+      return;
+    }
+    Alert.alert('Kapak kaldırılsın mı?', 'İlk galeri görseli yeni kapak olur.', [
+      { text: 'Vazgeç', style: 'cancel' },
+      { text: 'Kaldır', style: 'destructive', onPress: () => void runRemoveCover() },
+    ]);
+  }, [editingModel, runRemoveCover]);
+
+  const runRemoveGallery = useCallback(
+    async (index: number) => {
+      if (!editingId) return;
+      setPhotoBusy(true);
+      try {
+        const r = await removePersonalImage(editingId, { kind: 'gallery', index });
+        if (!r.ok) Alert.alert('Hata', r.message);
+        else lightImpact();
+      } finally {
+        setPhotoBusy(false);
+      }
+    },
+    [editingId, removePersonalImage],
+  );
+
+  const requestRemoveGallery = useCallback(
+    (index: number) => {
+      Alert.alert('Bu görsel kaldırılsın mı?', `Galeri fotoğrafı ${index + 1}`, [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Kaldır', style: 'destructive', onPress: () => void runRemoveGallery(index) },
+      ]);
+    },
+    [runRemoveGallery],
+  );
+
+  const onSaveEdit = useCallback(async () => {
+    if (!editingId) return;
+    const t = editTitle.trim();
+    if (!t) {
+      Alert.alert('Eksik', 'Model adı girin.');
+      return;
+    }
+    const p = parseInt(editPrice.replace(/\s/g, ''), 10);
+    if (!Number.isFinite(p) || p < 0) {
+      Alert.alert('Eksik', 'Geçerli bir fiyat (tam sayı) girin.');
+      return;
+    }
+    if (editFormats.length === 0) {
+      Alert.alert('Eksik', 'En az bir dosya formatı seçin.');
+      return;
+    }
+    setEditSaving(true);
+    try {
+      const result = await updatePersonal(editingId, {
+        title: t,
+        price: p,
+        category: editCategory,
+        description: editDescription.trim(),
+        formats: editFormats,
+      });
+      if (result.ok) {
+        lightImpact();
+        setEditingId(null);
+        Alert.alert('Tamam', 'Model güncellendi.');
+      } else {
+        Alert.alert('Hata', result.message);
+      }
+    } finally {
+      setEditSaving(false);
+    }
+  }, [editingId, editTitle, editPrice, editCategory, editDescription, editFormats, updatePersonal]);
 
   const pickCoverCamera = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -268,8 +401,11 @@ export default function ResimEkleTabScreen() {
     );
   }
 
+  const modalMaxH = Dimensions.get('window').height * 0.88;
+
   return (
-    <FlatList
+    <>
+      <FlatList
       data={personalOnlyAsModels}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={
@@ -487,11 +623,18 @@ export default function ResimEkleTabScreen() {
               <Text style={{ color: colors.tint, fontWeight: '800', marginTop: 4 }}>{formatTry(item.price)}</Text>
             </View>
           </View>
-          <Pressable
-            onPress={() => onDelete(item.id, item.title)}
-            style={[styles.delBtnRow, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
-            <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 14 }}>Sil</Text>
-          </Pressable>
+          <View style={styles.listActionsRow}>
+            <Pressable
+              onPress={() => openEdit(item)}
+              style={[styles.editBtnRow, { borderColor: colors.tint, backgroundColor: isDark ? '#16231c' : '#ecfdf5' }]}>
+              <Text style={{ color: colors.tint, fontWeight: '800', fontSize: 14 }}>Düzenle</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => onDelete(item.id, item.title)}
+              style={[styles.delBtnRow, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
+              <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 14 }}>Sil</Text>
+            </Pressable>
+          </View>
         </View>
       )}
       ListEmptyComponent={
@@ -537,7 +680,218 @@ export default function ResimEkleTabScreen() {
           ) : null}
         </View>
       }
-    />
+      />
+
+      <Modal
+        visible={editingId !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={closeEdit}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalRoot}>
+          <View style={styles.modalLayer}>
+            <Pressable
+              style={styles.modalBackdrop}
+              onPress={closeEdit}
+              disabled={editSaving || photoBusy}
+            />
+            <View pointerEvents="box-none" style={styles.modalCenter}>
+              <View
+                pointerEvents="auto"
+                style={[
+                  styles.modalCard,
+                  {
+                    maxHeight: modalMaxH,
+                    backgroundColor: cardBg,
+                    borderColor: cardBorder,
+                  },
+                ]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Modeli düzenle</Text>
+            <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 10 }]}>
+              Metin alanlarını değiştir; aşağıdan tek tek görsel de kaldırabilirsin. Yeni foto eklemek şimdilik ana
+              ekrandan yeni model oluşturmayı gerektirir.
+            </Text>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 12 }}>
+              {editingModel ? (
+                <View style={{ marginBottom: 14 }}>
+                  <Text style={[styles.label, { color: colors.text }]}>Görseller</Text>
+                  <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 8 }]}>
+                    Galeriden birini kaldırırsan liste buna göre güncellenir. Kapak kaldırırsan sıradaki galeri görseli
+                    kapak olur (en az bir galeri fotoğrafı gerekir).
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.editPhotoStrip}>
+                    <View style={styles.editPhotoTile}>
+                      <Text style={[styles.editPhotoBadge, { color: colors.text }]}>Kapak</Text>
+                      <ModelCoverImage
+                        source={editingModel.coverImage}
+                        accent={editingModel.accent}
+                        fallbackLetter="?"
+                        style={styles.editPhotoThumb}
+                      />
+                      <Pressable
+                        onPress={requestRemoveCover}
+                        disabled={photoBusy || !(editingModel.galleryImages?.length)}
+                        style={[
+                          styles.editPhotoRemove,
+                          {
+                            borderColor: '#b91c1c',
+                            opacity: photoBusy || !(editingModel.galleryImages?.length) ? 0.45 : 1,
+                          },
+                        ]}>
+                        <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 12 }}>Kaldır</Text>
+                      </Pressable>
+                    </View>
+                    {(editingModel.galleryImages ?? []).map((src, idx) => (
+                      <View key={`edit-g-${idx}`} style={styles.editPhotoTile}>
+                        <Text style={[styles.editPhotoBadge, { color: colors.text }]}>Galeri {idx + 1}</Text>
+                        <ModelCoverImage
+                          source={src}
+                          accent={editingModel.accent}
+                          fallbackLetter="?"
+                          style={styles.editPhotoThumb}
+                        />
+                        <Pressable
+                          onPress={() => requestRemoveGallery(idx)}
+                          disabled={photoBusy}
+                          style={[
+                            styles.editPhotoRemove,
+                            { borderColor: '#b91c1c', opacity: photoBusy ? 0.45 : 1 },
+                          ]}>
+                          <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 12 }}>Kaldır</Text>
+                        </Pressable>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
+              ) : null}
+
+              <Text style={[styles.label, { color: colors.text }]}>Model adı</Text>
+              <TextInput
+                value={editTitle}
+                onChangeText={setEditTitle}
+                placeholder="Model adı"
+                placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
+                style={[
+                  styles.input,
+                  { color: colors.text, borderColor: cardBorder, backgroundColor: isDark ? '#111' : '#fff' },
+                ]}
+              />
+
+              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Fiyat (TL)</Text>
+              <TextInput
+                value={editPrice}
+                onChangeText={setEditPrice}
+                placeholder="199"
+                keyboardType="number-pad"
+                placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
+                style={[
+                  styles.input,
+                  { color: colors.text, borderColor: cardBorder, backgroundColor: isDark ? '#111' : '#fff' },
+                ]}
+              />
+
+              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Kategori</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+                {CATEGORIES.map((c) => {
+                  const on = c === editCategory;
+                  return (
+                    <Pressable
+                      key={c}
+                      onPress={() => {
+                        lightImpact();
+                        setEditCategory(c);
+                      }}
+                      style={[
+                        styles.chip,
+                        {
+                          borderColor: on ? colors.tint : cardBorder,
+                          backgroundColor: on ? (isDark ? '#1e3a2f' : '#ecfdf5') : isDark ? '#26262c' : '#fff',
+                        },
+                      ]}>
+                      <Text style={{ color: on ? colors.tint : colors.text, fontWeight: '700', fontSize: 13 }}>{c}</Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+
+              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Formatlar</Text>
+              <View style={styles.wrapRow}>
+                {FORMAT_OPTIONS.map((f) => {
+                  const on = editFormats.includes(f);
+                  return (
+                    <Pressable
+                      key={f}
+                      onPress={() => toggleEditFormat(f)}
+                      style={[
+                        styles.chip,
+                        {
+                          borderColor: on ? colors.tint : cardBorder,
+                          backgroundColor: on ? (isDark ? '#1e3a2f' : '#ecfdf5') : isDark ? '#26262c' : '#fff',
+                        },
+                      ]}>
+                      <Text style={{ color: on ? colors.tint : colors.text, fontWeight: '700', fontSize: 13 }}>{f}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Açıklama (isteğe bağlı)</Text>
+              <TextInput
+                value={editDescription}
+                onChangeText={setEditDescription}
+                placeholder="Kısa not"
+                multiline
+                placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
+                style={[
+                  styles.input,
+                  styles.inputTall,
+                  { color: colors.text, borderColor: cardBorder, backgroundColor: isDark ? '#111' : '#fff' },
+                ]}
+              />
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              <Pressable
+                onPress={closeEdit}
+                disabled={editSaving || photoBusy}
+                style={[
+                  styles.btnWide,
+                  { borderColor: cardBorder, flex: 1, opacity: editSaving || photoBusy ? 0.6 : 1 },
+                ]}>
+                <Text style={[styles.btnText, { color: colors.text }]}>İptal</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => void onSaveEdit()}
+                disabled={editSaving || photoBusy}
+                style={[
+                  styles.btnWide,
+                  {
+                    backgroundColor: colors.tint,
+                    borderColor: colors.tint,
+                    flex: 1,
+                    opacity: editSaving || photoBusy ? 0.7 : 1,
+                  },
+                ]}>
+                {editSaving ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={[styles.btnText, { color: '#fff' }]}>Kaydet</Text>
+                )}
+              </Pressable>
+            </View>
+              </View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    </>
   );
 }
 
@@ -660,12 +1014,87 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
   },
-  delBtnRow: {
+  listActionsRow: {
+    flexDirection: 'row',
+    gap: 10,
     alignSelf: 'stretch',
+  },
+  editBtnRow: {
+    flex: 1,
+    minWidth: 0,
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  delBtnRow: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalRoot: {
+    flex: 1,
+  },
+  modalLayer: {
+    flex: 1,
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  modalCenter: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  modalCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+  },
+  editPhotoStrip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 4,
+    paddingRight: 4,
+  },
+  editPhotoTile: {
+    width: 108,
+    alignItems: 'center',
+  },
+  editPhotoBadge: {
+    fontSize: 11,
+    fontWeight: '800',
+    marginBottom: 6,
+    alignSelf: 'flex-start',
+  },
+  editPhotoThumb: {
+    width: 96,
+    height: 96,
+    borderRadius: 10,
+  },
+  editPhotoRemove: {
+    marginTop: 8,
+    alignSelf: 'stretch',
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
   },
 });

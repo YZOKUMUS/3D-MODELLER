@@ -75,6 +75,22 @@ export type PersonalModelsContextValue = {
     galleryUris: string[];
   }) => Promise<{ ok: true } | { ok: false; message: string }>;
   deletePersonal: (id: string) => Promise<void>;
+  /** Kişisel kaydın metin alanlarını günceller; görseller ayrıca `removePersonalImage` ile değişebilir. */
+  updatePersonal: (
+    id: string,
+    payload: {
+      title: string;
+      price: number;
+      category: ModelCategory;
+      description: string;
+      formats: string[];
+    },
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+  /** Tek bir galeri görselini siler; kapak silinirken galeride fotoğraf varsa ilki yeni kapak olur. */
+  removePersonalImage: (
+    id: string,
+    target: { kind: 'cover' } | { kind: 'gallery'; index: number },
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
   /** Tüm kişisel modelleri ve cihazdaki kopya görselleri siler; paket katalogu (CATALOG) değişmez. */
   clearAllPersonal: () => Promise<void>;
   /** true iken Modeller listesinde yalnızca bu cihazda eklenen kayıtlar görünür (paket vitrini gizlenir). */
@@ -258,6 +274,102 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
     setRevision((r) => r + 1);
   }, [supportsPersonal]);
 
+  const updatePersonal = useCallback(
+    async (
+      id: string,
+      payload: {
+        title: string;
+        price: number;
+        category: ModelCategory;
+        description: string;
+        formats: string[];
+      },
+    ): Promise<{ ok: true } | { ok: false; message: string }> => {
+      if (!supportsPersonal) return { ok: false, message: 'Bu özellik yalnızca Android veya iPhone uygulamasında.' };
+      const rec = recordsRef.current.find((r) => r.id === id);
+      if (!rec) return { ok: false, message: 'Kayıt bulunamadı.' };
+      const title = payload.title.trim();
+      if (!title) return { ok: false, message: 'Model adı girin.' };
+      if (payload.formats.length === 0) return { ok: false, message: 'En az bir dosya formatı seçin.' };
+      const tagline = `${title} · ${payload.formats.join(', ')}`.slice(0, 240);
+      const description = payload.description.trim() || `${title} modeli`;
+      const price = Math.max(0, Math.floor(payload.price));
+      setRecords((prev) => {
+        const next = prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                title,
+                tagline,
+                price,
+                formats: payload.formats,
+                category: payload.category,
+                description,
+              }
+            : r,
+        );
+        void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+      setRevision((r) => r + 1);
+      return { ok: true };
+    },
+    [supportsPersonal],
+  );
+
+  const removePersonalImage = useCallback(
+    async (
+      id: string,
+      target: { kind: 'cover' } | { kind: 'gallery'; index: number },
+    ): Promise<{ ok: true } | { ok: false; message: string }> => {
+      if (!supportsPersonal) return { ok: false, message: 'Bu özellik yalnızca Android veya iPhone uygulamasında.' };
+      const base = coversBaseDir();
+      if (!base) return { ok: false, message: 'Cihazda kayıt klasörü açılamadı.' };
+      const rec = recordsRef.current.find((r) => r.id === id);
+      if (!rec) return { ok: false, message: 'Kayıt bulunamadı.' };
+
+      if (target.kind === 'gallery') {
+        const i = target.index;
+        if (i < 0 || i >= rec.galleryFiles.length) {
+          return { ok: false, message: 'Geçersiz galeri görseli.' };
+        }
+        const file = rec.galleryFiles[i];
+        await FileSystem.deleteAsync(`${base}${file}`, { idempotent: true }).catch(() => undefined);
+        setRecords((prev) => {
+          const next = prev.map((r) =>
+            r.id === id ? { ...r, galleryFiles: r.galleryFiles.filter((_, idx) => idx !== i) } : r,
+          );
+          void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          return next;
+        });
+        setRevision((r) => r + 1);
+        return { ok: true };
+      }
+
+      if (rec.galleryFiles.length === 0) {
+        return {
+          ok: false,
+          message:
+            'Şu an yalnızca kapak fotoğrafı var; onu buradan silemezsin. Tüm modeli kaldırmak için listede Sil kullan.',
+        };
+      }
+      const oldCover = rec.coverFile;
+      const newCover = rec.galleryFiles[0];
+      const newGallery = rec.galleryFiles.slice(1);
+      await FileSystem.deleteAsync(`${base}${oldCover}`, { idempotent: true }).catch(() => undefined);
+      setRecords((prev) => {
+        const next = prev.map((r) =>
+          r.id === id ? { ...r, coverFile: newCover, galleryFiles: newGallery } : r,
+        );
+        void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+      setRevision((r) => r + 1);
+      return { ok: true };
+    },
+    [supportsPersonal],
+  );
+
   const clearAllPersonal = useCallback(async () => {
     if (!supportsPersonal) return;
     const base = coversBaseDir();
@@ -290,6 +402,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       personalOnlyAsModels,
       addFromPicker,
       deletePersonal,
+      updatePersonal,
+      removePersonalImage,
       clearAllPersonal,
       hideBundledCatalog,
       setHideBundledCatalog,
@@ -303,6 +417,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       personalOnlyAsModels,
       addFromPicker,
       deletePersonal,
+      updatePersonal,
+      removePersonalImage,
       clearAllPersonal,
       hideBundledCatalog,
       setHideBundledCatalog,
