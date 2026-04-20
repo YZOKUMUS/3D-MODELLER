@@ -5,17 +5,15 @@ import { Platform, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BAMBU } from '@/constants/bambuTheme';
-import { useCart } from '@/context/CartContext';
 import { useColorScheme } from '@/components/useColorScheme';
 import { tabBarBottomPadding } from '@/lib/layout';
 
-type TabGlyph = 'models' | 'cart' | 'profile';
+type TabGlyph = 'models' | 'add';
 
-/** Web/PWA: FontAwesome sik bozuluyor; +html.tsx'teki Material Icons ligature kullan. */
+/** Web/PWA: FontAwesome sık bozuluyor; +html.tsx'teki Material Icons ligature kullan. */
 function TabBarIcon({ kind, color }: { kind: TabGlyph; color: string }) {
   if (Platform.OS === 'web') {
-    const ligature =
-      kind === 'models' ? 'apps' : kind === 'cart' ? 'shopping_cart' : 'person';
+    const ligature = kind === 'models' ? 'apps' : 'add_a_photo';
     return (
       <Text
         allowFontScaling={false}
@@ -33,13 +31,12 @@ function TabBarIcon({ kind, color }: { kind: TabGlyph; color: string }) {
     );
   }
   const name: React.ComponentProps<typeof FontAwesome>['name'] =
-    kind === 'models' ? 'th-large' : kind === 'cart' ? 'shopping-cart' : 'user';
+    kind === 'models' ? 'th-large' : 'camera';
   return <FontAwesome name={name} size={22} color={color} style={{ marginBottom: 2 }} />;
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { totalQuantity, ready } = useCart();
   const insets = useSafeAreaInsets();
 
   const dark = colorScheme === 'dark';
@@ -77,23 +74,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="cart"
+        name="resim-ekle"
         options={{
-          title: 'Sepet',
-          tabBarIcon: ({ color }) => <TabBarIcon kind="cart" color={color} />,
-          tabBarBadge:
-            ready && totalQuantity > 0
-              ? totalQuantity > 99
-                ? '99+'
-                : totalQuantity
-              : undefined,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Ben',
-          tabBarIcon: ({ color }) => <TabBarIcon kind="profile" color={color} />,
+          title: 'Resim ekle',
+          tabBarIcon: ({ color }) => <TabBarIcon kind="add" color={color} />,
         }}
       />
     </Tabs>

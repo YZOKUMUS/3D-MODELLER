@@ -1,6 +1,6 @@
 import { Image as ExpoImage } from 'expo-image';
 import type { ReactNode } from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Image as RNImage,
   Platform,
@@ -36,6 +36,14 @@ function resolveWebUri(source: ImageSourcePropType): string | null {
     return (source as { uri: string }).uri;
   }
   return null;
+}
+
+function nativeUriKey(source: ImageSourcePropType): string {
+  if (typeof source === 'number') return `n:${source}`;
+  if (source && typeof source === 'object' && 'uri' in source && typeof (source as { uri: string }).uri === 'string') {
+    return `u:${(source as { uri: string }).uri}`;
+  }
+  return 'x';
 }
 
 /** GitHub Pages / mobil: onbellek veya preload sonrasi `load` olayi gelmeyebilir; `complete` ile yakalariz. */
@@ -118,6 +126,12 @@ export function ModelCoverImage({
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
+  const sourceKey = nativeUriKey(source);
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+  }, [sourceKey]);
+
   const placeholder = (
     <View style={[StyleSheet.absoluteFill, styles.fallback, { backgroundColor: accent }]}>
       <Text style={[styles.fallbackLetter, { fontSize: fallbackFontSize }]}>{fallbackLetter}</Text>
@@ -161,6 +175,31 @@ export function ModelCoverImage({
           style={styles.fillCover}
           resizeMode={contain ? 'contain' : 'cover'}
           onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      </View>
+    );
+  }
+
+  // Yerel dosya (file://) ve galeri URI: ExpoImage bazen onLoad geciktirir veya hic bildirmez; kapak
+  // dokununca yeniden cizilince gorunuyormus gibi olur. RN Image bu URI'lerde kararli.
+  if (
+    Platform.OS !== 'web' &&
+    source &&
+    typeof source === 'object' &&
+    'uri' in source &&
+    typeof (source as { uri: string }).uri === 'string'
+  ) {
+    const uri = (source as { uri: string }).uri;
+    return (
+      <View style={[styles.clip, style, { backgroundColor: accent }]}>
+        {!loaded && placeholder}
+        <RNImage
+          source={{ uri }}
+          style={styles.fillCover}
+          resizeMode={contain ? 'contain' : 'cover'}
+          onLoad={() => setLoaded(true)}
+          onLoadEnd={() => setLoaded(true)}
           onError={() => setFailed(true)}
         />
       </View>

@@ -8,7 +8,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { CartProvider } from '@/context/CartContext';
 import { LikesProvider } from '@/context/LikesContext';
 import { PersonalModelsProvider } from '@/context/PersonalModelsContext';
 
@@ -54,17 +53,14 @@ function RootLayoutNav() {
   return (
     <SafeAreaProvider>
       <PersonalModelsProvider>
-        <CartProvider>
-          <LikesProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="model/[id]" options={{ headerBackTitle: 'Geri' }} />
-                <Stack.Screen name="personal-studio" options={{ title: 'Telefondan vitrin' }} />
-              </Stack>
-            </ThemeProvider>
+        <LikesProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="model/[id]" options={{ headerBackTitle: 'Geri' }} />
+            </Stack>
+          </ThemeProvider>
         </LikesProvider>
-      </CartProvider>
       </PersonalModelsProvider>
     </SafeAreaProvider>
   );

@@ -15,11 +15,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
-import { useCart } from '@/context/CartContext';
 import { usePersonalModels } from '@/context/PersonalModelsContext';
 import { getDetailSlides } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
-import { lightImpact, successNotification } from '@/lib/haptics';
+import { lightImpact } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
 
 export default function ModelDetailScreen() {
@@ -30,7 +29,6 @@ export default function ModelDetailScreen() {
   const { getModelById, mergedCatalog } = usePersonalModels();
   const model = id ? getModelById(id) : undefined;
   const insets = useSafeAreaInsets();
-  const { add } = useCart();
 
   const slides = useMemo(() => (model ? getDetailSlides(model) : []), [model]);
   const slideWidth = windowWidth;
@@ -78,9 +76,9 @@ export default function ModelDetailScreen() {
     router.replace('/(tabs)' as const);
   };
 
-  const goToCart = () => {
+  const goToResimEkle = () => {
     lightImpact();
-    router.push('/(tabs)/cart' as const);
+    router.push('/(tabs)/resim-ekle' as Parameters<typeof router.push>[0]);
   };
 
   const similarModels = useMemo(() => {
@@ -103,12 +101,6 @@ export default function ModelDetailScreen() {
       </>
     );
   }
-
-  const addToCart = () => {
-    lightImpact();
-    add(model);
-    successNotification();
-  };
 
   return (
     <>
@@ -200,7 +192,7 @@ export default function ModelDetailScreen() {
         <ScrollView
           style={styles.bodyScroll}
           nestedScrollEnabled={Platform.OS === 'android'}
-          contentContainerStyle={{ paddingBottom: 100 + insets.bottom }}>
+          contentContainerStyle={{ paddingBottom: 28 + insets.bottom }}>
           <ModelLikeButton modelId={model.id} variant="detail" />
 
           <View style={styles.content}>
@@ -268,20 +260,12 @@ export default function ModelDetailScreen() {
         </View>
 
         <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 12 }]}>
-          <View style={styles.bottomBarRow}>
-            <Pressable
-              onPress={goToCart}
-              style={({ pressed }) => [styles.goCartBtn, { opacity: pressed ? 0.85 : 1 }]}>
-              <Icon name="shopping-bag" size={17} color="#00c853" />
-              <Text style={styles.goCartText}>Sepete Git</Text>
-            </Pressable>
-            <Pressable
-              onPress={addToCart}
-              style={({ pressed }) => [styles.ctaBtn, { opacity: pressed ? 0.9 : 1 }]}>
-              <Icon name="shopping-cart" size={18} color="#fff" />
-              <Text style={styles.ctaText}>Sepete Ekle</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={goToResimEkle}
+            style={({ pressed }) => [styles.ctaBtn, { opacity: pressed ? 0.9 : 1 }]}>
+            <Icon name="plus" size={18} color="#fff" />
+            <Text style={styles.ctaText}>Vitrine model / foto ekle</Text>
+          </Pressable>
         </View>
       </View>
     </>
