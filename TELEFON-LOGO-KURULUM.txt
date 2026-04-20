@@ -1,0 +1,91 @@
+================================================================================
+YZOKUMUS — Telefonda LOGO / ikona basinca acilsin (Android, ornek: Samsung M33)
+================================================================================
+
+Hedef: Ana ekranda kendi uygulama ikonun olsun; tiklayinca acilsin.
+       (Expo Go + QR ile her sefer baglanmak istemiyorsan bu yolu kullan.)
+
+ONEMLI AYRIM
+------------
+  A) npx expo run:android              -> "debug" yukleme; acilista cogu zaman
+     bilgisayarda Metro (npm start) bekler. Gelistirme icin.
+  B) npx expo run:android --variant release -> Surum yuklemesi; JS paketlenir,
+     Metro KAPALIYKEN de ikondan acilir. Gunluk kullanim icin B onerilir.
+
+================================================================================
+ADIM 0 — Once bir kez: Node ve proje
+================================================================================
+  - Node.js LTS kurulu olsun.
+  - Proje klasoru: ...\3D MODELLERİM\model-market  (icinde package.json)
+  - Terminal:
+      cd "C:\Users\ziyao\Desktop\3D MODELLERİM\model-market"
+      npm install
+
+================================================================================
+ADIM 1 — Android Studio (bir kez, bilgisayarda)
+================================================================================
+  1) https://developer.android.com/studio  adresinden Android Studio kur.
+  2) Ilk acilista "SDK" kurulumunu tamamla (SDK Platform ornegin 34 veya 35).
+  3) Ortam degiskeni ANDROID_HOME (Windows):
+       ANDROID_HOME =  C:\Users\<KULLANICI>\AppData\Local\Android\Sdk
+     (Gercek yolu Android Studio > SDK Manager'dan dogrula.)
+  4) Path'e ekle (yoksa):
+       %ANDROID_HOME%\platform-tools
+     (adb komutu boyle calisir.)
+
+================================================================================
+ADIM 2 — Telefonda USB hata ayiklama (bir kez)
+================================================================================
+  1) Ayarlar > Telefon hakkinda > "Yapı numarası" / "Build number" ustune
+     yaklasik 7 kez dokun -> "Gelistirici oldunuz" mesaji.
+  2) Ayarlar > Gelistirici secenekleri > "USB hata ayıklama" AC.
+  3) USB kablosu ile PC'ye bagla; telefonda cikan "Bu bilgisayara guven"
+     diyalogunda IZIN VER / Her zaman izin ver.
+
+  Not: USB modu "Sadece sarj" ise bildirimden "Dosya aktarimi" / MTP sec.
+
+================================================================================
+ADIM 3 — Bilgisayar telefonu goruyor mu? (istege bagli kontrol)
+================================================================================
+  PowerShell:
+      adb devices
+  Listede cihazin "device" yazmali (unauthorized degil).
+
+================================================================================
+ADIM 4 — Uygulamayi telefona yukle (LOGO bu adimdan sonra gelir)
+================================================================================
+  PowerShell (model-market icindeyken):
+
+      cd "C:\Users\ziyao\Desktop\3D MODELLERİM\model-market"
+      npx expo run:android --variant release --no-bundler
+
+  - Ilk seferde Gradle indirme + derleme 10–25 dk surebilir; sabir.
+  - Bitince telefona "YZOKUMUS" (veya app.json adi) ikonu yuklenir.
+  - Ana ekrana sabitlemek icin: uygulamayi acik tut > Ana ekrana ekle / Kisayol.
+  - --no-bundler: Metro sunucusu acilmaz; ikondan bagimsiz acilma icin uygun.
+
+================================================================================
+ADIM 5 — Kod degistirdikten sonra ne olur?
+================================================================================
+  - Release APK icindeki JS sabittir. Yeni kod icin ADIM 4'u tekrar calistir
+    (yeniden derle + yukle).
+  - Hizli deneme icin: debug yukleme + bilgisayarda npm start (Metro) kullan.
+
+================================================================================
+Sorun cikarsa (kisa)
+================================================================================
+  - "SDK location not found" -> ANDROID_HOME ayarla, Android Studio SDK kur.
+  - "adb: device unauthorized" -> Telefonda USB hata ayiklama iznini tekrar ver.
+  - "Could not read package.json" -> Yanlis klasordesin; mutlaka model-market.
+
+================================================================================
+PWA (GitHub sitesi ana ekran) ile karistirma
+================================================================================
+  GitHub Pages'ten "Ana ekrana ekle" = web; bu dosyadaki yol = gercek Android
+  uygulama ikonu (Expo derlemesi).
+
+================================================================================
+Kisayol (Windows)
+================================================================================
+  model-market klasorunde:  Telefon-Android-Release-Yukle.cmd  dosyasina
+  cift tikla (ADIM 0–3 hazir olduktan sonra). Metro baslatmaz (--no-bundler).
