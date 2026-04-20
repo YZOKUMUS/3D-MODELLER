@@ -3768,6 +3768,13 @@ export const CATALOG_TAB_CATEGORIES: ModelCategory[] = CATEGORIES.filter((c) =>
   _categoriesInCatalog.has(c)
 );
 
+/** Üst sekmeler: verilen model listesinde gerçekten kullanılan kategoriler (statik + telefon vitrini birleşimi için). */
+export function categoriesTabFromModels(models: readonly CatalogModel[]): ModelCategory[] {
+  const seen = new Set<ModelCategory>();
+  for (const m of models) seen.add(m.category);
+  return CATEGORIES.filter((c) => seen.has(c));
+}
+
 export function getModelById(id: string): CatalogModel | undefined {
   return CATALOG.find((m) => m.id === id);
 }

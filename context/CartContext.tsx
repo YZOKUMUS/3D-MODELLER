@@ -8,7 +8,9 @@ import React, {
   useState,
 } from 'react';
 
-import { CATALOG, type CatalogModel } from '@/data/catalog';
+import { type CatalogModel } from '@/data/catalog';
+
+import { usePersonalModels } from '@/context/PersonalModelsContext';
 
 const STORAGE_KEY = '@model_market_cart_v1';
 
@@ -30,14 +32,14 @@ type CartState = {
 
 const CartContext = createContext<CartState | null>(null);
 
-async function loadLines(): Promise<CartLine[]> {
+async function loadLines(resolve: (id: string) => CatalogModel | undefined): Promise<CartLine[]> {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as { modelId: string; quantity: number }[];
     const lines: CartLine[] = [];
     for (const row of parsed) {
-      const model = CATALOG.find((m) => m.id === row.modelId);
+      const model = resolve(row.modelId);
       if (model && row.quantity > 0) {
         lines.push({ model, quantity: row.quantity });
       }
@@ -54,12 +56,14 @@ async function saveLines(lines: CartLine[]): Promise<void> {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { getModelById, ready: catalogReady, revision } = usePersonalModels();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!catalogReady) return;
     let cancelled = false;
-    void loadLines().then((loaded) => {
+    void loadLines(getModelById).then((loaded) => {
       if (!cancelled) {
         setLines(loaded);
         setReady(true);
@@ -68,7 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [catalogReady, revision, getModelById]);
 
   const persist = useCallback((next: CartLine[]) => {
     setLines(next);

@@ -17,7 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridModelCard } from '@/components/GridModelCard';
 import { BAMBU } from '@/constants/bambuTheme';
-import { CATALOG, CATALOG_TAB_CATEGORIES, type ModelCategory } from '@/data/catalog';
+import { usePersonalModels } from '@/context/PersonalModelsContext';
+import { categoriesTabFromModels, type ModelCategory } from '@/data/catalog';
 import { lightImpact } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
 
@@ -28,20 +29,24 @@ const TAB_FONT = Platform.select({
   default: {},
 });
 
-const ALL_TABS: { id: string; label: string; category: ModelCategory | 'Tümü' }[] = [
-  { id: 'all', label: 'Senin İçin', category: 'Tümü' },
-  { id: 'trending', label: 'Trend', category: 'Tümü' },
-  ...CATALOG_TAB_CATEGORIES.map((c) => ({ id: c, label: c, category: c })),
-];
-
 export default function StoreScreen() {
+  const { mergedCatalog } = usePersonalModels();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [visibleCount, setVisibleCount] = useState(20);
 
-  const validTabIds = useMemo(() => new Set(ALL_TABS.map((t) => t.id)), []);
+  const ALL_TABS = useMemo(() => {
+    const tabCategories = categoriesTabFromModels(mergedCatalog);
+    return [
+      { id: 'all', label: 'Senin İçin', category: 'Tümü' as const },
+      { id: 'trending', label: 'Trend', category: 'Tümü' as const },
+      ...tabCategories.map((c) => ({ id: c, label: c, category: c })),
+    ];
+  }, [mergedCatalog]);
+
+  const validTabIds = useMemo(() => new Set(ALL_TABS.map((t) => t.id)), [ALL_TABS]);
 
   useEffect(() => {
     if (!validTabIds.has(activeTab)) {
@@ -112,7 +117,7 @@ export default function StoreScreen() {
   const currentTab = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
 
   const filtered = useMemo(() => {
-    let list = [...CATALOG].reverse();
+    let list = [...mergedCatalog].reverse();
     if (currentTab.category !== 'Tümü') {
       list = list.filter((m) => m.category === currentTab.category);
     }
@@ -128,11 +133,11 @@ export default function StoreScreen() {
       );
     }
     return list;
-  }, [query, activeTab, currentTab.category]);
+  }, [query, activeTab, currentTab.category, mergedCatalog]);
 
   /** Arama yokken sekme+Trend listesi — boş durumda “arama mı sekme mi” ayırımı için */
   const listWithoutSearch = useMemo(() => {
-    let list = [...CATALOG].reverse();
+    let list = [...mergedCatalog].reverse();
     if (currentTab.category !== 'Tümü') {
       list = list.filter((m) => m.category === currentTab.category);
     }
@@ -140,7 +145,7 @@ export default function StoreScreen() {
       list = [...list].sort((a, b) => b.rating - a.rating);
     }
     return list;
-  }, [activeTab, currentTab.category]);
+  }, [activeTab, currentTab.category, mergedCatalog]);
 
   const hasSearchQuery = query.trim().length > 0;
 

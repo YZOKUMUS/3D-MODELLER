@@ -37,7 +37,14 @@
       "description": "YZOKUMUS — 3D baskı vitrin"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Model fotograflarini vitrine eklemek icin galeriye ihtiyac var.",
+          "cameraPermission": "Kapak fotografi cekmek icin kameraya ihtiyac var."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

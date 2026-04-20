@@ -6,8 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useCart } from '@/context/CartContext';
+import { usePersonalModels } from '@/context/PersonalModelsContext';
 import Colors from '@/constants/Colors';
-import { CATALOG } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
@@ -19,11 +19,9 @@ export default function CartScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { lines, ready, remove, setQuantity, clear, subtotal, add } = useCart();
+  const { mergedCatalog } = usePersonalModels();
 
-  const suggestions = useMemo(
-    () => [...CATALOG].sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10)).slice(0, 3),
-    [],
-  );
+  const suggestions = useMemo(() => [...mergedCatalog].reverse().slice(0, 3), [mergedCatalog]);
 
   const checkout = () => {
     if (lines.length === 0) return;

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   LayoutChangeEvent,
   Platform,
@@ -31,7 +31,12 @@ const FEED_SANS = Platform.select({
 export function GridModelCard({ model }: Props) {
   const router = useRouter();
   const [imgSlotW, setImgSlotW] = useState(0);
-  const aspect = 0.85 + (parseInt(model.id, 10) % 4) * 0.12;
+  const aspectSeed = useMemo(() => {
+    const n = parseInt(model.id, 10);
+    if (Number.isFinite(n)) return n;
+    return model.id.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  }, [model.id]);
+  const aspect = 0.85 + (aspectSeed % 4) * 0.12;
   const imgHeight =
     imgSlotW > 0 ? Math.round(imgSlotW * aspect) : Math.round(168 * aspect);
 
@@ -40,7 +45,14 @@ export function GridModelCard({ model }: Props) {
     setImgSlotW((prev) => (prev !== w ? w : prev));
   }, []);
 
-  const isNew = parseInt(model.id, 10) > CATALOG.length - 10;
+  const staticMaxId = useMemo(
+    () => Math.max(0, ...CATALOG.map((m) => parseInt(m.id, 10)).filter(Number.isFinite)),
+    [],
+  );
+  const numericId = parseInt(model.id, 10);
+  const isNew =
+    model.id.startsWith('p-') ||
+    (Number.isFinite(numericId) && numericId > staticMaxId - 10);
 
   const openDetail = () => {
     lightImpact();

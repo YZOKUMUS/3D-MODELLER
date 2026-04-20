@@ -16,7 +16,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { ModelLikeButton } from '@/components/ModelLikeButton';
 import { useCart } from '@/context/CartContext';
-import { CATALOG, getDetailSlides, getModelById } from '@/data/catalog';
+import { usePersonalModels } from '@/context/PersonalModelsContext';
+import { getDetailSlides } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
 import { lightImpact, successNotification } from '@/lib/haptics';
 import { Icon } from '@/lib/web-icon';
@@ -26,6 +27,7 @@ export default function ModelDetailScreen() {
   const { id: idParam } = useLocalSearchParams<{ id: string | string[] }>();
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
   const router = useRouter();
+  const { getModelById, mergedCatalog } = usePersonalModels();
   const model = id ? getModelById(id) : undefined;
   const insets = useSafeAreaInsets();
   const { add } = useCart();
@@ -81,6 +83,13 @@ export default function ModelDetailScreen() {
     router.push('/(tabs)/cart' as const);
   };
 
+  const similarModels = useMemo(() => {
+    if (!model) return [];
+    return mergedCatalog
+      .filter((m) => m.category === model.category && m.id !== model.id)
+      .slice(0, 6);
+  }, [mergedCatalog, model?.category, model?.id]);
+
   if (!model) {
     return (
       <>
@@ -100,8 +109,6 @@ export default function ModelDetailScreen() {
     add(model);
     successNotification();
   };
-
-  const similarModels = CATALOG.filter((m) => m.category === model.category && m.id !== model.id).slice(0, 6);
 
   return (
     <>

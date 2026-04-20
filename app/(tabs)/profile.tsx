@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import {
   FlatList,
@@ -18,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
-import { CATALOG, getModelById } from '@/data/catalog';
+import { usePersonalModels } from '@/context/PersonalModelsContext';
 import { Icon } from '@/lib/web-icon';
 
 const PROFILE_HERO_COVER_STORAGE_KEY = 'profile:heroCoverModelId';
@@ -60,8 +61,10 @@ export default function ProfileScreen() {
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
+  const router = useRouter();
+  const { mergedCatalog, getModelById } = usePersonalModels();
 
-  const defaultHeroId = CATALOG[0]?.id ?? '';
+  const defaultHeroId = mergedCatalog[0]?.id ?? '';
   const [heroModelId, setHeroModelId] = useState(defaultHeroId);
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -71,7 +74,7 @@ export default function ProfileScreen() {
       try {
         const raw = await AsyncStorage.getItem(PROFILE_HERO_COVER_STORAGE_KEY);
         if (cancelled || raw == null) return;
-        if (getModelById(raw)) setHeroModelId(raw);
+        if (raw && getModelById(raw)) setHeroModelId(raw);
       } catch {
         /* ignore */
       }
@@ -79,9 +82,12 @@ export default function ProfileScreen() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [getModelById]);
 
-  const heroModel = useMemo(() => getModelById(heroModelId) ?? CATALOG[0], [heroModelId]);
+  const heroModel = useMemo(
+    () => getModelById(heroModelId) ?? mergedCatalog[0],
+    [getModelById, heroModelId, mergedCatalog],
+  );
 
   const pickerSheetWidth = Math.min(windowWidth - 24, 520);
   const pickerSheetHeight = Math.min(Math.round(windowHeight * 0.76), 600);
@@ -89,7 +95,7 @@ export default function ProfileScreen() {
   const pickerColGap = 10;
   const pickerThumbWidth = (pickerSheetWidth - pickerPad * 2 - pickerColGap) / 2;
 
-  const categoryCount = useMemo(() => new Set(CATALOG.map((m) => m.category)).size, []);
+  const categoryCount = useMemo(() => new Set(mergedCatalog.map((m) => m.category)).size, [mergedCatalog]);
 
   const onPickHeroModel = async (id: string) => {
     setHeroModelId(id);
@@ -151,6 +157,24 @@ export default function ProfileScreen() {
         <Text style={[styles.heroImageHint, { color: isDark ? '#64748b' : '#94a3b8' }]}>
           Kapak: {heroModel.title} · değiştirmek için görsele dokun
         </Text>
+        <Pressable
+          onPress={() => {
+            if (Platform.OS !== 'web') {
+              try {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              } catch {
+                /* ignore */
+              }
+            }
+            router.push('/personal-studio' as Parameters<typeof router.push>[0]);
+          }}
+          style={({ pressed }) => [
+            styles.studioBtn,
+            { borderColor: colors.tint, opacity: pressed ? 0.88 : 1 },
+          ]}>
+          <Icon name="plus" size={18} color={colors.tint} style={{ marginRight: 8 }} />
+          <Text style={[styles.studioBtnText, { color: colors.tint }]}>Telefondan model ekle</Text>
+        </Pressable>
         <Text style={[styles.name, { color: colors.text }]}>YZOKUMUS</Text>
         <Text style={[styles.tagline, { color: colors.tint }]}>Hobi ile üretiyorum</Text>
         <Text style={[styles.lead, { color: isDark ? '#cbd5e1' : '#475569' }]}>
@@ -180,7 +204,7 @@ export default function ProfileScreen() {
 
       <View style={[styles.statsGrid, { backgroundColor: cardBg, borderColor: cardBorder }]}>
         <View style={[styles.statCell, { borderColor: cardBorder }]}>
-          <Text style={[styles.statNum, { color: colors.tint }]}>{CATALOG.length}</Text>
+          <Text style={[styles.statNum, { color: colors.tint }]}>{mergedCatalog.length}</Text>
           <Text style={[styles.statLabel, { color: colors.text }]}>Vitrinde model</Text>
           <Text style={[styles.statHint, { color: isDark ? '#64748b' : '#94a3b8' }]}>Katalog güncellenerek büyür</Text>
         </View>
@@ -233,9 +257,9 @@ export default function ProfileScreen() {
       <View style={[styles.noteCard, { borderColor: isDark ? '#3f3f46' : '#cbd5e1', backgroundColor: isDark ? '#16161a' : '#f1f5f9' }]}>
         <Icon name="info-circle" size={20} color={colors.tint} style={styles.noteIcon} />
         <Text style={[styles.noteText, { color: isDark ? '#a1a1aa' : '#475569' }]}>
-          İçerik ve kapak görselleri bilgisayarındaki admin paneli ile güncellenir; uygulama kabaca “canlı
-          katalog + vitrin” gibi düşünülebilir. Görüş veya önerin varsa aynı şekilde not düşebilirsin —
-          burası hem vitrin hem de kendi üretim günlüğüm için bir pencere.
+          Telefonda hızlı eklemek için profildeki “Telefondan model ekle”yi kullanabilirsin; bu kayıtlar
+          cihazında kalır (GitHub katalog dosyasına yazılmaz). Bilgisayardaki admin paneli ile toplu içerik
+          güncellemesi hâlâ mümkündür.
         </Text>
       </View>
 
@@ -267,7 +291,7 @@ export default function ProfileScreen() {
           </Text>
           <FlatList
             style={styles.modalList}
-            data={CATALOG}
+            data={mergedCatalog}
             keyExtractor={(item) => item.id}
             numColumns={2}
             keyboardShouldPersistTaps="handled"
@@ -360,6 +384,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 8,
     lineHeight: 16,
+  },
+  studioBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    borderWidth: 2,
+    alignSelf: 'stretch',
+    maxWidth: 400,
+    width: '100%',
+  },
+  studioBtnText: {
+    fontSize: 15,
+    fontWeight: '900',
   },
   name: {
     marginTop: 14,
