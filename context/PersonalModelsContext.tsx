@@ -74,6 +74,8 @@ export type PersonalModelsContextValue = {
     galleryUris: string[];
   }) => Promise<{ ok: true } | { ok: false; message: string }>;
   deletePersonal: (id: string) => Promise<void>;
+  /** Tüm kişisel modelleri ve cihazdaki kopya görselleri siler; paket katalogu (CATALOG) değişmez. */
+  clearAllPersonal: () => Promise<void>;
   supportsPersonal: boolean;
 };
 
@@ -231,6 +233,29 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
     setRevision((r) => r + 1);
   }, [supportsPersonal]);
 
+  const clearAllPersonal = useCallback(async () => {
+    if (!supportsPersonal) return;
+    const base = coversBaseDir();
+    if (base) {
+      for (const rec of recordsRef.current) {
+        for (const f of [rec.coverFile, ...rec.galleryFiles]) {
+          await FileSystem.deleteAsync(`${base}${f}`, { idempotent: true }).catch(() => undefined);
+        }
+      }
+      try {
+        const rest = await FileSystem.readDirectoryAsync(base);
+        for (const name of rest) {
+          await FileSystem.deleteAsync(`${base}${name}`, { idempotent: true }).catch(() => undefined);
+        }
+      } catch {
+        /* klasör yok veya okunamadı */
+      }
+    }
+    setRecords([]);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    setRevision((r) => r + 1);
+  }, [supportsPersonal]);
+
   const value = useMemo(
     () => ({
       ready,
@@ -240,6 +265,7 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       personalOnlyAsModels,
       addFromPicker,
       deletePersonal,
+      clearAllPersonal,
       supportsPersonal,
     }),
     [
@@ -250,6 +276,7 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       personalOnlyAsModels,
       addFromPicker,
       deletePersonal,
+      clearAllPersonal,
       supportsPersonal,
     ],
   );

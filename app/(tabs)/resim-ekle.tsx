@@ -33,7 +33,8 @@ export default function ResimEkleTabScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
-  const { supportsPersonal, personalOnlyAsModels, addFromPicker, deletePersonal } = usePersonalModels();
+  const { supportsPersonal, personalOnlyAsModels, addFromPicker, deletePersonal, clearAllPersonal } =
+    usePersonalModels();
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
@@ -192,6 +193,26 @@ export default function ResimEkleTabScreen() {
         },
       },
     ]);
+  };
+
+  const onClearAllPersonal = () => {
+    const n = personalOnlyAsModels.length;
+    if (n === 0) return;
+    Alert.alert(
+      'Tüm kişisel modeller silinsin mi?',
+      `${n} kayıt ve cihaza kopyalanan görseller kaldırılır. Uygulama paketindeki hazır vitrin modelleri silinmez.`,
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        {
+          text: 'Hepsini sil',
+          style: 'destructive',
+          onPress: () => {
+            lightImpact();
+            void clearAllPersonal();
+          },
+        },
+      ],
+    );
   };
 
   const webBlock = useMemo(
@@ -420,6 +441,22 @@ export default function ResimEkleTabScreen() {
         <Text style={{ color: isDark ? '#64748b' : '#94a3b8', paddingHorizontal: 4, marginTop: 8 }}>
           Bu telefonda henüz kişisel model yok; yukarıdaki formdan ekleyin.
         </Text>
+      }
+      ListFooterComponent={
+        personalOnlyAsModels.length > 0 ? (
+          <View style={{ marginTop: 16, marginBottom: 8 }}>
+            <Pressable
+              onPress={onClearAllPersonal}
+              style={[styles.btnWide, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
+              <Text style={[styles.btnText, { color: '#dc2626', fontWeight: '800' }]}>
+                Tüm kişisel modelleri sil (baştan başla)
+              </Text>
+            </Pressable>
+            <Text style={[styles.hint, { color: isDark ? '#64748b' : '#94a3b8', marginTop: 8, textAlign: 'center' }]}>
+              Sadece bu telefonda ekledikleriniz silinir; projedeki sabit katalog aynı kalır.
+            </Text>
+          </View>
+        ) : null
       }
     />
   );
