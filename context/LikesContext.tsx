@@ -14,6 +14,7 @@ type LikesState = {
   ready: boolean;
   isLiked: (modelId: string) => boolean;
   toggleLike: (modelId: string) => void;
+  clearAllLikes: () => Promise<void>;
 };
 
 const LikesContext = createContext<LikesState | null>(null);
@@ -64,13 +65,23 @@ export function LikesProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const clearAllLikes = useCallback(async () => {
+    setIds([]);
+    try {
+      await saveIds([]);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       ready,
       isLiked,
       toggleLike,
+      clearAllLikes,
     }),
-    [ready, isLiked, toggleLike]
+    [ready, isLiked, toggleLike, clearAllLikes]
   );
 
   return <LikesContext.Provider value={value}>{children}</LikesContext.Provider>;

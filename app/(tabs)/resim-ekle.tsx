@@ -19,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ModelCoverImage } from '@/components/ModelCoverImage';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
+import { useLikes } from '@/context/LikesContext';
 import { usePersonalModels } from '@/context/PersonalModelsContext';
 import { CATEGORIES, type ModelCategory } from '@/data/catalog';
 import { formatTry } from '@/lib/format';
@@ -33,8 +34,16 @@ export default function ResimEkleTabScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
-  const { supportsPersonal, personalOnlyAsModels, addFromPicker, deletePersonal, clearAllPersonal } =
-    usePersonalModels();
+  const {
+    supportsPersonal,
+    personalOnlyAsModels,
+    addFromPicker,
+    deletePersonal,
+    clearAllPersonal,
+    hideBundledCatalog,
+    setHideBundledCatalog,
+  } = usePersonalModels();
+  const { clearAllLikes } = useLikes();
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
@@ -197,18 +206,39 @@ export default function ResimEkleTabScreen() {
 
   const onClearAllPersonal = () => {
     const n = personalOnlyAsModels.length;
-    if (n === 0) return;
+    const body =
+      n > 0
+        ? `${n} kayıt ve cihaza kopyalanan görseller kaldırılır. Uygulama paketindeki hazır vitrin modelleri silinmez.`
+        : 'Listede kayıt görünmese bile cihazda kalan kişisel kopya görseller varsa onlar da temizlenir. Hazır vitrin katalogu silinmez.';
+    Alert.alert(n > 0 ? 'Tüm kişisel modeller silinsin mi?' : 'Kişisel depo temizlensin mi?', body, [
+      { text: 'Vazgeç', style: 'cancel' },
+      {
+        text: n > 0 ? 'Hepsini sil' : 'Temizle',
+        style: 'destructive',
+        onPress: () => {
+          lightImpact();
+          void clearAllPersonal();
+        },
+      },
+    ]);
+  };
+
+  const onFullFreshStart = () => {
     Alert.alert(
-      'Tüm kişisel modeller silinsin mi?',
-      `${n} kayıt ve cihaza kopyalanan görseller kaldırılır. Uygulama paketindeki hazır vitrin modelleri silinmez.`,
+      'Tam yeni başlangıç?',
+      'Paket içi örnek vitrin Modeller sekmesinde gizlenir; bu telefona eklediğin kişisel kayıtlar ve kopya görseller silinir; kalpli beğeniler sıfırlanır. Sonra listede yalnızca yeniden eklediklerin görünür. İstersen aşağıdan paket vitrinini tekrar açabilirsin.',
       [
         { text: 'Vazgeç', style: 'cancel' },
         {
-          text: 'Hepsini sil',
+          text: 'Evet, sıfırla',
           style: 'destructive',
           onPress: () => {
             lightImpact();
-            void clearAllPersonal();
+            void (async () => {
+              await clearAllPersonal();
+              await setHideBundledCatalog(true);
+              await clearAllLikes();
+            })();
           },
         },
       ],
@@ -409,6 +439,38 @@ export default function ResimEkleTabScreen() {
             style={[styles.btnWide, { borderColor: cardBorder, marginBottom: 4 }]}>
             <Text style={[styles.btnText, { color: colors.tint }]}>Modeller listesine git</Text>
           </Pressable>
+
+          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder, marginTop: 6 }]}>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Bu sekmedeki liste</Text>
+            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 0 }]}>
+              Sadece bu telefonda &quot;Modeli vitrine ekle&quot; ile kaydettiğin modeller burada görünür. Modeller
+              sekmesindeki hazır vitrin burada listelenmez. Kayıtların varsa ekranı aşağı kaydır; her satırda
+              &quot;Sil&quot; düğmesi vardır.
+            </Text>
+          </View>
+
+          <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder, marginTop: 6 }]}>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Modeller sekmesini sıfırla</Text>
+            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
+              Telefonda çekip kaydetmediklerin (uygulama paketindeki örnek vitrin) Modeller listesinde gizlenir; kişisel
+              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür.
+            </Text>
+            {hideBundledCatalog ? (
+              <Pressable
+                onPress={() => {
+                  lightImpact();
+                  void setHideBundledCatalog(false);
+                }}
+                style={[styles.btnWide, { borderColor: colors.tint, marginBottom: 10 }]}>
+                <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              onPress={onFullFreshStart}
+              style={[styles.btnWide, { borderColor: '#b45309', backgroundColor: isDark ? '#2a1f0a' : '#fffbeb' }]}>
+              <Text style={[styles.btnText, { color: '#b45309' }]}>Tam yeni başlangıç (sadece kendi vitrinin)</Text>
+            </Pressable>
+          </View>
         </View>
       }
       contentContainerStyle={{
@@ -419,44 +481,53 @@ export default function ResimEkleTabScreen() {
       style={{ flex: 1, backgroundColor: colors.background }}
       renderItem={({ item }) => (
         <View style={[styles.listRow, { backgroundColor: cardBg, borderColor: cardBorder }]}>
-          <ModelCoverImage
-            source={item.coverImage}
-            accent={item.accent}
-            fallbackLetter={item.title.slice(0, 1).toUpperCase()}
-            style={styles.thumb}
-          />
-          <View style={styles.listMeta}>
-            <Text style={[styles.listTitle, { color: colors.text }]} numberOfLines={2}>
-              {item.title}
-            </Text>
-            <Text style={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: 12 }}>{item.category}</Text>
-            <Text style={{ color: colors.tint, fontWeight: '800', marginTop: 4 }}>{formatTry(item.price)}</Text>
+          <View style={styles.listRowTop}>
+            <ModelCoverImage
+              source={item.coverImage}
+              accent={item.accent}
+              fallbackLetter={item.title.slice(0, 1).toUpperCase()}
+              style={styles.thumb}
+            />
+            <View style={styles.listMeta}>
+              <Text style={[styles.listTitle, { color: colors.text }]} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <Text style={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: 12 }}>{item.category}</Text>
+              <Text style={{ color: colors.tint, fontWeight: '800', marginTop: 4 }}>{formatTry(item.price)}</Text>
+            </View>
           </View>
-          <Pressable onPress={() => onDelete(item.id, item.title)} style={[styles.delBtn, { borderColor: '#b91c1c' }]}>
-            <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 12 }}>Sil</Text>
+          <Pressable
+            onPress={() => onDelete(item.id, item.title)}
+            style={[styles.delBtnRow, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
+            <Text style={{ color: '#f87171', fontWeight: '800', fontSize: 14 }}>Sil</Text>
           </Pressable>
         </View>
       )}
       ListEmptyComponent={
-        <Text style={{ color: isDark ? '#64748b' : '#94a3b8', paddingHorizontal: 4, marginTop: 8 }}>
-          Bu telefonda henüz kişisel model yok; yukarıdaki formdan ekleyin.
-        </Text>
+        <View style={{ marginTop: 4 }}>
+          <Text style={{ color: isDark ? '#64748b' : '#94a3b8', paddingHorizontal: 4 }}>
+            Bu telefonda henüz kişisel model yok; yukarıdaki formdan ekleyin.
+            {hideBundledCatalog
+              ? ' Paket vitrini şu an kapalı; Modeller sekmesinde yalnızca buradan eklediklerin listelenir.'
+              : ' Modeller sekmesinde gördüklerin uygulama paketinden gelir; tam sıfırlamak için yukarıdaki turuncu düğmeyi kullanın.'}
+          </Text>
+        </View>
       }
       ListFooterComponent={
-        personalOnlyAsModels.length > 0 ? (
-          <View style={{ marginTop: 16, marginBottom: 8 }}>
-            <Pressable
-              onPress={onClearAllPersonal}
-              style={[styles.btnWide, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
-              <Text style={[styles.btnText, { color: '#dc2626', fontWeight: '800' }]}>
-                Tüm kişisel modelleri sil (baştan başla)
-              </Text>
-            </Pressable>
-            <Text style={[styles.hint, { color: isDark ? '#64748b' : '#94a3b8', marginTop: 8, textAlign: 'center' }]}>
-              Sadece bu telefonda ekledikleriniz silinir; projedeki sabit katalog aynı kalır.
+        <View style={{ marginTop: 18, marginBottom: 8 }}>
+          <Pressable
+            onPress={onClearAllPersonal}
+            style={[styles.btnWide, { borderColor: '#b91c1c', backgroundColor: isDark ? '#1c1010' : '#fff8f8' }]}>
+            <Text style={[styles.btnText, { color: '#dc2626', fontWeight: '800' }]}>
+              {personalOnlyAsModels.length > 0
+                ? 'Tüm kişisel modelleri sil (baştan başla)'
+                : 'Kişisel depoyu / kalan dosyaları temizle'}
             </Text>
-          </View>
-        ) : null
+          </Pressable>
+          <Text style={[styles.hint, { color: isDark ? '#64748b' : '#94a3b8', marginTop: 8, textAlign: 'center' }]}>
+            Sadece bu telefonda eklediklerin silinir; projedeki sabit katalog aynı kalır.
+          </Text>
+        </View>
       }
     />
   );
@@ -555,12 +626,17 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   listRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     borderRadius: 14,
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
+    gap: 10,
+  },
+  listRowTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   thumb: {
@@ -576,10 +652,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
   },
-  delBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  delBtnRow: {
+    alignSelf: 'stretch',
+    paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

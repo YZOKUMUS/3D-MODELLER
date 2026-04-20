@@ -30,7 +30,7 @@ const TAB_FONT = Platform.select({
 });
 
 export default function StoreScreen() {
-  const { mergedCatalog } = usePersonalModels();
+  const { mergedCatalog, hideBundledCatalog } = usePersonalModels();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const [query, setQuery] = useState('');
@@ -259,7 +259,9 @@ export default function StoreScreen() {
               {hasSearchQuery
                 ? 'Bu aramada sonuç yok'
                 : listWithoutSearch.length === 0
-                  ? 'Bu sekmede henüz model yok'
+                  ? hideBundledCatalog && mergedCatalog.length === 0
+                    ? 'Vitrin boş — yalnızca senin eklediklerin'
+                    : 'Bu sekmede henüz model yok'
                   : 'Sonuç yok'}
             </Text>
             <Text style={styles.emptyHint}>
@@ -267,7 +269,9 @@ export default function StoreScreen() {
                 ? 'Aramayı temizleyin veya başka bir sekme seçin.'
                 : hasSearchQuery
                   ? 'Başka kelimeler deneyin veya aramayı sıfırlayın.'
-                  : 'Üstten başka bir kategori veya “Senin İçin”e geçebilirsiniz.'}
+                  : hideBundledCatalog && mergedCatalog.length === 0
+                    ? 'Resim Ekle sekmesinden model ekleyin veya orada paket vitrinini tekrar açın.'
+                    : 'Üstten başka bir kategori veya “Senin İçin”e geçebilirsiniz.'}
             </Text>
             {hasSearchQuery && (
               <Pressable

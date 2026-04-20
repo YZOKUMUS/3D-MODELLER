@@ -14,6 +14,7 @@ import { Platform } from 'react-native';
 import { CATALOG, type CatalogModel, type ModelCategory } from '@/data/catalog';
 
 const STORAGE_KEY = '@model_market_personal_models_v1';
+const HIDE_BUNDLED_KEY = '@model_market_hide_bundled_catalog_v1';
 const COVERS_DIR = 'personal-covers';
 
 export type PersonalStoredRecord = {
@@ -76,6 +77,9 @@ export type PersonalModelsContextValue = {
   deletePersonal: (id: string) => Promise<void>;
   /** Tüm kişisel modelleri ve cihazdaki kopya görselleri siler; paket katalogu (CATALOG) değişmez. */
   clearAllPersonal: () => Promise<void>;
+  /** true iken Modeller listesinde yalnızca bu cihazda eklenen kayıtlar görünür (paket vitrini gizlenir). */
+  hideBundledCatalog: boolean;
+  setHideBundledCatalog: (hide: boolean) => Promise<void>;
   supportsPersonal: boolean;
 };
 
@@ -92,7 +96,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
   const supportsPersonal = Platform.OS === 'ios' || Platform.OS === 'android';
   const [records, setRecords] = useState<PersonalStoredRecord[]>([]);
   const recordsRef = useRef<PersonalStoredRecord[]>([]);
-  const [ready, setReady] = useState(!supportsPersonal);
+  const [ready, setReady] = useState(false);
+  const [hideBundledCatalog, setHideBundledCatalogState] = useState(false);
   const [revision, setRevision] = useState(0);
 
   useEffect(() => {
@@ -100,13 +105,16 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
   }, [records]);
 
   useEffect(() => {
-    if (!supportsPersonal) {
-      setRecords([]);
-      return;
-    }
     let cancelled = false;
     void (async () => {
       try {
+        const hideRaw = await AsyncStorage.getItem(HIDE_BUNDLED_KEY);
+        if (!cancelled && hideRaw === '1') setHideBundledCatalogState(true);
+
+        if (!supportsPersonal) {
+          setRecords([]);
+          return;
+        }
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (cancelled) return;
         if (raw) {
@@ -133,6 +141,20 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
     };
   }, [supportsPersonal]);
 
+  const setHideBundledCatalog = useCallback(async (hide: boolean) => {
+    setHideBundledCatalogState(hide);
+    try {
+      if (hide) {
+        await AsyncStorage.setItem(HIDE_BUNDLED_KEY, '1');
+      } else {
+        await AsyncStorage.removeItem(HIDE_BUNDLED_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+    setRevision((r) => r + 1);
+  }, []);
+
   const baseDir = supportsPersonal ? coversBaseDir() : null;
 
   const personalOnlyAsModels = useMemo(() => {
@@ -141,10 +163,13 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
   }, [records, supportsPersonal, baseDir]);
 
   const mergedCatalog = useMemo(() => {
-    if (!supportsPersonal || !baseDir) return CATALOG;
-    const personal = records.map((p) => storedToRuntime(baseDir, p));
+    const personal: CatalogModel[] =
+      supportsPersonal && baseDir ? records.map((p) => storedToRuntime(baseDir, p)) : [];
+    if (hideBundledCatalog) {
+      return personal;
+    }
     return [...CATALOG, ...personal];
-  }, [records, supportsPersonal, baseDir]);
+  }, [hideBundledCatalog, records, supportsPersonal, baseDir]);
 
   const getModelById = useCallback(
     (id: string) => mergedCatalog.find((m) => m.id === id),
@@ -266,6 +291,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       addFromPicker,
       deletePersonal,
       clearAllPersonal,
+      hideBundledCatalog,
+      setHideBundledCatalog,
       supportsPersonal,
     }),
     [
@@ -277,6 +304,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       addFromPicker,
       deletePersonal,
       clearAllPersonal,
+      hideBundledCatalog,
+      setHideBundledCatalog,
       supportsPersonal,
     ],
   );
