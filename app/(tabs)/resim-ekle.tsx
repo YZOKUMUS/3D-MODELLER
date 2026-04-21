@@ -45,8 +45,6 @@ export default function ResimEkleTabScreen() {
     clearAllPersonal,
     updatePersonal,
     removePersonalImage,
-    hideBundledCatalog,
-    setHideBundledCatalog,
   } = usePersonalModels();
   const { clearAllLikes } = useLikes();
 
@@ -326,7 +324,7 @@ export default function ResimEkleTabScreen() {
   const onFullFreshStart = () => {
     Alert.alert(
       'Tam yeni başlangıç?',
-      'Paket içi örnek vitrin Modeller sekmesinde gizlenir; bu telefona eklediğin kişisel kayıtlar ve kopya görseller silinir; kalpli beğeniler sıfırlanır. Sonra listede yalnızca yeniden eklediklerin görünür. İstersen aşağıdan paket vitrinini tekrar açabilirsin.',
+      'Bu telefona eklediğin kişisel kayıtlar ve kopya görseller silinir; kalpli beğeniler sıfırlanır.',
       [
         { text: 'Vazgeç', style: 'cancel' },
         {
@@ -336,7 +334,6 @@ export default function ResimEkleTabScreen() {
             lightImpact();
             void (async () => {
               await clearAllPersonal();
-              await setHideBundledCatalog(true);
               await clearAllLikes();
             })();
           },
@@ -544,10 +541,7 @@ export default function ResimEkleTabScreen() {
       ListEmptyComponent={
         <View style={{ marginTop: 4 }}>
           <Text style={{ color: isDark ? '#64748b' : '#94a3b8', paddingHorizontal: 4 }}>
-            Bu telefonda henüz kişisel model yok; yukarıdaki formdan ekleyin.
-            {hideBundledCatalog
-              ? ' Paket vitrini şu an kapalı; Modeller sekmesinde yalnızca buradan eklediklerin listelenir. Açmak için en alttaki «Paket vitrinini tekrar göster»e basın.'
-              : ' Modeller sekmesinde gördüklerin uygulama paketinden gelir; tam sıfırlamak için üstteki turuncu düğmeyi kullanın.'}
+            Bu telefonda henüz kişisel model yok; yukarıdan ekleyin.
           </Text>
         </View>
       }
@@ -565,23 +559,6 @@ export default function ResimEkleTabScreen() {
           <Text style={[styles.hint, { color: isDark ? '#64748b' : '#94a3b8', marginTop: 8, textAlign: 'center' }]}>
             Sadece bu telefonda eklediklerin silinir; projedeki sabit katalog aynı kalır.
           </Text>
-          {hideBundledCatalog ? (
-            <Pressable
-              onPress={() => {
-                lightImpact();
-                void setHideBundledCatalog(false);
-              }}
-              style={[
-                styles.btnWide,
-                {
-                  borderColor: colors.tint,
-                  backgroundColor: isDark ? '#16231c' : '#ecfdf5',
-                  marginTop: 20,
-                },
-              ]}>
-              <Text style={[styles.btnText, { color: colors.tint }]}>Paket vitrinini tekrar göster</Text>
-            </Pressable>
-          ) : null}
         </View>
       }
       />
