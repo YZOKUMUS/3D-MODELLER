@@ -169,10 +169,13 @@ export default function ModelDetailScreen() {
               <Text style={styles.priceTag}>{formatTry(model.price)}</Text>
             </View>
 
-            <View style={styles.divider} />
-
-            <Text style={styles.sectionTitle}>Açıklama</Text>
-            <Text style={styles.description}>{model.description}</Text>
+            {model.description?.trim() ? (
+              <>
+                <View style={styles.divider} />
+                <Text style={styles.sectionTitle}>Açıklama</Text>
+                <Text style={styles.description}>{model.description}</Text>
+              </>
+            ) : null}
 
             {similarModels.length > 0 && (
               <>

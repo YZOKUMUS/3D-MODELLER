@@ -231,6 +231,7 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
 
       const title = payload.title.trim();
       const tagline = `${title} · ${payload.formats.join(', ')}`.slice(0, 240);
+      const description = payload.description.trim();
       setRecords((prev) => {
         const rec: PersonalStoredRecord = {
           id,
@@ -239,7 +240,7 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
           price: Math.max(0, Math.floor(payload.price)),
           formats: payload.formats,
           category: payload.category,
-          description: payload.description.trim() || `${title} modeli`,
+          description,
           coverFile,
           galleryFiles,
           accent: ACCENTS[prev.length % ACCENTS.length],
@@ -292,7 +293,7 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
       if (!title) return { ok: false, message: 'Model adı girin.' };
       if (payload.formats.length === 0) return { ok: false, message: 'En az bir dosya formatı seçin.' };
       const tagline = `${title} · ${payload.formats.join(', ')}`.slice(0, 240);
-      const description = payload.description.trim() || `${title} modeli`;
+      const description = payload.description.trim();
       const price = Math.max(0, Math.floor(payload.price));
       setRecords((prev) => {
         const next = prev.map((r) =>
