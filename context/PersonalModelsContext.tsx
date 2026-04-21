@@ -159,7 +159,8 @@ export function PersonalModelsProvider({ children }: { children: React.ReactNode
   const mergedCatalog = useMemo(() => {
     const personal: CatalogModel[] =
       supportsPersonal && baseDir ? records.map((p) => storedToRuntime(baseDir, p)) : [];
-    return [...CATALOG, ...personal];
+    // "Sıfırdan başla" modu: paket içi örnek vitrin modellerini göstermiyoruz.
+    return personal;
   }, [records, supportsPersonal, baseDir]);
 
   const getModelById = useCallback(
