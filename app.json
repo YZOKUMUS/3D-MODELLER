@@ -22,7 +22,17 @@
         "backgroundColor": "#064e3b"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.yzokumus.modelmarket"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2759da18-e781-4f08-980b-71c2f7787840"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
     "web": {
       "bundler": "metro",
@@ -47,8 +57,13 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "baseUrl": "/3D-MODELLER/"
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2759da18-e781-4f08-980b-71c2f7787840"
+      }
     }
   }
 }

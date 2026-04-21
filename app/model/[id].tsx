@@ -138,9 +138,6 @@ export default function ModelDetailScreen() {
                 ))}
               </View>
               <View style={styles.galleryFooter} pointerEvents="box-none">
-                <Text style={styles.galleryHint} numberOfLines={2}>
-                  Fotoğraflar arasında sağa/sola kaydırın.
-                </Text>
                 <View style={styles.imageCounter}>
                   <Text style={styles.imageCounterText}>
                     {slideIndex + 1}/{slides.length}

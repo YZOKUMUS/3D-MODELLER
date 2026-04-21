@@ -2,6 +2,7 @@ import { Image as ExpoImage } from 'expo-image';
 import type { ReactNode } from 'react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Image as RNImage,
   Platform,
   StyleSheet,
@@ -125,12 +126,23 @@ export function ModelCoverImage({
 }: Props) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const fade = useRef(new Animated.Value(0)).current;
 
   const sourceKey = nativeUriKey(source);
   useEffect(() => {
     setLoaded(false);
     setFailed(false);
+    fade.setValue(0);
   }, [sourceKey]);
+
+  const markLoaded = () => {
+    setLoaded(true);
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const placeholder = (
     <View style={[StyleSheet.absoluteFill, styles.fallback, { backgroundColor: accent }]}>
@@ -170,13 +182,15 @@ export function ModelCoverImage({
     return (
       <View style={[styles.clip, style, { backgroundColor: accent }]}>
         {!loaded && placeholder}
-        <RNImage
-          source={source}
-          style={styles.fillCover}
-          resizeMode={contain ? 'contain' : 'cover'}
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
-        />
+        <Animated.View style={[styles.fillCover, { opacity: fade }]}>
+          <RNImage
+            source={source}
+            style={styles.fillCover}
+            resizeMode={contain ? 'contain' : 'cover'}
+            onLoad={markLoaded}
+            onError={() => setFailed(true)}
+          />
+        </Animated.View>
       </View>
     );
   }
@@ -194,14 +208,16 @@ export function ModelCoverImage({
     return (
       <View style={[styles.clip, style, { backgroundColor: accent }]}>
         {!loaded && placeholder}
-        <RNImage
-          source={{ uri }}
-          style={styles.fillCover}
-          resizeMode={contain ? 'contain' : 'cover'}
-          onLoad={() => setLoaded(true)}
-          onLoadEnd={() => setLoaded(true)}
-          onError={() => setFailed(true)}
-        />
+        <Animated.View style={[styles.fillCover, { opacity: fade }]}>
+          <RNImage
+            source={{ uri }}
+            style={styles.fillCover}
+            resizeMode={contain ? 'contain' : 'cover'}
+            onLoad={markLoaded}
+            onLoadEnd={markLoaded}
+            onError={() => setFailed(true)}
+          />
+        </Animated.View>
       </View>
     );
   }
@@ -215,7 +231,7 @@ export function ModelCoverImage({
         contentFit={contain ? 'contain' : 'cover'}
         transition={300}
         cachePolicy="memory-disk"
-        onLoad={() => setLoaded(true)}
+        onLoad={markLoaded}
         onError={() => setFailed(true)}
       />
     </View>

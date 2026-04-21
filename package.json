@@ -10,7 +10,9 @@
     "web": "expo start --web",
     "admin": "node scripts/admin.cjs",
     "add-category": "node scripts/add-category.cjs",
+    "remove-category": "node scripts/remove-category.cjs",
     "sync-covers": "node scripts/sync-covers-and-catalog.cjs",
+    "phone:update": "npx eas-cli update --channel preview --message \"update\"",
     "export:web": "expo export -p web && node scripts/post-web-export.cjs",
     "publish:docs": "npm run export:web && node scripts/copy-dist-to-docs.cjs"
   },
@@ -30,6 +32,7 @@
     "expo-router": "~6.0.23",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.16",
     "expo-web-browser": "~15.0.10",
     "react": "19.1.0",
     "react-dom": "19.1.0",

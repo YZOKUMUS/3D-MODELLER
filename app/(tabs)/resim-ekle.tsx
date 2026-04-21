@@ -28,7 +28,7 @@ import { CATEGORIES, type CatalogModel, type ModelCategory } from '@/data/catalo
 import { formatTry } from '@/lib/format';
 import { lightImpact } from '@/lib/haptics';
 
-const FORMAT_OPTIONS = ['GLB', 'OBJ', 'FBX', 'STL', 'STEP'] as const;
+const DEFAULT_FORMATS = ['GLB'] as const;
 
 export default function ResimEkleTabScreen() {
   const scheme = useColorScheme() ?? 'light';
@@ -52,9 +52,7 @@ export default function ResimEkleTabScreen() {
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ModelCategory>(CATEGORIES[0]);
-  const [formats, setFormats] = useState<string[]>(['GLB']);
   const [coverUri, setCoverUri] = useState<string | null>(null);
   const [galleryUris, setGalleryUris] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -62,9 +60,7 @@ export default function ResimEkleTabScreen() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editPrice, setEditPrice] = useState('');
-  const [editDescription, setEditDescription] = useState('');
   const [editCategory, setEditCategory] = useState<ModelCategory>(CATEGORIES[0]);
-  const [editFormats, setEditFormats] = useState<string[]>(['GLB']);
   const [editSaving, setEditSaving] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
 
@@ -77,34 +73,12 @@ export default function ResimEkleTabScreen() {
   const cardBorder = isDark ? '#2d2d35' : '#e2e8f0';
   const listPadBottom = tabBarHeight + insets.bottom + 20;
 
-  const toggleFormat = (f: string) => {
-    lightImpact();
-    setFormats((prev) => {
-      const has = prev.includes(f);
-      if (has && prev.length === 1) return prev;
-      if (has) return prev.filter((x) => x !== f);
-      return [...prev, f];
-    });
-  };
-
-  const toggleEditFormat = (f: string) => {
-    lightImpact();
-    setEditFormats((prev) => {
-      const has = prev.includes(f);
-      if (has && prev.length === 1) return prev;
-      if (has) return prev.filter((x) => x !== f);
-      return [...prev, f];
-    });
-  };
-
   const openEdit = useCallback((item: CatalogModel) => {
     lightImpact();
     setEditingId(item.id);
     setEditTitle(item.title);
     setEditPrice(String(item.price));
-    setEditDescription(item.description ?? '');
     setEditCategory(item.category);
-    setEditFormats(item.formats.length > 0 ? [...item.formats] : ['GLB']);
   }, []);
 
   const closeEdit = useCallback(() => {
@@ -176,18 +150,17 @@ export default function ResimEkleTabScreen() {
       Alert.alert('Eksik', 'Geçerli bir fiyat (tam sayı) girin.');
       return;
     }
-    if (editFormats.length === 0) {
-      Alert.alert('Eksik', 'En az bir dosya formatı seçin.');
-      return;
-    }
+    const existingFormats =
+      editingModel?.formats && editingModel.formats.length > 0 ? editingModel.formats : [...DEFAULT_FORMATS];
+    const existingDesc = (editingModel?.description ?? '').trim();
     setEditSaving(true);
     try {
       const result = await updatePersonal(editingId, {
         title: t,
         price: p,
         category: editCategory,
-        description: editDescription.trim(),
-        formats: editFormats,
+        description: existingDesc,
+        formats: existingFormats,
       });
       if (result.ok) {
         lightImpact();
@@ -199,7 +172,7 @@ export default function ResimEkleTabScreen() {
     } finally {
       setEditSaving(false);
     }
-  }, [editingId, editTitle, editPrice, editCategory, editDescription, editFormats, updatePersonal]);
+  }, [editingId, editTitle, editPrice, editCategory, updatePersonal, editingModel]);
 
   const pickCoverCamera = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -290,18 +263,14 @@ export default function ResimEkleTabScreen() {
       Alert.alert('Eksik', 'Kapak için kamera veya galeriden foto seçin.');
       return;
     }
-    if (formats.length === 0) {
-      Alert.alert('Eksik', 'En az bir dosya formatı seçin.');
-      return;
-    }
     setSaving(true);
     try {
       const result = await addFromPicker({
         title: t,
         price: p,
         category,
-        description: description.trim(),
-        formats,
+        description: '',
+        formats: [...DEFAULT_FORMATS],
         coverUri,
         galleryUris,
       });
@@ -309,9 +278,7 @@ export default function ResimEkleTabScreen() {
         lightImpact();
         setTitle('');
         setPrice('');
-        setDescription('');
         setCategory(CATEGORIES[0]);
-        setFormats(['GLB']);
         setCoverUri(null);
         setGalleryUris([]);
         Alert.alert('Tamam', 'Model vitrine eklendi (bu telefonda saklanır).');
@@ -321,7 +288,7 @@ export default function ResimEkleTabScreen() {
     } finally {
       setSaving(false);
     }
-  }, [supportsPersonal, title, price, coverUri, formats, category, description, galleryUris, addFromPicker]);
+  }, [supportsPersonal, title, price, coverUri, category, galleryUris, addFromPicker]);
 
   const onDelete = (id: string, name: string) => {
     Alert.alert('Silinsin mi?', name, [
@@ -411,21 +378,11 @@ export default function ResimEkleTabScreen() {
       ListHeaderComponent={
         <View style={{ gap: 14, paddingBottom: 8 }}>
           <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
-            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Bu sekmedeki liste</Text>
-            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 0 }]}>
-              Sadece bu telefonda &quot;Modeli vitrine ekle&quot; ile kaydettiğin modeller burada görünür. Modeller
-              sekmesindeki hazır vitrin burada listelenmez. Kayıtların varsa aşağı kaydır; her satırda &quot;Sil&quot;
-              vardır.
-            </Text>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Kişisel modeller</Text>
           </View>
 
           <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
-            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Modeller sekmesini sıfırla</Text>
-            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-              Telefonda çekip kaydetmediklerin (uygulama paketindeki örnek vitrin) Modeller listesinde gizlenir; kişisel
-              kayıtlar ve beğeniler temizlenir. Sonra yalnızca buradan eklediklerin görünür. Paket vitrinini geri
-              açmak için ekranın en altındaki düğmeyi kullanın.
-            </Text>
+            <Text style={[styles.blockTitle, { color: colors.text, fontSize: 15 }]}>Sıfırla</Text>
             <Pressable
               onPress={onFullFreshStart}
               style={[styles.btnWide, { borderColor: '#b45309', backgroundColor: isDark ? '#2a1f0a' : '#fffbeb' }]}>
@@ -435,22 +392,11 @@ export default function ResimEkleTabScreen() {
 
           <View style={[styles.block, { backgroundColor: cardBg, borderColor: cardBorder }]}>
             <Text style={[styles.blockTitle, { color: colors.text }]}>Yeni model</Text>
-            <Text style={[styles.para, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-              Birden fazla fotoğrafı tek vitrin kaydında tutmak için aşağıdan galeride hepsini seç: ilki kapak,
-              diğerleri model detayında sağa/sola kaydırarak görünür. Ayrı ayrı model oluşturmaz.
-            </Text>
-
             <Pressable
               onPress={() => void pickAllPhotosForOneModel()}
               style={[styles.saveBtn, { backgroundColor: colors.tint, marginBottom: 4 }]}>
               <Text style={styles.saveBtnText}>Tek model — galeriden tüm fotoğrafları seç</Text>
             </Pressable>
-            <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 12 }]}>
-              Seçim sırası önemli: ilk foto liste kapaklarında, sonrakiler detay galerisinde 2., 3., … sırayla çıkar.
-              Tek foto seçersen sadece kapak olur.
-            </Text>
-
-            <Text style={[styles.label, { color: colors.text }]}>Kapak fotoğrafı (ayrı ayrı)</Text>
             <View style={styles.row}>
               <Pressable
                 onPress={pickCoverCamera}
@@ -472,10 +418,6 @@ export default function ResimEkleTabScreen() {
               />
             ) : null}
 
-            <Text style={[styles.label, { color: colors.text, marginTop: 12 }]}>Ek fotoğraflar (isteğe bağlı)</Text>
-            <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b' }]}>
-              Galeride birden fazla foto seç. Aynı düğmeye tekrar basınca yeni seçimler eklenir (en fazla 12).
-            </Text>
             <Pressable
               onPress={pickGalleryExtras}
               style={[styles.btnWide, { borderColor: cardBorder, backgroundColor: isDark ? '#26262c' : '#fff' }]}>
@@ -494,11 +436,10 @@ export default function ResimEkleTabScreen() {
               </Pressable>
             ) : null}
 
-            <Text style={[styles.label, { color: colors.text }]}>Model adı</Text>
             <TextInput
               value={title}
               onChangeText={setTitle}
-              placeholder="Örn. Kalem tutacağı"
+              placeholder="Model adı"
               placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
               style={[
                 styles.input,
@@ -506,7 +447,6 @@ export default function ResimEkleTabScreen() {
               ]}
             />
 
-            <Text style={[styles.label, { color: colors.text }]}>Fiyat (TL)</Text>
             <TextInput
               value={price}
               onChangeText={setPrice}
@@ -519,7 +459,6 @@ export default function ResimEkleTabScreen() {
               ]}
             />
 
-            <Text style={[styles.label, { color: colors.text }]}>Kategori</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
               {CATEGORIES.map((c) => {
                 const on = c === category;
@@ -542,41 +481,6 @@ export default function ResimEkleTabScreen() {
                 );
               })}
             </ScrollView>
-
-            <Text style={[styles.label, { color: colors.text }]}>Formatlar</Text>
-            <View style={styles.wrapRow}>
-              {FORMAT_OPTIONS.map((f) => {
-                const on = formats.includes(f);
-                return (
-                  <Pressable
-                    key={f}
-                    onPress={() => toggleFormat(f)}
-                    style={[
-                      styles.chip,
-                      {
-                        borderColor: on ? colors.tint : cardBorder,
-                        backgroundColor: on ? (isDark ? '#1e3a2f' : '#ecfdf5') : isDark ? '#26262c' : '#fff',
-                      },
-                    ]}>
-                    <Text style={{ color: on ? colors.tint : colors.text, fontWeight: '700', fontSize: 13 }}>{f}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <Text style={[styles.label, { color: colors.text }]}>Açıklama (isteğe bağlı)</Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Kısa not"
-              multiline
-              placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
-              style={[
-                styles.input,
-                styles.inputTall,
-                { color: colors.text, borderColor: cardBorder, backgroundColor: isDark ? '#111' : '#fff' },
-              ]}
-            />
 
             <Pressable
               onPress={() => void onSave()}
@@ -708,21 +612,12 @@ export default function ResimEkleTabScreen() {
                   },
                 ]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>Modeli düzenle</Text>
-            <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 10 }]}>
-              Metin alanlarını değiştir; aşağıdan tek tek görsel de kaldırabilirsin. Yeni foto eklemek şimdilik ana
-              ekrandan yeni model oluşturmayı gerektirir.
-            </Text>
             <ScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 12 }}>
               {editingModel ? (
                 <View style={{ marginBottom: 14 }}>
-                  <Text style={[styles.label, { color: colors.text }]}>Görseller</Text>
-                  <Text style={[styles.hint, { color: isDark ? '#94a3b8' : '#64748b', marginBottom: 8 }]}>
-                    Galeriden birini kaldırırsan liste buna göre güncellenir. Kapak kaldırırsan sıradaki galeri görseli
-                    kapak olur (en az bir galeri fotoğrafı gerekir).
-                  </Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -772,7 +667,6 @@ export default function ResimEkleTabScreen() {
                 </View>
               ) : null}
 
-              <Text style={[styles.label, { color: colors.text }]}>Model adı</Text>
               <TextInput
                 value={editTitle}
                 onChangeText={setEditTitle}
@@ -784,7 +678,6 @@ export default function ResimEkleTabScreen() {
                 ]}
               />
 
-              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Fiyat (TL)</Text>
               <TextInput
                 value={editPrice}
                 onChangeText={setEditPrice}
@@ -797,7 +690,6 @@ export default function ResimEkleTabScreen() {
                 ]}
               />
 
-              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Kategori</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
                 {CATEGORIES.map((c) => {
                   const on = c === editCategory;
@@ -821,40 +713,6 @@ export default function ResimEkleTabScreen() {
                 })}
               </ScrollView>
 
-              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Formatlar</Text>
-              <View style={styles.wrapRow}>
-                {FORMAT_OPTIONS.map((f) => {
-                  const on = editFormats.includes(f);
-                  return (
-                    <Pressable
-                      key={f}
-                      onPress={() => toggleEditFormat(f)}
-                      style={[
-                        styles.chip,
-                        {
-                          borderColor: on ? colors.tint : cardBorder,
-                          backgroundColor: on ? (isDark ? '#1e3a2f' : '#ecfdf5') : isDark ? '#26262c' : '#fff',
-                        },
-                      ]}>
-                      <Text style={{ color: on ? colors.tint : colors.text, fontWeight: '700', fontSize: 13 }}>{f}</Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-
-              <Text style={[styles.label, { color: colors.text, marginTop: 10 }]}>Açıklama (isteğe bağlı)</Text>
-              <TextInput
-                value={editDescription}
-                onChangeText={setEditDescription}
-                placeholder="Kısa not"
-                multiline
-                placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
-                style={[
-                  styles.input,
-                  styles.inputTall,
-                  { color: colors.text, borderColor: cardBorder, backgroundColor: isDark ? '#111' : '#fff' },
-                ]}
-              />
             </ScrollView>
 
             <View style={styles.modalActions}>
